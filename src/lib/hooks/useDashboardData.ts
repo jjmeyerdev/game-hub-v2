@@ -1,0 +1,88 @@
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { getUserGames, getNowPlayingGames, getUserStats, type UserGame } from '@/app/actions/games';
+
+interface DashboardUser {
+  email: string;
+  name: string;
+  greeting: string;
+}
+
+export function useDashboardData() {
+  const [user, setUser] = useState<DashboardUser>({
+    email: '',
+    name: 'User',
+    greeting: '',
+  });
+  const [userGames, setUserGames] = useState<UserGame[]>([]);
+  const [nowPlaying, setNowPlaying] = useState<UserGame[]>([]);
+  const [stats, setStats] = useState({
+    totalGames: 0,
+    hoursPlayed: 0,
+    achievements: 0,
+    completionRate: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      if (authUser) {
+        const email = authUser.email || '';
+        const emailName = email.split('@')[0] || 'User';
+        const name =
+          authUser.user_metadata?.full_name ||
+          authUser.user_metadata?.name ||
+          emailName.charAt(0).toUpperCase() + emailName.slice(1);
+
+        // Set time-based greeting
+        const hour = new Date().getHours();
+        let greeting = 'Good morning';
+        if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
+        else if (hour >= 18) greeting = 'Good evening';
+
+        setUser({ email, name, greeting });
+      }
+
+      // Fetch real data
+      const [gamesResult, nowPlayingResult, statsResult] = await Promise.all([
+        getUserGames(),
+        getNowPlayingGames(),
+        getUserStats(),
+      ]);
+
+      if (gamesResult.error) throw new Error(typeof gamesResult.error === 'string' ? gamesResult.error : gamesResult.error.message);
+      if (nowPlayingResult.error) throw new Error(typeof nowPlayingResult.error === 'string' ? nowPlayingResult.error : nowPlayingResult.error.message);
+
+      setUserGames(gamesResult.data || []);
+      setNowPlaying(nowPlayingResult.data || []);
+      setStats(statsResult);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  return {
+    user,
+    userGames,
+    nowPlaying,
+    stats,
+    loading,
+    error,
+    refreshData: loadData,
+  };
+}
