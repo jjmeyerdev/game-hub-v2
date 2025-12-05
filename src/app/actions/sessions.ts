@@ -134,13 +134,18 @@ async function startGameSessionBySteamAppId(
   }
 
   // Update user_games status to 'playing' and last_played_at
-  await supabase
+  const { error: updateError } = await supabase
     .from('user_games')
     .update({
       status: 'playing',
       last_played_at: new Date().toISOString(),
     })
     .eq('id', userGame.id);
+
+  if (updateError) {
+    console.error('Failed to update user_games status:', updateError);
+    // Session was created but status update failed - non-critical error
+  }
 
   return session;
 }
@@ -165,7 +170,7 @@ async function endGameSession(sessionId: string): Promise<void> {
   const durationMinutes = Math.floor((now.getTime() - started.getTime()) / (1000 * 60));
 
   // Update session
-  await supabase
+  const { error: sessionUpdateError } = await supabase
     .from('game_sessions')
     .update({
       ended_at: now.toISOString(),
@@ -174,16 +179,26 @@ async function endGameSession(sessionId: string): Promise<void> {
     })
     .eq('id', sessionId);
 
+  if (sessionUpdateError) {
+    console.error('Failed to end session:', sessionUpdateError);
+    return;
+  }
+
   // Update user_games: total playtime and reset status from 'playing' to 'backlog'
-  const { data: userGame } = await supabase
+  const { data: userGame, error: userGameFetchError } = await supabase
     .from('user_games')
     .select('playtime_hours, status')
     .eq('id', session.user_game_id)
     .single();
 
+  if (userGameFetchError) {
+    console.error('Failed to fetch user_game for playtime update:', userGameFetchError);
+    return;
+  }
+
   if (userGame) {
     const newPlaytimeHours = (userGame.playtime_hours || 0) + durationMinutes / 60;
-    await supabase
+    const { error: playtimeUpdateError } = await supabase
       .from('user_games')
       .update({
         playtime_hours: newPlaytimeHours,
@@ -191,6 +206,10 @@ async function endGameSession(sessionId: string): Promise<void> {
         status: userGame.status === 'playing' ? 'backlog' : userGame.status,
       })
       .eq('id', session.user_game_id);
+
+    if (playtimeUpdateError) {
+      console.error('Failed to update playtime:', playtimeUpdateError);
+    }
   }
 }
 

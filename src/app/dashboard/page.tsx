@@ -13,8 +13,7 @@ import {
 } from '@/components/dashboard';
 import { ActiveSessionWidget } from '@/components/dashboard/ActiveSessionWidget';
 import {
-  AddGameModal,
-  EditGameModal,
+  GameFormModal,
   DeleteConfirmModal,
   SteamImportModal,
 } from '@/components/modals';
@@ -202,20 +201,22 @@ export default function DashboardPage() {
         </div>
 
       {/* Add Game Modal */}
-      <AddGameModal
+      <GameFormModal
         isOpen={showAddGameModal}
         onClose={() => setShowAddGameModal(false)}
         onSuccess={handleGameAdded}
+        mode="add"
       />
 
       {/* Edit Game Modal */}
-      <EditGameModal
+      <GameFormModal
         isOpen={showEditGameModal}
         onClose={() => {
           setShowEditGameModal(false);
           setSelectedGame(null);
         }}
         onSuccess={handleGameAdded}
+        mode="edit"
         userGame={selectedGame}
       />
 

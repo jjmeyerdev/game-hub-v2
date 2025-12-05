@@ -113,3 +113,11 @@ export function isPcPlatform(platform: string): boolean {
     platform === pcPlatform || platform.startsWith(pcPlatform)
   );
 }
+
+// Library filter constants
+export const LIBRARY_FILTER_PLATFORMS = ['All', 'Steam', 'PlayStation', 'Xbox', 'Windows', 'Epic', 'EA App', 'Battle.net', 'Physical'] as const;
+
+export type SortOption = 'title-asc' | 'title-desc' | 'recent' | 'completion-asc' | 'completion-desc' | 'playtime-asc' | 'playtime-desc' | 'priority-high' | 'priority-low';
+
+// Priority order mapping for sorting
+export const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };

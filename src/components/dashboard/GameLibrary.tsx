@@ -1,19 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { Library, Search, Filter, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, ChevronDown, Gamepad2, X, ShieldOff, Shield } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Library, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, X, ShieldOff, Shield } from 'lucide-react';
 import type { UserGame } from '@/app/actions/games';
 import { GameCard } from './cards/GameCard';
+import { filterAndSortGames } from '@/lib/utils';
+import { LIBRARY_FILTER_PLATFORMS, type SortOption } from '@/lib/constants/platforms';
 
-const PLATFORMS = ['All', 'Steam', 'PlayStation', 'Xbox', 'Windows', 'Epic', 'EA App', 'Battle.net', 'Physical'];
 const PRIORITY_OPTIONS = [
   { id: 'all', label: 'All Priorities', icon: null, color: '', activeClass: 'bg-cyan-500 text-void' },
   { id: 'high', label: 'High', icon: Flame, color: 'text-red-400', activeClass: 'bg-red-500/20 text-red-400 ring-1 ring-red-500/50' },
   { id: 'medium', label: 'Medium', icon: Clock, color: 'text-yellow-400', activeClass: 'bg-yellow-500/20 text-yellow-400 ring-1 ring-yellow-500/50' },
   { id: 'low', label: 'Low', icon: Coffee, color: 'text-blue-400', activeClass: 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50' },
 ] as const;
-
-type SortOption = 'title-asc' | 'title-desc' | 'recent' | 'completion-asc' | 'completion-desc' | 'playtime-asc' | 'playtime-desc' | 'priority-high' | 'priority-low';
 
 interface GameLibraryProps {
   userGames: UserGame[];
@@ -40,72 +39,21 @@ export function GameLibrary({
   const [sortBy, setSortBy] = useState<SortOption>('title-asc');
   const [censorHidden, setCensorHidden] = useState(true);
 
-  // Filter games
-  const filteredGames = userGames.filter((userGame) => {
-    // Hidden filter - when showHiddenGames is true, show ONLY hidden games
-    // When false, show only non-hidden games
-    if (showHiddenGames) {
-      if (!userGame.hidden) return false;
-    } else {
-      if (userGame.hidden) return false;
-    }
-
-    // Platform filter - smart matching
-    if (selectedPlatform !== 'All') {
-      const gamePlatform = userGame.platform.toLowerCase();
-      const filterPlatform = selectedPlatform.toLowerCase();
-
-      // Special case: PC should match exactly
-      if (filterPlatform === 'pc') {
-        if (gamePlatform !== 'pc') {
-          return false;
-        }
-      } else {
-        // For other platforms, check if game platform contains the filter
-        if (!gamePlatform.includes(filterPlatform)) {
-          return false;
-        }
-      }
-    }
-    // Priority filter
-    if (selectedPriority !== 'all' && userGame.priority !== selectedPriority) {
-      return false;
-    }
-    // Search filter
-    if (searchQuery && !userGame.game?.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
-
-  // Priority order mapping for sorting
-  const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
-
-  // Sort games
-  const sortedGames = [...filteredGames].sort((a, b) => {
-    switch (sortBy) {
-      case 'title-asc':
-        return (a.game?.title || '').localeCompare(b.game?.title || '');
-      case 'title-desc':
-        return (b.game?.title || '').localeCompare(a.game?.title || '');
-      case 'recent':
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      case 'completion-desc':
-        return b.completion_percentage - a.completion_percentage;
-      case 'completion-asc':
-        return a.completion_percentage - b.completion_percentage;
-      case 'playtime-desc':
-        return b.playtime_hours - a.playtime_hours;
-      case 'playtime-asc':
-        return a.playtime_hours - b.playtime_hours;
-      case 'priority-high':
-        return (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
-      case 'priority-low':
-        return (priorityOrder[b.priority] ?? 1) - (priorityOrder[a.priority] ?? 1);
-      default:
-        return 0;
-    }
-  });
+  // Filter and sort games using utility functions with memoization
+  const sortedGames = useMemo(
+    () =>
+      filterAndSortGames(
+        userGames,
+        {
+          showHiddenGames,
+          selectedPlatform,
+          selectedPriority,
+          searchQuery,
+        },
+        sortBy
+      ),
+    [userGames, showHiddenGames, selectedPlatform, selectedPriority, searchQuery, sortBy]
+  );
 
   // Check if any filters are active
   const hasActiveFilters = selectedPlatform !== 'All' || selectedPriority !== 'all';
@@ -211,7 +159,7 @@ export function GameLibrary({
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {PLATFORMS.map((platform) => (
+              {LIBRARY_FILTER_PLATFORMS.map((platform) => (
                 <button
                   key={platform}
                   onClick={() => setSelectedPlatform(platform)}

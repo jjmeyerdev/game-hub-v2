@@ -23,7 +23,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layouts';
-import { EditGameModal, DeleteConfirmModal } from '@/components/modals';
+import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
 import { isPcPlatform } from '@/lib/constants/platforms';
 import type { UserGame } from '@/app/actions/games';
 
@@ -701,10 +701,11 @@ export default function GameDetailPage() {
       </div>
 
       {/* Modals */}
-      <EditGameModal
+      <GameFormModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSuccess={handleSuccess}
+        mode="edit"
         userGame={game}
       />
 
