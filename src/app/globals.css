@@ -237,3 +237,40 @@ body::before {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Game Card Animations */
+@keyframes cardReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardScanline {
+  0% {
+    top: -2px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.animate-card-scanline {
+  animation: cardScanline 2s linear infinite;
+}

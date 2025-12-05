@@ -8,7 +8,7 @@ interface DashboardUser {
   greeting: string;
 }
 
-export function useDashboardData() {
+export function useDashboardData(includeHidden = false) {
   const [user, setUser] = useState<DashboardUser>({
     email: '',
     name: 'User',
@@ -54,7 +54,7 @@ export function useDashboardData() {
 
       // Fetch real data
       const [gamesResult, nowPlayingResult, statsResult] = await Promise.all([
-        getUserGames(),
+        getUserGames(includeHidden),
         getNowPlayingGames(),
         getUserStats(),
       ]);
@@ -70,7 +70,7 @@ export function useDashboardData() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [includeHidden]);
 
   useEffect(() => {
     loadData();

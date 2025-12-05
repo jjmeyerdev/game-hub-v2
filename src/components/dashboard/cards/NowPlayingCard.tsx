@@ -1,4 +1,5 @@
 import { Library, Edit3, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/app/actions/games';
 
 interface NowPlayingCardProps {
@@ -8,6 +9,8 @@ interface NowPlayingCardProps {
 }
 
 export function NowPlayingCard({ game, onEdit, onDelete }: NowPlayingCardProps) {
+  const router = useRouter();
+  
   const formatLastPlayed = (date: string | null) => {
     if (!date) return 'Never';
     const now = new Date();
@@ -23,8 +26,15 @@ export function NowPlayingCard({ game, onEdit, onDelete }: NowPlayingCardProps) 
     return played.toLocaleDateString();
   };
 
+  const handleClick = () => {
+    router.push(`/game/${game.id}`);
+  };
+
   return (
-    <div className="flex-shrink-0 w-72 bg-deep border border-steel rounded-xl overflow-hidden hover:border-cyan-500 transition-all group">
+    <div 
+      className="flex-shrink-0 w-72 bg-deep border border-steel rounded-xl overflow-hidden hover:border-cyan-500 transition-all group cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="aspect-video bg-gradient-to-br from-slate via-steel to-deep relative">
         {game.game?.cover_url ? (
           <img
@@ -42,7 +52,7 @@ export function NowPlayingCard({ game, onEdit, onDelete }: NowPlayingCardProps) 
         <div className={`absolute inset-0 ${game.game?.cover_url ? 'hidden' : 'flex'} items-center justify-center`}>
           <Library className="w-16 h-16 text-gray-700 opacity-30" />
         </div>
-        <div className="absolute top-2 right-2 px-2 py-1 bg-cyan-500 text-void text-xs font-bold uppercase rounded">
+        <div className="absolute top-2 left-2 px-2 py-1 bg-cyan-500 text-void text-xs font-bold uppercase rounded z-10">
           {game.platform}
         </div>
 

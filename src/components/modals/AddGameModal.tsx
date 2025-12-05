@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Gamepad2, Loader2, CheckCircle, Sparkles, Search, Zap } from 'lucide-react';
+import { Gamepad2, Loader2, CheckCircle, Sparkles, Search, Zap, Flame, Clock, Coffee } from 'lucide-react';
 import { addGameToLibrary } from '@/app/actions/games';
 import { BaseModal } from '@/components/modals';
 import { useIGDBSearch } from '@/lib/hooks';
-import { PLATFORMS, CONSOLE_OPTIONS, STATUSES } from '@/lib/constants';
+import { PLATFORMS, CONSOLE_OPTIONS, STATUSES, PRIORITIES } from '@/lib/constants';
 import type { IGDBGame } from '@/lib/types';
 
 interface AddGameModalProps {
@@ -17,7 +17,8 @@ interface AddGameModalProps {
 export default function AddGameModal({ isOpen, onClose, onSuccess }: AddGameModalProps) {
   const [selectedPlatform, setSelectedPlatform] = useState('Steam');
   const [selectedConsole, setSelectedConsole] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState('playing');
+  const [selectedStatus, setSelectedStatus] = useState('unplayed');
+  const [selectedPriority, setSelectedPriority] = useState('medium');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -48,7 +49,8 @@ export default function AddGameModal({ isOpen, onClose, onSuccess }: AddGameModa
         setError('');
         setSelectedPlatform('Steam');
         setSelectedConsole('');
-        setSelectedStatus('playing');
+        setSelectedStatus('unplayed');
+        setSelectedPriority('medium');
         clearResults();
         formRef.current?.reset();
       }, 300);
@@ -120,6 +122,7 @@ export default function AddGameModal({ isOpen, onClose, onSuccess }: AddGameModa
 
     formData.set('platform', platformValue);
     formData.set('status', selectedStatus);
+    formData.set('priority', selectedPriority);
 
     const result = await addGameToLibrary(formData);
 
@@ -144,6 +147,7 @@ export default function AddGameModal({ isOpen, onClose, onSuccess }: AddGameModa
       icon={<Gamepad2 className="w-6 h-6 text-void" strokeWidth={2.5} />}
       maxWidth="2xl"
     >
+      <div className="max-h-[85vh] overflow-y-auto modal-scrollbar">
       {/* Success State */}
       {success && (
         <div
@@ -391,6 +395,51 @@ export default function AddGameModal({ isOpen, onClose, onSuccess }: AddGameModa
           </div>
         </div>
 
+        {/* Priority Selector */}
+        <div className="space-y-3">
+          <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">
+            Backlog Priority
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedPriority('high')}
+              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                selectedPriority === 'high'
+                  ? 'bg-red-500 text-white shadow-lg scale-105'
+                  : 'bg-deep border border-steel text-gray-400 hover:border-red-500/50 hover:text-white'
+              }`}
+            >
+              <div className="text-lg mb-1"><Flame className="w-5 h-5 mx-auto" /></div>
+              High
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedPriority('medium')}
+              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                selectedPriority === 'medium'
+                  ? 'bg-yellow-500 text-void shadow-lg scale-105'
+                  : 'bg-deep border border-steel text-gray-400 hover:border-yellow-500/50 hover:text-white'
+              }`}
+            >
+              <div className="text-lg mb-1"><Clock className="w-5 h-5 mx-auto" /></div>
+              Medium
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedPriority('low')}
+              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                selectedPriority === 'low'
+                  ? 'bg-blue-500 text-white shadow-lg scale-105'
+                  : 'bg-deep border border-steel text-gray-400 hover:border-blue-500/50 hover:text-white'
+              }`}
+            >
+              <div className="text-lg mb-1"><Coffee className="w-5 h-5 mx-auto" /></div>
+              Low
+            </button>
+          </div>
+        </div>
+
         {/* Optional Fields - Collapsed by default */}
         <details className="group">
           <summary className="cursor-pointer text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2 hover:text-purple-300 transition-colors">
@@ -466,8 +515,28 @@ export default function AddGameModal({ isOpen, onClose, onSuccess }: AddGameModa
           </button>
         </div>
       </form>
+      </div>
 
       <style jsx global>{`
+        .modal-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .modal-scrollbar::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.5);
+          border-radius: 4px;
+        }
+
+        .modal-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #06b6d4 0%, #a855f7 100%);
+          border-radius: 4px;
+          transition: background 0.2s;
+        }
+
+        .modal-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #0891b2 0%, #9333ea 100%);
+        }
+
         @keyframes successPop {
           0% {
             transform: scale(0);

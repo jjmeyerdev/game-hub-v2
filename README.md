@@ -50,6 +50,13 @@ All your games, achievements, and playtime in one beautiful dashboard.
   - Bulk import with IGDB enrichment
   - Update existing games with latest IGDB data
 
+- **Steam Integration** ⭐ NEW
+  - Connect Steam account via OpenID or manual Steam ID
+  - Automatically import entire Steam library
+  - Sync playtime and achievements
+  - Real-time library updates
+  - Steam badges on game cards
+
 ### 🎨 Design
 - Modern, cyberpunk-inspired UI with cyan/purple gradients
 - Smooth animations and transitions
@@ -125,6 +132,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser! 🎉
 ### Setup Guides
 - **[Quick Start Guide](QUICK_START.md)** - Get up and running in 5 minutes
 - **[IGDB Setup](IGDB_SETUP.md)** - Configure IGDB API access
+- **[Steam Integration](STEAM_INTEGRATION.md)** - Connect and sync your Steam library ⭐ NEW
 - **[Database Schema](supabase/README.md)** - Understanding the data structure
 
 ### Import & Management
@@ -159,6 +167,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser! 🎉
 
 ### APIs
 - **[IGDB API](https://api.igdb.com/)** - Game database and metadata
+- **[Steam Web API](https://steamcommunity.com/dev)** - Steam library and player data
 - **Next.js API Routes** - Server-side endpoints
 
 ### Development Tools

@@ -188,11 +188,9 @@ export function DashboardSidebar({
             {/* Menu items */}
             <div className="py-2">
               {/* Settings */}
-              <button
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  // Navigate to settings or handle settings
-                }}
+              <Link
+                href="/settings"
+                onClick={() => setUserMenuOpen(false)}
                 className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-cyan-500/10 transition-all duration-200 group"
               >
                 <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 group-hover:border-cyan-500/40 transition-all">
@@ -201,7 +199,7 @@ export function DashboardSidebar({
                 <span className="text-sm font-semibold text-gray-300 group-hover:text-white transition-colors">
                   Settings
                 </span>
-              </button>
+              </Link>
 
               {/* Divider */}
               <div className="h-px bg-gradient-to-r from-transparent via-steel to-transparent my-2" />

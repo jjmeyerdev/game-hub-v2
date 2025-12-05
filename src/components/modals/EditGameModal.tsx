@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Gamepad2, Loader2, CheckCircle, Search, Zap, Edit3 } from 'lucide-react';
-import { editUserGame } from '@/app/actions/games';
+import { Gamepad2, Loader2, CheckCircle, Search, Zap, Edit3, EyeOff, Flame, Clock, Coffee } from 'lucide-react';
+import { editUserGame, updateGameCoverFromIGDB } from '@/app/actions/games';
 import type { UserGame } from '@/app/actions/games';
 import { BaseModal } from '@/components/modals';
 import { useIGDBSearch } from '@/lib/hooks';
-import { PLATFORMS, CONSOLE_OPTIONS, STATUSES } from '@/lib/constants';
+import { PLATFORMS, CONSOLE_OPTIONS, STATUSES, PRIORITIES } from '@/lib/constants';
 import type { IGDBGame } from '@/lib/types';
 
 interface EditGameModalProps {
@@ -25,9 +25,13 @@ export default function EditGameModal({
   const [selectedPlatform, setSelectedPlatform] = useState('Steam');
   const [selectedConsole, setSelectedConsole] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState('playing');
+  const [selectedPriority, setSelectedPriority] = useState('medium');
+  const [isHidden, setIsHidden] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [updatingCover, setUpdatingCover] = useState(false);
+  const [coverUpdateMessage, setCoverUpdateMessage] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   // Use IGDB search hook
@@ -58,6 +62,8 @@ export default function EditGameModal({
       setSelectedPlatform(basePlatform);
       setSelectedConsole(console);
       setSelectedStatus(userGame.status);
+      setSelectedPriority(userGame.priority || 'medium');
+      setIsHidden(userGame.hidden ?? false);
       clearResults();
     }
   }, [isOpen, userGame, clearResults]);
@@ -68,6 +74,7 @@ export default function EditGameModal({
       setTimeout(() => {
         setSuccess(false);
         setError('');
+        setCoverUpdateMessage('');
         clearResults();
         formRef.current?.reset();
       }, 300);
@@ -141,6 +148,8 @@ export default function EditGameModal({
 
     formData.set('platform', platformValue);
     formData.set('status', selectedStatus);
+    formData.set('priority', selectedPriority);
+    formData.set('hidden', isHidden.toString());
 
     const result = await editUserGame(formData);
 
@@ -157,6 +166,41 @@ export default function EditGameModal({
     }
   };
 
+  const handleUpdateCoverFromIGDB = async () => {
+    if (!userGame?.game) {
+      return;
+    }
+
+    setUpdatingCover(true);
+    setCoverUpdateMessage('');
+    setError('');
+
+    try {
+      const result = await updateGameCoverFromIGDB(userGame.game_id, userGame.game.title, userGame.platform);
+
+      if (result.error) {
+        setError(result.error);
+      } else if (result.success) {
+        setCoverUpdateMessage(result.message || 'Cover updated!');
+        // Update the cover URL input field
+        if (formRef.current && result.coverUrl) {
+          const coverInput = formRef.current.querySelector('input[name="coverUrl"]') as HTMLInputElement;
+          if (coverInput) {
+            coverInput.value = result.coverUrl;
+          }
+        }
+        // Refresh after a delay
+        setTimeout(() => {
+          onSuccess();
+        }, 1500);
+      }
+    } catch {
+      setError('Failed to update cover art');
+    }
+
+    setUpdatingCover(false);
+  };
+
   if (!userGame) return null;
 
   return (
@@ -167,6 +211,7 @@ export default function EditGameModal({
       icon={<Edit3 className="w-6 h-6 text-void" strokeWidth={2.5} />}
       maxWidth="2xl"
     >
+      <div className="max-h-[85vh] overflow-y-auto modal-scrollbar">
       {/* Success State */}
       {success && (
         <div className="absolute inset-0 z-20 bg-abyss/95 backdrop-blur-sm flex items-center justify-center animate-fade-in">
@@ -323,6 +368,36 @@ export default function EditGameModal({
           />
         </div>
 
+        {/* Hide from Library Toggle */}
+        <button
+          type="button"
+          onClick={() => setIsHidden(!isHidden)}
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+            isHidden
+              ? 'bg-purple-500/20 border-2 border-purple-500/50'
+              : 'bg-deep border-2 border-steel hover:border-purple-500/30'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <EyeOff className={`w-5 h-5 ${isHidden ? 'text-purple-400' : 'text-gray-500'}`} />
+            <div className="text-left">
+              <span className={`text-sm font-semibold ${isHidden ? 'text-purple-300' : 'text-gray-400'}`}>
+                Hide from Library
+              </span>
+              <p className="text-xs text-gray-500">
+                {isHidden ? 'Game is hidden from main view' : 'Game is visible in library'}
+              </p>
+            </div>
+          </div>
+          <div className={`w-12 h-6 rounded-full transition-all ${isHidden ? 'bg-purple-500' : 'bg-steel'}`}>
+            <div
+              className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-all ${
+                isHidden ? 'translate-x-6' : 'translate-x-0.5'
+              } mt-0.5`}
+            />
+          </div>
+        </button>
+
         {/* Platform Selector */}
         <div className="space-y-3">
           <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">
@@ -417,6 +492,51 @@ export default function EditGameModal({
           </div>
         </div>
 
+        {/* Priority Selector */}
+        <div className="space-y-3">
+          <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">
+            Backlog Priority
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedPriority('high')}
+              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                selectedPriority === 'high'
+                  ? 'bg-red-500 text-white shadow-lg scale-105'
+                  : 'bg-deep border border-steel text-gray-400 hover:border-red-500/50 hover:text-white'
+              }`}
+            >
+              <div className="text-lg mb-1"><Flame className="w-5 h-5 mx-auto" /></div>
+              High
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedPriority('medium')}
+              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                selectedPriority === 'medium'
+                  ? 'bg-yellow-500 text-void shadow-lg scale-105'
+                  : 'bg-deep border border-steel text-gray-400 hover:border-yellow-500/50 hover:text-white'
+              }`}
+            >
+              <div className="text-lg mb-1"><Clock className="w-5 h-5 mx-auto" /></div>
+              Medium
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedPriority('low')}
+              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                selectedPriority === 'low'
+                  ? 'bg-blue-500 text-white shadow-lg scale-105'
+                  : 'bg-deep border border-steel text-gray-400 hover:border-blue-500/50 hover:text-white'
+              }`}
+            >
+              <div className="text-lg mb-1"><Coffee className="w-5 h-5 mx-auto" /></div>
+              Low
+            </button>
+          </div>
+        </div>
+
         {/* Optional Fields - Collapsed by default */}
         <details className="group">
           <summary className="cursor-pointer text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2 hover:text-purple-300 transition-colors">
@@ -426,7 +546,27 @@ export default function EditGameModal({
           <div className="mt-4 space-y-4 pl-4 border-l-2 border-purple-500/30">
             {/* Cover URL */}
             <div className="space-y-2">
+              <div className="flex items-center justify-between">
               <label className="block text-sm font-semibold text-gray-400">Cover Image URL</label>
+                <button
+                  type="button"
+                  onClick={handleUpdateCoverFromIGDB}
+                  disabled={updatingCover}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-500/50 rounded-lg text-xs font-semibold text-cyan-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {updatingCover ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3 h-3" />
+                      Get IGDB Cover
+                    </>
+                  )}
+                </button>
+              </div>
               <input
                 type="url"
                 name="coverUrl"
@@ -434,6 +574,12 @@ export default function EditGameModal({
                 placeholder="https://..."
                 className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
               />
+              {coverUpdateMessage && (
+                <p className="text-xs text-emerald-400 flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3" />
+                  {coverUpdateMessage}
+                </p>
+              )}
             </div>
 
             {/* Developer */}
@@ -469,7 +615,7 @@ export default function EditGameModal({
                 type="number"
                 name="playtimeHours"
                 min="0"
-                step="0.5"
+                step="any"
                 defaultValue={userGame.playtime_hours}
                 className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
               />
@@ -551,8 +697,28 @@ export default function EditGameModal({
           </button>
         </div>
       </form>
+      </div>
 
       <style jsx global>{`
+        .modal-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .modal-scrollbar::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.5);
+          border-radius: 4px;
+        }
+
+        .modal-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #06b6d4 0%, #a855f7 100%);
+          border-radius: 4px;
+          transition: background 0.2s;
+        }
+
+        .modal-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #0891b2 0%, #9333ea 100%);
+        }
+
         @keyframes successPop {
           0% {
             transform: scale(0);

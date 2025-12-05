@@ -9,11 +9,9 @@ export default function LogoutPage() {
 
   useEffect(() => {
     const signOut = async () => {
-      console.log('Signing out...');
       const supabase = createClient();
       await supabase.auth.signOut();
-      console.log('Signed out successfully');
-      
+
       // Clear all cookies
       document.cookie.split(";").forEach((c) => {
         document.cookie = c

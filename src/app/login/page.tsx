@@ -9,8 +9,6 @@ import { signIn } from '@/app/actions/auth';
 export default function LoginPage() {
   const [state, formAction] = useActionState<{ error?: string } | undefined, FormData>(signIn, undefined);
 
-  console.log('LoginPage component loaded');
-
   return (
     <div className="min-h-screen bg-void flex flex-col relative overflow-hidden">
       {/* Background Effects */}

@@ -13,6 +13,18 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
+  -- Steam integration
+  steam_id TEXT UNIQUE,
+  steam_persona_name TEXT,
+  steam_avatar_url TEXT,
+  steam_profile_url TEXT,
+  steam_last_sync TIMESTAMP WITH TIME ZONE,
+  -- PlayStation Network integration
+  psn_account_id TEXT UNIQUE,
+  psn_online_id TEXT,
+  psn_avatar_url TEXT,
+  psn_trophy_level INTEGER,
+  psn_last_sync TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -40,6 +52,8 @@ CREATE POLICY "Users can insert their own profile"
 CREATE TABLE IF NOT EXISTS public.games (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   igdb_id INTEGER UNIQUE, -- IGDB game ID for syncing
+  steam_appid INTEGER UNIQUE, -- Steam App ID for syncing
+  psn_communication_id TEXT UNIQUE, -- PSN Communication ID for syncing
   title TEXT NOT NULL,
   description TEXT,
   cover_url TEXT,
@@ -98,6 +112,13 @@ CREATE TABLE IF NOT EXISTS public.user_games (
   -- Achievements
   achievements_earned INTEGER DEFAULT 0,
   achievements_total INTEGER DEFAULT 0,
+
+  -- Visibility
+  hidden BOOLEAN DEFAULT false, -- Hide game from main library view
+
+  -- Steam-specific tracking
+  steam_playtime_minutes INTEGER DEFAULT 0,
+  steam_last_played TIMESTAMP WITH TIME ZONE,
   
   -- Metadata
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,

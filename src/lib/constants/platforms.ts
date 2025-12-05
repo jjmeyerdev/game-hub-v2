@@ -6,6 +6,11 @@ export const PLATFORMS = [
     color: 'from-blue-600 to-indigo-600',
     hasConsoles: true,
   },
+  // PSN sync uses specific platform names
+  { id: 'PS5', label: 'PS5', color: 'from-blue-600 to-indigo-600', hasConsoles: false },
+  { id: 'PS4', label: 'PS4', color: 'from-blue-600 to-indigo-600', hasConsoles: false },
+  { id: 'PS3', label: 'PS3', color: 'from-blue-600 to-indigo-600', hasConsoles: false },
+  { id: 'PS Vita', label: 'PS Vita', color: 'from-blue-600 to-indigo-600', hasConsoles: false },
   { id: 'Xbox', label: 'Xbox', color: 'from-green-500 to-emerald-600', hasConsoles: true },
   { id: 'Windows', label: 'Windows', color: 'from-sky-500 to-blue-500', hasConsoles: false },
   { id: 'Epic', label: 'Epic Games', color: 'from-slate-600 to-slate-700', hasConsoles: false },
@@ -89,5 +94,22 @@ export const STATUSES = [
   { id: 'on_hold', label: 'On Hold', icon: '⏸' },
 ] as const;
 
+export const PRIORITIES = [
+  { id: 'high', label: 'High', color: 'from-red-500 to-orange-500', bgColor: 'bg-red-500', textColor: 'text-red-400', borderColor: 'border-red-500' },
+  { id: 'medium', label: 'Medium', color: 'from-yellow-500 to-amber-500', bgColor: 'bg-yellow-500', textColor: 'text-yellow-400', borderColor: 'border-yellow-500' },
+  { id: 'low', label: 'Low', color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-500', textColor: 'text-blue-400', borderColor: 'border-blue-500' },
+] as const;
+
 export type PlatformId = (typeof PLATFORMS)[number]['id'];
 export type StatusId = (typeof STATUSES)[number]['id'];
+export type PriorityId = (typeof PRIORITIES)[number]['id'];
+
+// Platforms that can have active session tracking (PC platforms)
+export const PC_PLATFORMS = ['Steam', 'Windows', 'Epic', 'EA App', 'Battle.net', 'GOG', 'Xbox Game Pass'] as const;
+
+export function isPcPlatform(platform: string): boolean {
+  // Check if the platform starts with any PC platform name
+  return PC_PLATFORMS.some(pcPlatform =>
+    platform === pcPlatform || platform.startsWith(pcPlatform)
+  );
+}
