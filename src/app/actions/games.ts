@@ -1009,6 +1009,158 @@ export async function mergeStatsAcrossCopies(gameIds: string[]) {
 }
 
 /**
+ * Merge selected game entries into one while keeping unselected entries separate
+ * Unlike mergeStatsAcrossCopies, this doesn't delete the unselected entries
+ */
+export async function mergeSelectedKeepRest(selectedIds: string[]) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'Not authenticated' };
+  }
+
+  if (selectedIds.length < 2) {
+    return { error: 'Need at least 2 games to merge' };
+  }
+
+  // Fetch all selected games with their game metadata
+  const { data: games, error: fetchError } = await supabase
+    .from('user_games')
+    .select('*, game:games(*)')
+    .eq('user_id', user.id)
+    .in('id', selectedIds);
+
+  if (fetchError || !games || games.length === 0) {
+    return { error: fetchError?.message || 'Failed to fetch games' };
+  }
+
+  // Calculate merged stats: sum playtime, max achievements, keep highest completion
+  let totalPlaytime = 0;
+  let maxAchievementsEarned = 0;
+  let maxAchievementsTotal = 0;
+  let maxCompletion = 0;
+  let latestPlayed: string | null = null;
+  let bestStatus = 'unplayed';
+  let bestPriority = 'medium';
+  const allNotes: string[] = [];
+  const allTags: string[] = [];
+
+  const statusPriority: Record<string, number> = {
+    'unplayed': 0,
+    'on_hold': 1,
+    'playing': 2,
+    'played': 3,
+    'completed': 4,
+    '100_completed': 5,
+  };
+
+  const priorityOrder: Record<string, number> = {
+    'low': 0,
+    'medium': 1,
+    'high': 2,
+  };
+
+  // Pick the primary entry: prefer the one with most playtime, then most achievements
+  let primaryGame = games[0];
+  let maxScore = 0;
+
+  for (const game of games) {
+    // Calculate a "richness" score to pick the best entry to keep
+    const score = (game.playtime_hours || 0) * 10 +
+                  (game.achievements_earned || 0) * 5 +
+                  (game.completion_percentage || 0);
+    if (score > maxScore) {
+      maxScore = score;
+      primaryGame = game;
+    }
+
+    // Aggregate stats
+    totalPlaytime += game.playtime_hours || 0;
+    maxAchievementsEarned = Math.max(maxAchievementsEarned, game.achievements_earned || 0);
+    maxAchievementsTotal = Math.max(maxAchievementsTotal, game.achievements_total || 0);
+    maxCompletion = Math.max(maxCompletion, game.completion_percentage || 0);
+
+    if (game.last_played_at && (!latestPlayed || new Date(game.last_played_at) > new Date(latestPlayed))) {
+      latestPlayed = game.last_played_at;
+    }
+
+    // Keep the "best" status (most progressed)
+    if ((statusPriority[game.status] || 0) > (statusPriority[bestStatus] || 0)) {
+      bestStatus = game.status;
+    }
+
+    // Keep highest priority
+    if ((priorityOrder[game.priority] || 0) > (priorityOrder[bestPriority] || 0)) {
+      bestPriority = game.priority;
+    }
+
+    // Collect notes (with platform context)
+    if (game.notes?.trim()) {
+      allNotes.push(`[${game.platform}] ${game.notes.trim()}`);
+    }
+
+    // Collect all unique tags
+    if (game.tags?.length) {
+      allTags.push(...game.tags);
+    }
+  }
+
+  // Deduplicate tags
+  const uniqueTags = [...new Set(allTags)].slice(0, 10);
+
+  // Combine notes (limit length)
+  const combinedNotes = allNotes.length > 0 ? allNotes.join('\n\n').slice(0, 2000) : primaryGame.notes;
+
+  // Combine platforms into a note about merged sources
+  const platforms = games.map(g => g.platform).join(', ');
+
+  // Update the primary entry with merged stats
+  const { error: updateError } = await supabase
+    .from('user_games')
+    .update({
+      playtime_hours: totalPlaytime,
+      achievements_earned: maxAchievementsEarned,
+      achievements_total: maxAchievementsTotal,
+      completion_percentage: maxCompletion,
+      last_played_at: latestPlayed,
+      status: bestStatus,
+      priority: bestPriority,
+      notes: combinedNotes || `Merged from: ${platforms}`,
+      tags: uniqueTags.length > 0 ? uniqueTags : primaryGame.tags,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', primaryGame.id)
+    .eq('user_id', user.id);
+
+  if (updateError) {
+    return { error: updateError.message };
+  }
+
+  // Delete only the other SELECTED entries (not all entries in the group)
+  const toDeleteIds = games.filter(g => g.id !== primaryGame.id).map(g => g.id);
+
+  if (toDeleteIds.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('user_games')
+      .delete()
+      .eq('user_id', user.id)
+      .in('id', toDeleteIds);
+
+    if (deleteError) {
+      return { error: deleteError.message };
+    }
+  }
+
+  revalidatePath('/dashboard');
+  revalidatePath('/library');
+  return { success: true, merged: games.length, kept: primaryGame.platform };
+}
+
+/**
  * Update game cover art from IGDB search
  */
 export async function updateGameCoverFromIGDB(gameId: string, gameTitle: string, userPlatform?: string) {

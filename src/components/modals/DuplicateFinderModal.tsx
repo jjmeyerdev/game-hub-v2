@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Merge, Gamepad2, Clock, Trophy, ChevronRight, Check, ShieldCheck, Radio } from 'lucide-react';
-import { findDuplicateGames, mergeDuplicateGames, mergeStatsAcrossCopies, deleteUserGame } from '@/app/actions/games';
+import { findDuplicateGames, mergeDuplicateGames, mergeStatsAcrossCopies, mergeSelectedKeepRest, deleteUserGame } from '@/app/actions/games';
 import type { DuplicateGroup, UserGame, Game } from '@/app/actions/games';
 
 interface DuplicateFinderModalProps {
@@ -181,6 +181,31 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
 
     try {
       const result = await mergeStatsAcrossCopies(allIds);
+
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setResolvedGroups(prev => new Set([...prev, group.normalizedTitle]));
+        onSuccess();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Merge failed');
+    } finally {
+      setProcessingGroup(null);
+    }
+  };
+
+  // Merge only selected entries into one, keep unselected entries separate
+  const handleMergeSelectedKeepRest = async (group: DuplicateGroup) => {
+    const keepIds = selectedToKeep[group.normalizedTitle];
+    if (!keepIds || keepIds.size < 2) return;
+
+    const selectedIds = Array.from(keepIds);
+
+    setProcessingGroup(group.normalizedTitle);
+
+    try {
+      const result = await mergeSelectedKeepRest(selectedIds);
 
       if (result.error) {
         setError(result.error);
@@ -431,6 +456,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                   onDeleteOnly={() => handleDeleteOnly(group)}
                   onMarkNotDuplicates={() => handleMarkNotDuplicates(group)}
                   onMergeStatsOnly={() => handleMergeStatsOnly(group)}
+                  onMergeSelectedKeepRest={() => handleMergeSelectedKeepRest(group)}
                   isProcessing={processingGroup === group.normalizedTitle}
                 />
               ))}
@@ -484,6 +510,7 @@ interface DuplicateGroupCardProps {
   onDeleteOnly: () => void;
   onMarkNotDuplicates: () => void;
   onMergeStatsOnly: () => void;
+  onMergeSelectedKeepRest: () => void;
   isProcessing: boolean;
 }
 
@@ -496,6 +523,7 @@ function DuplicateGroupCard({
   onDeleteOnly,
   onMarkNotDuplicates,
   onMergeStatsOnly,
+  onMergeSelectedKeepRest,
   isProcessing,
 }: DuplicateGroupCardProps) {
   const [expanded, setExpanded] = useState(groupIndex === 0);
@@ -671,10 +699,10 @@ function DuplicateGroupCard({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 mt-4 pt-4 border-t border-steel/20">
+          <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-steel/20">
             {/* When all are selected - show Merge Into One and Not Duplicates options */}
             {allSelected ? (
-              <>
+              <div className="flex items-center gap-3">
                 <button
                   onClick={onMergeStatsOnly}
                   disabled={isProcessing}
@@ -695,29 +723,47 @@ function DuplicateGroupCard({
                   <ShieldCheck className="w-4 h-4" />
                   Keep All
                 </button>
-              </>
+              </div>
             ) : (
               <>
-                <button
-                  onClick={onMerge}
-                  disabled={isProcessing || toDeleteCount === 0}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 rounded-xl font-semibold text-void disabled:text-gray-400 transition-all"
-                >
-                  {isProcessing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Merge className="w-4 h-4" />
-                  )}
-                  Merge Stats & Delete {toDeleteCount}
-                </button>
-                <button
-                  onClick={onDeleteOnly}
-                  disabled={isProcessing || toDeleteCount === 0}
-                  className="px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 disabled:border-gray-600 rounded-xl font-semibold text-red-400 disabled:text-gray-500 transition-all flex items-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete {toDeleteCount}
-                </button>
+                {/* Primary action: Merge selected & keep the rest */}
+                {toKeepCount >= 2 && (
+                  <button
+                    onClick={onMergeSelectedKeepRest}
+                    disabled={isProcessing}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 disabled:from-gray-600 disabled:to-gray-700 rounded-xl font-semibold text-void disabled:text-gray-400 transition-all"
+                  >
+                    {isProcessing ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Merge className="w-4 h-4" />
+                    )}
+                    Merge {toKeepCount} Selected & Keep {toDeleteCount} Separate
+                  </button>
+                )}
+                {/* Secondary actions */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={onMerge}
+                    disabled={isProcessing || toDeleteCount === 0}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-500/50 disabled:border-gray-600 rounded-xl font-semibold text-purple-400 disabled:text-gray-500 transition-all"
+                  >
+                    {isProcessing ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Merge className="w-4 h-4" />
+                    )}
+                    Merge & Delete {toDeleteCount}
+                  </button>
+                  <button
+                    onClick={onDeleteOnly}
+                    disabled={isProcessing || toDeleteCount === 0}
+                    className="px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 disabled:border-gray-600 rounded-xl font-semibold text-red-400 disabled:text-gray-500 transition-all flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete {toDeleteCount}
+                  </button>
+                </div>
               </>
             )}
           </div>
