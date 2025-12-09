@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Play, ChevronRight } from 'lucide-react';
 import type { UserGame } from '@/app/actions/games';
 import { NowPlayingCard } from './cards/NowPlayingCard';
@@ -5,7 +6,6 @@ import { NowPlayingCard } from './cards/NowPlayingCard';
 interface NowPlayingSectionProps {
   nowPlaying: UserGame[];
   loading: boolean;
-  onAddGame: () => void;
   onEditGame: (game: UserGame) => void;
   onDeleteGame: (game: UserGame) => void;
 }
@@ -13,7 +13,6 @@ interface NowPlayingSectionProps {
 export function NowPlayingSection({
   nowPlaying,
   loading,
-  onAddGame,
   onEditGame,
   onDeleteGame,
 }: NowPlayingSectionProps) {
@@ -38,12 +37,12 @@ export function NowPlayingSection({
         <div className="text-center py-12 bg-deep border border-steel rounded-xl">
           <Play className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-500">No games currently playing</p>
-          <button
-            onClick={onAddGame}
-            className="mt-4 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-void font-semibold rounded-lg transition-colors"
+          <Link
+            href="/library"
+            className="mt-4 inline-block px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-void font-semibold rounded-lg transition-colors"
           >
-            Add Your First Game
-          </button>
+            Go to Library
+          </Link>
         </div>
       ) : (
         <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">

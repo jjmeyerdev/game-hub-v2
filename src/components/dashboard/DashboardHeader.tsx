@@ -1,11 +1,10 @@
 'use client';
 
-import { Plus, Zap, RefreshCw } from 'lucide-react';
+import { Zap, RefreshCw } from 'lucide-react';
 
 interface DashboardHeaderProps {
   userName: string;
   greeting: string;
-  onAddGame: () => void;
   steamConnected?: boolean;
   steamLastSync?: string | null;
   onSteamSync?: () => void;
@@ -21,7 +20,6 @@ interface DashboardHeaderProps {
 export function DashboardHeader({
   userName,
   greeting,
-  onAddGame,
   steamConnected,
   steamLastSync,
   onSteamSync,
@@ -91,14 +89,6 @@ export function DashboardHeader({
 
         {/* Right: Action buttons */}
         <div className="flex items-center space-x-4">
-          <button
-            onClick={onAddGame}
-            className="px-4 py-2 bg-deep hover:bg-slate border border-steel rounded-lg text-sm font-semibold transition-colors flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Game</span>
-          </button>
-
           {steamConnected && onUpdateSteamCovers && (
             <button
               onClick={onUpdateSteamCovers}

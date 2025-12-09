@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchGames } from '@/lib/igdb';
+import { searchGames, getGameById } from '@/lib/igdb';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -10,6 +10,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Check if query is a numeric IGDB ID
+    const igdbId = parseInt(query, 10);
+    if (!isNaN(igdbId) && query.match(/^\d+$/)) {
+      const game = await getGameById(igdbId);
+      if (game) {
+        return NextResponse.json([game]);
+      }
+      // If ID lookup fails, fall through to title search
+    }
+
     const games = await searchGames(query, 10);
     return NextResponse.json(games);
   } catch (error) {

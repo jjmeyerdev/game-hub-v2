@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Library, Edit3, Trash2, Trophy, EyeOff, Flame, Clock, Gamepad2 } from 'lucide-react';
+import { Library, Edit3, Trash2, Trophy, EyeOff, Flame, Clock, Gamepad2, Disc } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/app/actions/games';
 
@@ -52,7 +52,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
       onClick={handleClick}
     >
       {/* Outer glow container */}
-      <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+      <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-b from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm pointer-events-none" />
 
       {/* Main card */}
       <div
@@ -113,11 +113,20 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
         {/* Top section - Platform & sync badges */}
         <div className="absolute top-0 left-0 right-0 p-2.5 z-10">
           <div className="flex items-start justify-between">
-            {/* Platform badge */}
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 bg-void/70 backdrop-blur-md text-[10px] font-bold text-gray-300 rounded-md ring-1 ring-white/10 uppercase tracking-wide">
-                {game.platform}
-              </span>
+            {/* Platform badge with physical indicator */}
+            <div className="flex flex-col gap-1">
+              {/* Physical copy badge */}
+              {game.is_physical && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 backdrop-blur-md text-[9px] font-bold text-amber-300 rounded ring-1 ring-amber-500/40 uppercase tracking-wide w-fit">
+                  <Disc className="w-2.5 h-2.5" />
+                  Physical
+                </span>
+              )}
+              {/* Platform and sync badges row */}
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 bg-void/70 backdrop-blur-md text-[10px] font-bold text-gray-300 rounded-md ring-1 ring-white/10 uppercase tracking-wide">
+                  {game.platform}
+                </span>
 
               {/* Sync badges */}
               {game.game?.steam_appid && (
@@ -140,6 +149,25 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                   </svg>
                 </span>
               )}
+              {game.game?.xbox_title_id && (
+                <span
+                  className="w-6 h-5 bg-[#107c10]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10"
+                  title="Xbox"
+                >
+                  <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6.43 3.72A9.449 9.449 0 0 0 5.4 4.63c-.43.43.64 2.12 1.97 3.56 1.32 1.45 3.32 3.53 4.63 5.97 1.31-2.44 3.31-4.52 4.63-5.97 1.33-1.44 2.4-3.13 1.97-3.56a9.449 9.449 0 0 0-1.03-.91C14.93 2.23 13.09 2 12 2c-1.09 0-2.93.23-5.57 1.72zm-3.65 4.6c-1.58 2.05-2.3 4.1-2.3 6.2 0 1.59.29 2.97.85 4.18 1.07-1.46 2.4-3.73 3.66-5.95 1.26-2.23 2.37-3.98 3.16-4.92-1.42-1.52-3.46-3.67-4.08-3.16-.28.23-.8.87-1.29 1.65zm18.45 0c-.5-.78-1.01-1.42-1.3-1.65-.61-.51-2.65 1.64-4.07 3.16.79.94 1.9 2.69 3.16 4.92 1.26 2.22 2.59 4.49 3.66 5.95.56-1.21.85-2.59.85-4.18 0-2.1-.72-4.15-2.3-6.2zM12 13.61c-1.62 2.93-3.49 6.13-4.31 7.45.92.42 2.04.94 4.31.94 2.27 0 3.39-.52 4.31-.94-.82-1.32-2.69-4.52-4.31-7.45z"/>
+                  </svg>
+                </span>
+              )}
+              {game.game?.epic_catalog_item_id && (
+                <span
+                  className="w-6 h-5 bg-[#2a2a2a]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10"
+                  title="Epic Games"
+                >
+                  <span className="text-[10px] font-black text-white">E</span>
+                </span>
+              )}
+              </div>
             </div>
 
             {/* Status indicators */}
@@ -220,10 +248,10 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
         </div>
 
         {/* Corner accents */}
-        <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-white/10 rounded-tl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-white/10 rounded-tr-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-500/30 rounded-bl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-purple-500/30 rounded-br-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-white/10 rounded-tl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-white/10 rounded-tr-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-500/30 rounded-bl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-purple-500/30 rounded-br-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       </div>
 
       {/* Card reflection/glow underneath */}

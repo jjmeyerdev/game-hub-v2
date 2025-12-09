@@ -9,7 +9,6 @@ import {
   DashboardHeader,
   StatsSection,
   NowPlayingSection,
-  GameLibrary,
 } from '@/components/dashboard';
 import { ActiveSessionWidget } from '@/components/dashboard/ActiveSessionWidget';
 import {
@@ -26,7 +25,6 @@ import type { SteamProfile } from '@/lib/types/steam';
 import type { PsnProfile } from '@/lib/types/psn';
 
 export default function DashboardPage() {
-  const [showAddGameModal, setShowAddGameModal] = useState(false);
   const [showEditGameModal, setShowEditGameModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSteamImportModal, setShowSteamImportModal] = useState(false);
@@ -36,10 +34,8 @@ export default function DashboardPage() {
   const [updatingSteamCovers, setUpdatingSteamCovers] = useState(false);
   const [psnProfile, setPsnProfile] = useState<PsnProfile | null>(null);
   const [psnSyncing, setPsnSyncing] = useState(false);
-  const [showHiddenGames, setShowHiddenGames] = useState(false);
-
-  // Load all dashboard data with custom hook - always include hidden for client-side filtering
-  const { user, userGames, nowPlaying, stats, loading, refreshData } = useDashboardData(true);
+  // Load all dashboard data with custom hook
+  const { user, userGames, nowPlaying, stats, loading, refreshData } = useDashboardData();
 
   // Session tracking (only enabled if Steam is connected)
   const { activeSession, sessionDuration, todayPlaytime, isRateLimited, clearRateLimitWarning } = useSessionTracking(!!steamProfile);
@@ -130,7 +126,6 @@ export default function DashboardPage() {
       <DashboardHeader
         userName={user.name}
         greeting={user.greeting}
-        onAddGame={() => setShowAddGameModal(true)}
         steamConnected={!!steamProfile}
         steamLastSync={steamProfile?.steam_last_sync}
         onSteamSync={handleSteamSync}
@@ -163,20 +158,8 @@ export default function DashboardPage() {
         <NowPlayingSection
           nowPlaying={nowPlaying}
           loading={loading}
-          onAddGame={() => setShowAddGameModal(true)}
           onEditGame={handleEditGame}
           onDeleteGame={handleDeleteGame}
-        />
-
-          {/* Game Library */}
-        <GameLibrary
-          userGames={userGames}
-          loading={loading}
-          onAddGame={() => setShowAddGameModal(true)}
-          onEditGame={handleEditGame}
-          onDeleteGame={handleDeleteGame}
-          showHiddenGames={showHiddenGames}
-          onToggleHiddenGames={() => setShowHiddenGames(!showHiddenGames)}
         />
 
           {/* Recent Activity - Coming Soon */}
@@ -199,14 +182,6 @@ export default function DashboardPage() {
             </section>
           )}
         </div>
-
-      {/* Add Game Modal */}
-      <GameFormModal
-        isOpen={showAddGameModal}
-        onClose={() => setShowAddGameModal(false)}
-        onSuccess={handleGameAdded}
-        mode="add"
-      />
 
       {/* Edit Game Modal */}
       <GameFormModal

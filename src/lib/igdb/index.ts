@@ -1,5 +1,6 @@
 export {
   searchGames,
+  getGameById,
   findBestMatch,
   findPCGame,
   getGameUpdateData,

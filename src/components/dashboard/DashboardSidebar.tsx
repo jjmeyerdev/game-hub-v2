@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   Gamepad2,
   Library,
+  Layers,
   Trophy,
   TrendingUp,
   Users,
@@ -105,6 +106,7 @@ export function DashboardSidebar({
       <nav className={`flex-1 p-4 space-y-1 transition-all duration-500 ${collapsed ? 'px-2' : 'px-4'}`}>
         <NavItem icon={Library} label="Dashboard" collapsed={collapsed} href="/dashboard" />
         <NavItem icon={Gamepad2} label="Library" collapsed={collapsed} href="/library" />
+        <NavItem icon={Layers} label="Backlog" collapsed={collapsed} href="/backlog" />
         <NavItem icon={Trophy} label="Achievements" collapsed={collapsed} href="/achievements" />
         <NavItem icon={TrendingUp} label="Stats" collapsed={collapsed} href="/stats" />
         <NavItem icon={Users} label="Friends" collapsed={collapsed} href="/friends" />

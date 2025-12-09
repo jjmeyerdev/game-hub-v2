@@ -33,11 +33,28 @@ export function GameLibrary({
   showHiddenGames = false,
   onToggleHiddenGames,
 }: GameLibraryProps) {
-  const [selectedPlatform, setSelectedPlatform] = useState('All');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('title-asc');
   const [censorHidden, setCensorHidden] = useState(true);
+
+  // Toggle helpers for multi-select
+  const togglePlatform = (platform: string) => {
+    setSelectedPlatforms(prev =>
+      prev.includes(platform)
+        ? prev.filter(p => p !== platform)
+        : [...prev, platform]
+    );
+  };
+
+  const togglePriority = (priority: string) => {
+    setSelectedPriorities(prev =>
+      prev.includes(priority)
+        ? prev.filter(p => p !== priority)
+        : [...prev, priority]
+    );
+  };
 
   // Filter and sort games using utility functions with memoization
   const sortedGames = useMemo(
@@ -46,20 +63,18 @@ export function GameLibrary({
         userGames,
         {
           showHiddenGames,
-          selectedPlatform,
-          selectedPriority,
+          selectedPlatforms,
+          selectedPriorities,
           searchQuery,
+          selectedSources: [],
         },
         sortBy
       ),
-    [userGames, showHiddenGames, selectedPlatform, selectedPriority, searchQuery, sortBy]
+    [userGames, showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, sortBy]
   );
 
   // Check if any filters are active
-  const hasActiveFilters = selectedPlatform !== 'All' || selectedPriority !== 'all';
-
-  // Get active priority info for display
-  const activePriorityInfo = PRIORITY_OPTIONS.find(p => p.id === selectedPriority);
+  const hasActiveFilters = selectedPlatforms.length > 0 || selectedPriorities.length > 0;
 
   return (
     <section>
@@ -157,21 +172,27 @@ export function GameLibrary({
             <div className="flex items-center gap-2 mb-2">
               <Gamepad2 className="w-3.5 h-3.5 text-gray-500" />
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</span>
+              {selectedPlatforms.length > 0 && (
+                <span className="text-[10px] text-cyan-400 font-medium">({selectedPlatforms.length})</span>
+              )}
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {LIBRARY_FILTER_PLATFORMS.map((platform) => (
-                <button
-                  key={platform}
-                  onClick={() => setSelectedPlatform(platform)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    selectedPlatform === platform
-                      ? 'bg-cyan-500 text-void shadow-lg shadow-cyan-500/20'
-                      : 'bg-abyss/60 text-gray-400 hover:text-white hover:bg-slate/60'
-                  }`}
-                >
-                  {platform}
-                </button>
-              ))}
+              {LIBRARY_FILTER_PLATFORMS.filter(p => p !== 'All').map((platform) => {
+                const isSelected = selectedPlatforms.includes(platform);
+                return (
+                  <button
+                    key={platform}
+                    onClick={() => togglePlatform(platform)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      isSelected
+                        ? 'bg-cyan-500 text-void shadow-lg shadow-cyan-500/20'
+                        : 'bg-abyss/60 text-gray-400 hover:text-white hover:bg-slate/60'
+                    }`}
+                  >
+                    {platform}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -180,24 +201,27 @@ export function GameLibrary({
             <div className="flex items-center gap-2 mb-2">
               <Flame className="w-3.5 h-3.5 text-gray-500" />
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</span>
+              {selectedPriorities.length > 0 && (
+                <span className="text-[10px] text-cyan-400 font-medium">({selectedPriorities.length})</span>
+              )}
             </div>
             <div className="flex gap-1.5">
-              {PRIORITY_OPTIONS.map((priority) => {
+              {PRIORITY_OPTIONS.filter(p => p.id !== 'all').map((priority) => {
                 const Icon = priority.icon;
-                const isActive = selectedPriority === priority.id;
+                const isSelected = selectedPriorities.includes(priority.id);
                 return (
                   <button
                     key={priority.id}
-                    onClick={() => setSelectedPriority(priority.id)}
+                    onClick={() => togglePriority(priority.id)}
                     className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      isActive
+                      isSelected
                         ? priority.activeClass
                         : 'bg-abyss/60 text-gray-400 hover:text-white hover:bg-slate/60'
                     }`}
                     title={priority.label}
                   >
-                    {Icon && <Icon className={`w-3.5 h-3.5 ${isActive ? '' : 'opacity-60'}`} />}
-                    <span className="hidden sm:inline">{priority.id === 'all' ? 'All' : priority.label}</span>
+                    {Icon && <Icon className={`w-3.5 h-3.5 ${isSelected ? '' : 'opacity-60'}`} />}
+                    <span className="hidden sm:inline">{priority.label}</span>
                   </button>
                 );
               })}
@@ -210,38 +234,42 @@ export function GameLibrary({
           <div className="flex items-center gap-2 mt-4 pt-3 border-t border-steel/30">
             <span className="text-xs text-gray-500">Active:</span>
             <div className="flex flex-wrap gap-1.5">
-              {selectedPlatform !== 'All' && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 text-cyan-400 text-xs rounded-md">
-                  {selectedPlatform}
+              {selectedPlatforms.map(platform => (
+                <span key={platform} className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 text-cyan-400 text-xs rounded-md">
+                  {platform}
                   <button
-                    onClick={() => setSelectedPlatform('All')}
+                    onClick={() => togglePlatform(platform)}
                     className="hover:text-cyan-300 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
                 </span>
-              )}
-              {selectedPriority !== 'all' && activePriorityInfo && (
-                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md ${
-                  selectedPriority === 'high' ? 'bg-red-500/10 text-red-400' :
-                  selectedPriority === 'medium' ? 'bg-yellow-500/10 text-yellow-400' :
-                  'bg-blue-500/10 text-blue-400'
-                }`}>
-                  {activePriorityInfo.icon && <activePriorityInfo.icon className="w-3 h-3" />}
-                  {activePriorityInfo.label}
-                  <button
-                    onClick={() => setSelectedPriority('all')}
-                    className="hover:opacity-70 transition-opacity"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
+              ))}
+              {selectedPriorities.map(priority => {
+                const priorityInfo = PRIORITY_OPTIONS.find(p => p.id === priority);
+                const PriorityIcon = priorityInfo?.icon;
+                return (
+                  <span key={priority} className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md ${
+                    priority === 'high' ? 'bg-red-500/10 text-red-400' :
+                    priority === 'medium' ? 'bg-yellow-500/10 text-yellow-400' :
+                    'bg-blue-500/10 text-blue-400'
+                  }`}>
+                    {PriorityIcon && <PriorityIcon className="w-3 h-3" />}
+                    {priorityInfo?.label}
+                    <button
+                      onClick={() => togglePriority(priority)}
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
             </div>
             <button
               onClick={() => {
-                setSelectedPlatform('All');
-                setSelectedPriority('all');
+                setSelectedPlatforms([]);
+                setSelectedPriorities([]);
               }}
               className="ml-auto text-xs text-gray-500 hover:text-white transition-colors"
             >

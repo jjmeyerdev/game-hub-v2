@@ -9,54 +9,48 @@ import {
   Zap,
   Edit3,
   EyeOff,
+  Eye,
   Flame,
   Clock,
   Coffee,
+  Tag,
+  X,
+  Plus,
+  Calendar,
+  Building2,
+  Users,
+  Layers,
+  Star,
+  Trophy,
+  Timer,
+  FileText,
+  Image,
+  Sparkles,
+  RefreshCw,
+  Package,
+  Heart,
+  Disc,
 } from 'lucide-react';
-import { addGameToLibrary, editUserGame, updateGameCoverFromIGDB } from '@/app/actions/games';
+import { addGameToLibrary, editUserGame, updateGameCoverFromIGDB, fetchIGDBMetadata } from '@/app/actions/games';
 import type { UserGame } from '@/app/actions/games';
 import { BaseModal } from '@/components/modals';
 import { useIGDBSearch } from '@/lib/hooks';
 import { PLATFORMS, CONSOLE_OPTIONS, STATUSES } from '@/lib/constants';
 import type { IGDBGame } from '@/lib/types';
 
-// Shared modal styles
-const MODAL_STYLES = `
-  .modal-scrollbar::-webkit-scrollbar {
-    width: 8px;
-  }
-  .modal-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
-    border-radius: 4px;
-  }
-  .modal-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #06b6d4 0%, #a855f7 100%);
-    border-radius: 4px;
-    transition: background 0.2s;
-  }
-  .modal-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #0891b2 0%, #9333ea 100%);
-  }
-  @keyframes successPop {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  @keyframes slideDown {
-    from { opacity: 0; max-height: 0; transform: translateY(-10px); }
-    to { opacity: 1; max-height: 200px; transform: translateY(0); }
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`;
+const PRIORITY_CONFIG = {
+  high: { label: 'High', Icon: Flame, color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/50', glow: 'shadow-red-500/20' },
+  medium: { label: 'Medium', Icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/20', border: 'border-amber-500/50', glow: 'shadow-amber-500/20' },
+  low: { label: 'Low', Icon: Coffee, color: 'text-sky-400', bg: 'bg-sky-500/20', border: 'border-sky-500/50', glow: 'shadow-sky-500/20' },
+} as const;
 
-const PRIORITY_BUTTONS = [
-  { id: 'high', label: 'High', Icon: Flame, activeClass: 'bg-red-500 text-white', hoverBorder: 'hover:border-red-500/50' },
-  { id: 'medium', label: 'Medium', Icon: Clock, activeClass: 'bg-yellow-500 text-void', hoverBorder: 'hover:border-yellow-500/50' },
-  { id: 'low', label: 'Low', Icon: Coffee, activeClass: 'bg-blue-500 text-white', hoverBorder: 'hover:border-blue-500/50' },
-] as const;
+const STATUS_CONFIG = {
+  unplayed: { label: 'Unplayed', icon: '◇', color: 'text-gray-400', bg: 'bg-gray-500/20' },
+  playing: { label: 'Playing', icon: '▶', color: 'text-emerald-400', bg: 'bg-emerald-500/20' },
+  played: { label: 'Played', icon: '●', color: 'text-purple-400', bg: 'bg-purple-500/20' },
+  completed: { label: 'Completed', icon: '✓', color: 'text-cyan-400', bg: 'bg-cyan-500/20' },
+  on_hold: { label: 'On Hold', icon: '॥', color: 'text-amber-400', bg: 'bg-amber-500/20' },
+} as const;
 
 interface GameFormModalProps {
   isOpen: boolean;
@@ -73,20 +67,40 @@ export default function GameFormModal({
   mode,
   userGame,
 }: GameFormModalProps) {
-  // Form state
+  // Game metadata state
+  const [title, setTitle] = useState('');
+  const [coverUrl, setCoverUrl] = useState('');
+  const [description, setDescription] = useState('');
+  const [developer, setDeveloper] = useState('');
+  const [publisher, setPublisher] = useState('');
+  const [releaseDate, setReleaseDate] = useState('');
+  const [genres, setGenres] = useState<string[]>([]);
+  const [genreInput, setGenreInput] = useState('');
+
+  // Platform state
   const [selectedPlatform, setSelectedPlatform] = useState('Steam');
   const [selectedConsole, setSelectedConsole] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState(mode === 'add' ? 'unplayed' : 'playing');
-  const [selectedPriority, setSelectedPriority] = useState('medium');
+
+  // User game state
+  const [selectedStatus, setSelectedStatus] = useState<keyof typeof STATUS_CONFIG>('unplayed');
+  const [selectedPriority, setSelectedPriority] = useState<keyof typeof PRIORITY_CONFIG>('medium');
   const [isHidden, setIsHidden] = useState(false);
+  const [ownershipStatus, setOwnershipStatus] = useState<'owned' | 'wishlist' | 'unowned'>('owned');
+  const [isPhysical, setIsPhysical] = useState(false);
+  const [playtimeHours, setPlaytimeHours] = useState('');
+  const [completionPercentage, setCompletionPercentage] = useState('');
+  const [personalRating, setPersonalRating] = useState('');
+  const [notes, setNotes] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
 
   // UI state
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [updatingCover, setUpdatingCover] = useState(false);
-  const [coverUpdateMessage, setCoverUpdateMessage] = useState('');
-  const formRef = useRef<HTMLFormElement>(null);
+  const [refreshingMetadata, setRefreshingMetadata] = useState(false);
+  const [activeSection, setActiveSection] = useState<'search' | 'manual'>('search');
 
   // IGDB search
   const {
@@ -106,11 +120,6 @@ export default function GameFormModal({
   const consoleOptions = hasConsoles ? CONSOLE_OPTIONS[selectedPlatform] ?? [] : [];
 
   const isEditMode = mode === 'edit';
-  const title = isEditMode ? 'Edit Game' : 'Add Game';
-  const submitLabel = isEditMode ? 'Save Changes' : 'Add Game';
-  const loadingLabel = isEditMode ? 'Saving...' : 'Adding...';
-  const successMessage = isEditMode ? 'Game Updated!' : 'Game Added!';
-  const successSubtext = isEditMode ? 'Changes saved successfully' : 'Added to your library';
 
   // Initialize form with existing game data (edit mode)
   useEffect(() => {
@@ -119,11 +128,34 @@ export default function GameFormModal({
       const basePlatform = platformMatch?.[1] ?? userGame.platform;
       const consoleName = platformMatch?.[2] ?? '';
 
+      // Game metadata
+      setTitle(userGame.game?.title ?? '');
+      setCoverUrl(userGame.game?.cover_url ?? '');
+      setDescription(userGame.game?.description ?? '');
+      setDeveloper(userGame.game?.developer ?? '');
+      setPublisher(userGame.game?.publisher ?? '');
+      setReleaseDate(userGame.game?.release_date ?? '');
+      setGenres(userGame.game?.genres ?? []);
+
+      // Platform
       setSelectedPlatform(basePlatform);
       setSelectedConsole(consoleName);
-      setSelectedStatus(userGame.status);
-      setSelectedPriority(userGame.priority ?? 'medium');
+
+      // User game data
+      setSelectedStatus((userGame.status as keyof typeof STATUS_CONFIG) ?? 'unplayed');
+      setSelectedPriority((userGame.priority as keyof typeof PRIORITY_CONFIG) ?? 'medium');
       setIsHidden(userGame.hidden ?? false);
+      // Map the ownership_status field or derive from owned boolean for backwards compatibility
+      const ownership = userGame.ownership_status ?? (userGame.owned ? 'owned' : 'wishlist');
+      setOwnershipStatus(ownership as 'owned' | 'wishlist' | 'unowned');
+      setIsPhysical(userGame.is_physical ?? false);
+      setPlaytimeHours(userGame.playtime_hours?.toString() ?? '');
+      setCompletionPercentage(userGame.completion_percentage?.toString() ?? '');
+      setPersonalRating(userGame.personal_rating?.toString() ?? '');
+      setNotes(userGame.notes ?? '');
+      setTags(userGame.tags ?? []);
+
+      setActiveSection('manual');
       clearResults();
     }
   }, [isOpen, isEditMode, userGame, clearResults]);
@@ -134,18 +166,68 @@ export default function GameFormModal({
       const timer = setTimeout(() => {
         setSuccess(false);
         setError('');
-        setCoverUpdateMessage('');
+        setTitle('');
+        setCoverUrl('');
+        setDescription('');
+        setDeveloper('');
+        setPublisher('');
+        setReleaseDate('');
+        setGenres([]);
+        setGenreInput('');
         setSelectedPlatform('Steam');
         setSelectedConsole('');
-        setSelectedStatus(mode === 'add' ? 'unplayed' : 'playing');
+        setSelectedStatus('unplayed');
         setSelectedPriority('medium');
         setIsHidden(false);
+        setOwnershipStatus('owned');
+        setIsPhysical(false);
+        setPlaytimeHours('');
+        setCompletionPercentage('');
+        setPersonalRating('');
+        setNotes('');
+        setTags([]);
+        setTagInput('');
+        setActiveSection('search');
+        setRefreshingMetadata(false);
         clearResults();
-        formRef.current?.reset();
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, mode, clearResults]);
+  }, [isOpen, clearResults]);
+
+  // Refresh metadata from IGDB
+  const handleRefreshFromIGDB = async () => {
+    if (!title.trim()) {
+      setError('Enter a game title first');
+      return;
+    }
+
+    setRefreshingMetadata(true);
+    setError('');
+
+    try {
+      const platformValue = hasConsoles && selectedConsole
+        ? `${selectedPlatform} (${selectedConsole})`
+        : selectedPlatform;
+
+      const result = await fetchIGDBMetadata(title, platformValue);
+
+      if (result.error) {
+        setError(result.error);
+      } else if (result.success && result.data) {
+        // Update all fields with IGDB data
+        if (result.data.coverUrl) setCoverUrl(result.data.coverUrl);
+        if (result.data.description) setDescription(result.data.description);
+        if (result.data.developer) setDeveloper(result.data.developer);
+        if (result.data.releaseDate) setReleaseDate(result.data.releaseDate);
+        if (result.data.genres && result.data.genres.length > 0) setGenres(result.data.genres);
+      }
+    } catch {
+      setError('Failed to fetch from IGDB');
+    }
+
+    setRefreshingMetadata(false);
+  };
 
   // Auto-select first console when platform changes
   useEffect(() => {
@@ -154,58 +236,94 @@ export default function GameFormModal({
     }
   }, [selectedPlatform, hasConsoles, consoleOptions, selectedConsole]);
 
+  // Tag management
+  const addTag = useCallback((tag: string) => {
+    const trimmedTag = tag.trim().toLowerCase();
+    if (trimmedTag && !tags.includes(trimmedTag) && tags.length < 10) {
+      setTags(prev => [...prev, trimmedTag]);
+      setTagInput('');
+    }
+  }, [tags]);
+
+  const removeTag = useCallback((tagToRemove: string) => {
+    setTags(prev => prev.filter(tag => tag !== tagToRemove));
+  }, []);
+
+  // Genre management
+  const addGenre = useCallback((genre: string) => {
+    const trimmedGenre = genre.trim();
+    if (trimmedGenre && !genres.includes(trimmedGenre) && genres.length < 10) {
+      setGenres(prev => [...prev, trimmedGenre]);
+      setGenreInput('');
+    }
+  }, [genres]);
+
+  const removeGenre = useCallback((genreToRemove: string) => {
+    setGenres(prev => prev.filter(g => g !== genreToRemove));
+  }, []);
+
   const handleSelectGame = useCallback((game: IGDBGame) => {
     setShowResults(false);
     clearResults();
+    setSearchQuery('');
 
-    setTimeout(() => {
-      if (!formRef.current) return;
-
-      const fields: Record<string, string | null | undefined> = {
-        title: game.name,
-        coverUrl: game.cover,
-        developer: game.developer,
-        description: game.summary,
-      };
-
-      Object.entries(fields).forEach(([name, value]) => {
-        const input = formRef.current?.querySelector(`[name="${name}"]`) as HTMLInputElement | HTMLTextAreaElement | null;
-        if (input && value != null) {
-          input.value = value;
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      });
-    }, 0);
-  }, [setShowResults, clearResults]);
+    // Populate all fields from IGDB
+    setTitle(game.name);
+    setCoverUrl(game.cover ?? '');
+    setDescription(game.summary ?? '');
+    setDeveloper(game.developer ?? '');
+    setReleaseDate(game.releaseDate ?? '');
+    setGenres(game.genres ?? []);
+    setActiveSection('manual');
+  }, [setShowResults, clearResults, setSearchQuery]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formRef.current) return;
+    if (!title.trim()) {
+      setError('Game title is required');
+      return;
+    }
 
     setLoading(true);
     setError('');
 
-    const formData = new FormData(formRef.current);
+    const formData = new FormData();
 
-    // Combine platform and console if applicable
+    // Game metadata
+    formData.set('title', title);
+    formData.set('coverUrl', coverUrl);
+    formData.set('description', description);
+    formData.set('developer', developer);
+    formData.set('publisher', publisher);
+    formData.set('releaseDate', releaseDate);
+    formData.set('genres', JSON.stringify(genres));
+
+    // Platform
     const platformValue = hasConsoles && selectedConsole
       ? `${selectedPlatform} (${selectedConsole})`
       : selectedPlatform;
-
     formData.set('platform', platformValue);
+
+    // User game data
     formData.set('status', selectedStatus);
     formData.set('priority', selectedPriority);
-
-    let result: { error?: string };
+    formData.set('tags', JSON.stringify(tags));
+    formData.set('ownership_status', ownershipStatus);
+    formData.set('is_physical', isPhysical.toString());
 
     if (isEditMode && userGame) {
       formData.set('userGameId', userGame.id);
       formData.set('gameId', userGame.game_id);
       formData.set('hidden', isHidden.toString());
-      result = await editUserGame(formData);
-    } else {
-      result = await addGameToLibrary(formData);
+      formData.set('playtimeHours', playtimeHours);
+      formData.set('completionPercentage', completionPercentage);
+      formData.set('personalRating', personalRating);
+      formData.set('notes', notes);
     }
+
+    const result = isEditMode && userGame
+      ? await editUserGame(formData)
+      : await addGameToLibrary(formData);
 
     if (result.error) {
       setError(result.error);
@@ -213,10 +331,14 @@ export default function GameFormModal({
     } else {
       setSuccess(true);
       setLoading(false);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 1500);
+      onSuccess(); // Refresh data immediately
+
+      // For edit mode, auto-close after delay. For add mode, let user choose.
+      if (isEditMode) {
+        setTimeout(() => {
+          onClose();
+        }, 1200);
+      }
     }
   };
 
@@ -224,23 +346,15 @@ export default function GameFormModal({
     if (!userGame?.game) return;
 
     setUpdatingCover(true);
-    setCoverUpdateMessage('');
     setError('');
 
     try {
       const result = await updateGameCoverFromIGDB(userGame.game_id, userGame.game.title, userGame.platform);
-
       if (result.error) {
         setError(result.error);
-      } else if (result.success) {
-        setCoverUpdateMessage(result.message ?? 'Cover updated!');
-        if (formRef.current && result.coverUrl) {
-          const coverInput = formRef.current.querySelector('input[name="coverUrl"]') as HTMLInputElement | null;
-          if (coverInput) {
-            coverInput.value = result.coverUrl;
-          }
-        }
-        setTimeout(() => onSuccess(), 1500);
+      } else if (result.success && result.coverUrl) {
+        setCoverUrl(result.coverUrl);
+        setTimeout(() => onSuccess(), 1000);
       }
     } catch {
       setError('Failed to update cover art');
@@ -249,45 +363,100 @@ export default function GameFormModal({
     setUpdatingCover(false);
   };
 
-  // Don't render edit modal without a game
   if (isEditMode && !userGame) return null;
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={title}
-      icon={
-        isEditMode
-          ? <Edit3 className="w-6 h-6 text-void" strokeWidth={2.5} />
-          : <Gamepad2 className="w-6 h-6 text-void" strokeWidth={2.5} />
-      }
-      maxWidth="2xl"
+      title={isEditMode ? 'EDIT GAME' : 'ADD GAME'}
+      icon={isEditMode ? <Edit3 className="w-5 h-5 text-void" /> : <Gamepad2 className="w-5 h-5 text-void" />}
+      maxWidth="4xl"
     >
-      <div className="max-h-[85vh] overflow-y-auto modal-scrollbar">
-        {/* Success State */}
+      <div className="relative">
+        {/* Success Overlay */}
         {success && (
-          <div className="absolute inset-0 z-20 bg-abyss/95 backdrop-blur-sm flex items-center justify-center animate-fade-in">
-            <div className="text-center">
+          <div className="absolute inset-0 z-50 bg-void/95 backdrop-blur-md flex items-center justify-center rounded-xl overflow-hidden">
+            {/* Animated background grid */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
+                animation: 'gridPulse 2s ease-in-out infinite'
+              }} />
+            </div>
+
+            {/* Radial glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl animate-pulse" />
+
+            <div className="text-center relative z-10">
+              {/* Success icon with rings */}
               <div className="relative inline-block mb-6">
-                <CheckCircle
-                  className="w-20 h-20 text-emerald-400"
-                  style={{ animation: 'successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                />
-                <div className="absolute inset-0 bg-emerald-400/30 rounded-full blur-xl animate-pulse" />
+                <div className="absolute inset-0 scale-150 rounded-full border border-emerald-500/20 animate-[ringExpand_1.5s_ease-out_infinite]" />
+                <div className="absolute inset-0 scale-125 rounded-full border border-emerald-500/30 animate-[ringExpand_1.5s_ease-out_0.3s_infinite]" />
+                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center animate-[successPop_0.5s_cubic-bezier(0.34,1.56,0.64,1)] shadow-lg shadow-emerald-500/30">
+                  <CheckCircle className="w-10 h-10 text-void" strokeWidth={2.5} />
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">{successMessage}</h3>
-              <p className="text-gray-400">{successSubtext}</p>
+
+              <h3 className="text-2xl font-bold text-white mb-2 tracking-wide">
+                {isEditMode ? 'Game Updated!' : 'Game Added!'}
+              </h3>
+              <p className="text-gray-400 text-sm mb-8">
+                {isEditMode ? 'Changes saved successfully' : 'Successfully added to your library'}
+              </p>
+
+              {/* Action buttons - only show Add Another for add mode */}
+              {!isEditMode && (
+                <div className="flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Reset form for another game
+                      setSuccess(false);
+                      setTitle('');
+                      setCoverUrl('');
+                      setDescription('');
+                      setDeveloper('');
+                      setPublisher('');
+                      setReleaseDate('');
+                      setGenres([]);
+                      setGenreInput('');
+                      setSelectedPlatform('Steam');
+                      setSelectedConsole('');
+                      setSelectedStatus('unplayed');
+                      setSelectedPriority('medium');
+                      setTags([]);
+                      setTagInput('');
+                      setActiveSection('search');
+                      clearResults();
+                    }}
+                    className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl font-bold text-void overflow-hidden transition-all hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      <Plus className="w-4 h-4" />
+                      Add Another
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-6 py-3 bg-abyss/80 border border-steel/50 rounded-xl font-semibold text-gray-400 hover:text-white hover:border-steel transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Done
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* IGDB Search Bar */}
-        <div className="relative p-6 pb-0" ref={searchContainerRef}>
-          <div className="space-y-2">
-            <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">
-              Search IGDB for games...
-            </label>
+        {/* Main Content */}
+        <div className="max-h-[80vh] overflow-y-auto custom-scrollbar">
+          {/* IGDB Search Section */}
+          <div className="p-5 border-b border-steel/50" ref={searchContainerRef}>
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
                 {searching ? (
@@ -300,403 +469,632 @@ export default function GameFormModal({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => {
-                  if (searchResults.length > 0) setShowResults(true);
-                }}
-                placeholder="Search IGDB for games..."
-                className="w-full pl-12 pr-12 py-4 bg-deep border-2 border-steel rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 transition-all"
+                onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                placeholder={isEditMode ? "Search IGDB to replace game data..." : "Search by title or IGDB ID..."}
+                className="w-full pl-12 pr-24 py-3.5 bg-abyss border border-steel/50 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all font-mono text-sm"
               />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
                   <Zap className="w-3 h-3 text-cyan-400" />
-                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">IGDB</span>
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">IGDB</span>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Search Results Dropdown */}
-          {showResults && searchResults.length > 0 && (
-            <div className="absolute left-6 right-6 top-full mt-2 bg-abyss border-2 border-cyan-500/30 rounded-xl overflow-hidden shadow-2xl z-50 max-h-96 overflow-y-auto animate-dropdown-slide-in">
-              {searchResults.map((game, index) => (
-                <button
-                  key={game.id}
-                  type="button"
-                  onClick={() => handleSelectGame(game)}
-                  className="w-full flex items-start gap-4 p-4 hover:bg-cyan-500/10 transition-all border-b border-steel/30 last:border-0 group"
-                  style={{ animation: `fadeInUp 0.3s ease-out ${index * 0.05}s both` }}
-                >
-                  <div className="flex-shrink-0 w-16 h-20 bg-deep rounded-lg overflow-hidden border border-steel group-hover:border-cyan-500 transition-all">
-                    {game.cover ? (
-                      <img src={game.cover} alt={game.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Gamepad2 className="w-6 h-6 text-gray-700" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 text-left min-w-0">
-                    <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors mb-1 truncate">
-                      {game.name}
-                    </h3>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <span className="text-xs px-2 py-0.5 bg-cyan-500/20 border border-cyan-500/40 rounded text-cyan-300 font-semibold">
-                        {game.platform}
-                      </span>
-                      {game.releaseDate && (
-                        <span className="text-xs px-2 py-0.5 bg-deep border border-steel rounded text-gray-400">
-                          {new Date(game.releaseDate).getFullYear()}
-                        </span>
-                      )}
-                      {game.developer && (
-                        <span className="text-xs px-2 py-0.5 bg-deep border border-steel rounded text-gray-400 truncate max-w-[150px]">
-                          {game.developer}
-                        </span>
-                      )}
-                    </div>
-                    {game.genres.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {game.genres.slice(0, 3).map((genre) => (
-                          <span key={genre} className="text-xs px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/30 rounded text-cyan-400">
-                            {genre}
-                          </span>
+              {/* Search Results - Grouped by Platform */}
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-2 bg-abyss border border-cyan-500/30 rounded-xl overflow-hidden shadow-2xl shadow-cyan-500/10 z-50 max-h-96 overflow-y-auto">
+                  {(() => {
+                    // Group results by platform
+                    const grouped = searchResults.reduce((acc, game) => {
+                      const platform = game.platform || 'Unknown';
+                      if (!acc[platform]) acc[platform] = [];
+                      acc[platform].push(game);
+                      return acc;
+                    }, {} as Record<string, typeof searchResults>);
+
+                    // Sort platforms: PC first, then alphabetically
+                    const sortedPlatforms = Object.keys(grouped).sort((a, b) => {
+                      if (a.includes('PC') || a.includes('Windows')) return -1;
+                      if (b.includes('PC') || b.includes('Windows')) return 1;
+                      if (a.includes('PlayStation')) return -1;
+                      if (b.includes('PlayStation')) return 1;
+                      if (a.includes('Xbox')) return -1;
+                      if (b.includes('Xbox')) return 1;
+                      return a.localeCompare(b);
+                    });
+
+                    return sortedPlatforms.map((platform) => (
+                      <div key={platform}>
+                        {/* Platform Header */}
+                        <div className="sticky top-0 px-3 py-2 bg-deep/95 backdrop-blur-sm border-b border-steel/30 flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">{platform}</span>
+                          <span className="text-[10px] text-gray-600">({grouped[platform].length})</span>
+                        </div>
+                        {/* Games for this platform */}
+                        {grouped[platform].map((game) => (
+                          <button
+                            key={game.id}
+                            type="button"
+                            onClick={() => handleSelectGame(game)}
+                            className="w-full flex items-start gap-3 p-3 hover:bg-cyan-500/10 transition-all border-b border-steel/20 last:border-0 group"
+                          >
+                            <div className="flex-shrink-0 w-10 h-14 bg-deep rounded-lg overflow-hidden border border-steel/50 group-hover:border-cyan-500/50 transition-all">
+                              {game.cover ? (
+                                <img src={game.cover} alt={game.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Gamepad2 className="w-4 h-4 text-gray-700" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 text-left min-w-0">
+                              <h4 className="font-semibold text-white group-hover:text-cyan-400 transition-colors text-sm truncate">
+                                {game.name}
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                {game.releaseDate && (
+                                  <span className="text-[10px] px-1.5 py-0.5 bg-steel/50 rounded text-gray-400 font-mono">
+                                    {new Date(game.releaseDate).getFullYear()}
+                                  </span>
+                                )}
+                                {game.developer && (
+                                  <span className="text-[10px] text-gray-500 truncate max-w-[100px]">
+                                    {game.developer}
+                                  </span>
+                                )}
+                              </div>
+                              {game.genres.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {game.genres.slice(0, 2).map((genre) => (
+                                    <span key={genre} className="text-[10px] px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 rounded text-purple-400">
+                                      {genre}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </button>
                         ))}
                       </div>
+                    ));
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 mt-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-steel/50 to-transparent" />
+              <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+                {isEditMode ? 'or edit manually below' : 'or enter manually'}
+              </span>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-steel/50 to-transparent" />
+            </div>
+          </div>
+
+          {/* Two-Panel Layout */}
+          <form onSubmit={handleSubmit} className="p-5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* LEFT PANEL - Game Metadata */}
+              <div className="space-y-4">
+                {/* Section Header */}
+                <div className="flex items-center justify-between pb-2 border-b border-steel/30">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Game Info</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRefreshFromIGDB}
+                    disabled={refreshingMetadata || !title.trim()}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-[10px] font-semibold text-cyan-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Refresh all metadata from IGDB"
+                  >
+                    {refreshingMetadata ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-3 h-3" />
+                    )}
+                    {refreshingMetadata ? 'Fetching...' : 'Refresh from IGDB'}
+                  </button>
+                </div>
+
+                {/* Cover + Title Row */}
+                <div className="flex gap-4">
+                  {/* Cover Preview */}
+                  <div className="flex-shrink-0">
+                    <div className="w-24 h-32 bg-deep rounded-xl overflow-hidden border-2 border-steel/50 relative group">
+                      {coverUrl ? (
+                        <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
+                          <Image className="w-8 h-8 mb-1" />
+                          <span className="text-[10px]">No Cover</span>
+                        </div>
+                      )}
+                      {/* Scanline effect */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    {isEditMode && (
+                      <button
+                        type="button"
+                        onClick={handleUpdateCoverFromIGDB}
+                        disabled={updatingCover}
+                        className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-[10px] font-semibold text-cyan-400 transition-all disabled:opacity-50"
+                      >
+                        {updatingCover ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                        {updatingCover ? 'Updating...' : 'Get Cover'}
+                      </button>
                     )}
                   </div>
-                </button>
-              ))}
-            </div>
-          )}
 
-          {/* No Results */}
-          {showResults && searchResults.length === 0 && !searching && (
-            <div className="absolute left-6 right-6 top-full mt-2 bg-abyss border-2 border-steel/30 rounded-xl p-6 text-center">
-              <Search className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400">No games found</p>
-              <p className="text-sm text-gray-600 mt-1">Try a different search term</p>
-            </div>
-          )}
-        </div>
+                  {/* Title + Cover URL */}
+                  <div className="flex-1 space-y-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Title <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Game title..."
+                        className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        Cover URL
+                      </label>
+                      <input
+                        type="url"
+                        value={coverUrl}
+                        onChange={(e) => setCoverUrl(e.target.value)}
+                        placeholder="https://..."
+                        className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-        {/* Divider */}
-        <div className="px-6">
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-steel to-transparent" />
-            <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">Or Enter Manually</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-steel to-transparent" />
-          </div>
-        </div>
+                {/* Developer + Publisher */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      <Building2 className="w-3 h-3" /> Developer
+                    </label>
+                    <input
+                      type="text"
+                      value={developer}
+                      onChange={(e) => setDeveloper(e.target.value)}
+                      placeholder="Studio name..."
+                      className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      <Users className="w-3 h-3" /> Publisher
+                    </label>
+                    <input
+                      type="text"
+                      value={publisher}
+                      onChange={(e) => setPublisher(e.target.value)}
+                      placeholder="Publisher name..."
+                      className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
+                    />
+                  </div>
+                </div>
 
-        {/* Form */}
-        <form ref={formRef} onSubmit={handleSubmit} className="relative px-6 pb-6 space-y-6">
-          {/* Game Title */}
-          <div className="space-y-2">
-            <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">Game Title *</label>
-            <input
-              type="text"
-              name="title"
-              required
-              defaultValue={isEditMode ? userGame?.game?.title : ''}
-              placeholder="Enter game name..."
-              className="w-full px-4 py-3 bg-deep border-2 border-steel rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 transition-all"
-            />
-          </div>
+                {/* Release Date */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <Calendar className="w-3 h-3" /> Release Date
+                  </label>
+                  <input
+                    type="date"
+                    value={releaseDate}
+                    onChange={(e) => setReleaseDate(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50 text-sm [color-scheme:dark]"
+                  />
+                </div>
 
-          {/* Hide from Library Toggle (Edit Mode Only) */}
-          {isEditMode && (
-            <button
-              type="button"
-              onClick={() => setIsHidden(!isHidden)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
-                isHidden
-                  ? 'bg-purple-500/20 border-2 border-purple-500/50'
-                  : 'bg-deep border-2 border-steel hover:border-purple-500/30'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <EyeOff className={`w-5 h-5 ${isHidden ? 'text-purple-400' : 'text-gray-500'}`} />
-                <div className="text-left">
-                  <span className={`text-sm font-semibold ${isHidden ? 'text-purple-300' : 'text-gray-400'}`}>
-                    Hide from Library
-                  </span>
-                  <p className="text-xs text-gray-500">
-                    {isHidden ? 'Game is hidden from main view' : 'Game is visible in library'}
-                  </p>
+                {/* Genres */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <Layers className="w-3 h-3" /> Genres
+                  </label>
+                  <div className="flex flex-wrap gap-1.5 p-2.5 bg-abyss border border-steel/50 rounded-lg min-h-[42px]">
+                    {genres.map((genre) => (
+                      <span
+                        key={genre}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/20 border border-purple-500/40 rounded text-xs text-purple-300"
+                      >
+                        {genre}
+                        <button type="button" onClick={() => removeGenre(genre)} className="hover:text-white">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      value={genreInput}
+                      onChange={(e) => setGenreInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); addGenre(genreInput); }
+                      }}
+                      placeholder={genres.length === 0 ? "Add genre..." : ""}
+                      className="flex-1 min-w-[80px] bg-transparent text-sm text-white placeholder:text-gray-600 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <FileText className="w-3 h-3" /> Description
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Game description..."
+                    rows={3}
+                    className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm resize-none"
+                  />
                 </div>
               </div>
-              <div className={`w-12 h-6 rounded-full transition-all ${isHidden ? 'bg-purple-500' : 'bg-steel'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-all ${isHidden ? 'translate-x-6' : 'translate-x-0.5'} mt-0.5`} />
-              </div>
-            </button>
-          )}
 
-          {/* Platform Selector */}
-          <div className="space-y-3">
-            <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">Platform *</label>
-            <div className="grid grid-cols-3 gap-3">
-              {PLATFORMS.map((platform) => (
-                <button
-                  key={platform.id}
-                  type="button"
-                  onClick={() => setSelectedPlatform(platform.id)}
-                  className={`relative px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
-                    selectedPlatform === platform.id
-                      ? 'bg-gradient-to-r ' + platform.color + ' text-white shadow-lg scale-105'
-                      : 'bg-deep border border-steel text-gray-400 hover:border-cyan-500/50 hover:text-white'
-                  }`}
-                >
-                  {selectedPlatform === platform.id && (
-                    <div className={`absolute inset-0 bg-gradient-to-r ${platform.color} rounded-xl blur-lg opacity-50`} />
+              {/* RIGHT PANEL - User Data */}
+              <div className="space-y-4">
+                {/* Section Header */}
+                <div className="flex items-center gap-2 pb-2 border-b border-steel/30">
+                  <Gamepad2 className="w-4 h-4 text-purple-400" />
+                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Your Library</span>
+                </div>
+
+                {/* Platform Selection */}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    Platform <span className="text-red-400">*</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {PLATFORMS.filter(p => ['PC', 'Steam', 'PlayStation', 'Xbox', 'Epic Games', 'EA App', 'Nintendo', 'Battle.net', 'Physical'].includes(p.id)).sort((a, b) => a.label.localeCompare(b.label)).map((platform) => (
+                      <button
+                        key={platform.id}
+                        type="button"
+                        onClick={() => { setSelectedPlatform(platform.id); setSelectedConsole(''); }}
+                        className={`px-2 py-2 rounded-lg text-[11px] font-semibold transition-all ${
+                          selectedPlatform === platform.id
+                            ? `bg-gradient-to-r ${platform.color} text-white shadow-lg`
+                            : 'bg-abyss border border-steel/50 text-gray-400 hover:border-steel hover:text-white'
+                        }`}
+                      >
+                        {platform.label}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Console selector */}
+                  {hasConsoles && consoleOptions.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {[...consoleOptions].sort((a, b) => a.localeCompare(b)).map((consoleName) => (
+                        <button
+                          key={consoleName}
+                          type="button"
+                          onClick={() => setSelectedConsole(consoleName)}
+                          className={`px-2 py-1.5 rounded text-[10px] font-medium transition-all ${
+                            selectedConsole === consoleName
+                              ? 'bg-purple-500/30 border border-purple-500/50 text-purple-300'
+                              : 'bg-abyss/50 border border-steel/30 text-gray-500 hover:text-white'
+                          }`}
+                        >
+                          {consoleName}
+                        </button>
+                      ))}
+                    </div>
                   )}
-                  <span className="relative">{platform.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+                </div>
 
-          {/* Console Selector */}
-          {hasConsoles && consoleOptions.length > 0 && (
-            <div className="space-y-3 overflow-hidden" style={{ animation: 'slideDown 0.3s ease-out' }}>
-              <div className="flex items-center gap-2">
-                <label className="block text-sm font-bold text-purple-400 uppercase tracking-wider">Console Version *</label>
-                <div className="h-px flex-1 bg-gradient-to-r from-purple-500/50 to-transparent" />
-              </div>
-              <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-2">
-                {consoleOptions.map((consoleName) => (
-                  <button
-                    key={consoleName}
-                    type="button"
-                    onClick={() => setSelectedConsole(consoleName)}
-                    className={`relative px-3 py-2.5 rounded-xl font-semibold text-xs transition-all ${
-                      selectedConsole === consoleName
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg scale-105'
-                        : 'bg-deep border border-steel text-gray-400 hover:border-purple-500/50 hover:text-white'
-                    }`}
-                  >
-                    {selectedConsole === consoleName && (
-                      <>
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl blur-lg opacity-50" />
-                        <div className="absolute inset-0 rounded-xl border-2 border-purple-400 animate-pulse" />
-                      </>
-                    )}
-                    <span className="relative">{consoleName}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+                {/* Status + Priority */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Status */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Status</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(Object.entries(STATUS_CONFIG) as [keyof typeof STATUS_CONFIG, typeof STATUS_CONFIG[keyof typeof STATUS_CONFIG]][]).map(([key, config]) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => setSelectedStatus(key)}
+                          className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
+                            selectedStatus === key
+                              ? `${config.bg} ${config.color} border border-current`
+                              : 'bg-abyss border border-steel/50 text-gray-500 hover:text-white'
+                          }`}
+                        >
+                          <span className="text-xs">{config.icon}</span>
+                          {config.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-          {/* Status Selector */}
-          <div className="space-y-3">
-            <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">Status</label>
-            <div className="grid grid-cols-4 gap-3">
-              {STATUSES.map((status) => (
-                <button
-                  key={status.id}
-                  type="button"
-                  onClick={() => setSelectedStatus(status.id)}
-                  className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
-                    selectedStatus === status.id
-                      ? 'bg-cyan-500 text-void shadow-lg scale-105'
-                      : 'bg-deep border border-steel text-gray-400 hover:border-cyan-500/50 hover:text-white'
-                  }`}
-                >
-                  <div className="text-lg mb-1">{status.icon}</div>
-                  {status.label}
-                </button>
-              ))}
-            </div>
-          </div>
+                  {/* Priority */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Priority</label>
+                    <div className="space-y-1.5">
+                      {(Object.entries(PRIORITY_CONFIG) as [keyof typeof PRIORITY_CONFIG, typeof PRIORITY_CONFIG[keyof typeof PRIORITY_CONFIG]][]).map(([key, config]) => {
+                        const Icon = config.Icon;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setSelectedPriority(key)}
+                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold transition-all ${
+                              selectedPriority === key
+                                ? `${config.bg} ${config.color} border ${config.border}`
+                                : 'bg-abyss border border-steel/50 text-gray-500 hover:text-white'
+                            }`}
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                            {config.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
 
-          {/* Priority Selector */}
-          <div className="space-y-3">
-            <label className="block text-sm font-bold text-cyan-400 uppercase tracking-wider">Backlog Priority</label>
-            <div className="grid grid-cols-3 gap-3">
-              {PRIORITY_BUTTONS.map(({ id, label, Icon, activeClass, hoverBorder }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setSelectedPriority(id)}
-                  className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
-                    selectedPriority === id
-                      ? `${activeClass} shadow-lg scale-105`
-                      : `bg-deep border border-steel text-gray-400 ${hoverBorder} hover:text-white`
-                  }`}
-                >
-                  <div className="text-lg mb-1"><Icon className="w-5 h-5 mx-auto" /></div>
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Optional Fields */}
-          <details className="group">
-            <summary className="cursor-pointer text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2 hover:text-purple-300 transition-colors">
-              <span>Additional Details</span>
-              <span className="text-xs">(Optional)</span>
-            </summary>
-            <div className="mt-4 space-y-4 pl-4 border-l-2 border-purple-500/30">
-              {/* Cover URL */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-semibold text-gray-400">Cover Image URL</label>
-                  {isEditMode && (
+                {/* Ownership Status - Three-state Toggle (shown for both add and edit modes) */}
+                <div className="space-y-1.5">
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                    <Package className="w-3 h-3" /> Ownership
+                  </label>
+                  <div className="relative flex bg-abyss border border-steel/50 rounded-xl p-1 overflow-hidden">
+                    {/* Sliding background indicator */}
+                    <div
+                      className={`absolute top-1 bottom-1 w-[calc(33.333%-3px)] rounded-lg transition-all duration-300 ease-out ${
+                        ownershipStatus === 'owned'
+                          ? 'left-1 bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30'
+                          : ownershipStatus === 'wishlist'
+                          ? 'left-[calc(33.333%+1px)] bg-gradient-to-r from-rose-500 to-pink-500 shadow-lg shadow-rose-500/30'
+                          : 'left-[calc(66.666%+1px)] bg-gradient-to-r from-gray-500 to-gray-600 shadow-lg shadow-gray-500/20'
+                      }`}
+                    />
+                    {/* Owned option */}
                     <button
                       type="button"
-                      onClick={handleUpdateCoverFromIGDB}
-                      disabled={updatingCover}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-500/50 rounded-lg text-xs font-semibold text-cyan-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setOwnershipStatus('owned')}
+                      className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
+                        ownershipStatus === 'owned' ? 'text-void font-bold' : 'text-gray-500 hover:text-gray-300'
+                      }`}
                     >
-                      {updatingCover ? (
-                        <>
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                          Updating...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-3 h-3" />
-                          Get IGDB Cover
-                        </>
-                      )}
+                      <Package className={`w-3.5 h-3.5 transition-transform ${ownershipStatus === 'owned' ? 'scale-110' : ''}`} />
+                      <span className="text-xs">Owned</span>
                     </button>
-                  )}
+                    {/* Wishlist option */}
+                    <button
+                      type="button"
+                      onClick={() => setOwnershipStatus('wishlist')}
+                      className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
+                        ownershipStatus === 'wishlist' ? 'text-void font-bold' : 'text-gray-500 hover:text-gray-300'
+                      }`}
+                    >
+                      <Heart className={`w-3.5 h-3.5 transition-transform ${ownershipStatus === 'wishlist' ? 'scale-110 fill-current' : ''}`} />
+                      <span className="text-xs">Wishlist</span>
+                    </button>
+                    {/* Unowned option */}
+                    <button
+                      type="button"
+                      onClick={() => setOwnershipStatus('unowned')}
+                      className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
+                        ownershipStatus === 'unowned' ? 'text-white font-bold' : 'text-gray-500 hover:text-gray-300'
+                      }`}
+                    >
+                      <X className={`w-3.5 h-3.5 transition-transform ${ownershipStatus === 'unowned' ? 'scale-110' : ''}`} />
+                      <span className="text-xs">Unowned</span>
+                    </button>
+                  </div>
                 </div>
-                <input
-                  type="url"
-                  name="coverUrl"
-                  defaultValue={isEditMode ? userGame?.game?.cover_url ?? '' : ''}
-                  placeholder="https://..."
-                  className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
-                />
-                {coverUpdateMessage && (
-                  <p className="text-xs text-emerald-400 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
-                    {coverUpdateMessage}
-                  </p>
+
+                {/* Physical Copy Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setIsPhysical(!isPhysical)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
+                    isPhysical
+                      ? 'bg-amber-500/20 border border-amber-500/50'
+                      : 'bg-abyss border border-steel/50 hover:border-steel'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Disc className={`w-4 h-4 ${isPhysical ? 'text-amber-400' : 'text-gray-500'}`} />
+                    <span className={`text-sm font-medium ${isPhysical ? 'text-amber-300' : 'text-gray-400'}`}>
+                      Physical Copy
+                    </span>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full transition-all ${isPhysical ? 'bg-amber-500' : 'bg-steel'}`}>
+                    <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-all ${isPhysical ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
+                  </div>
+                </button>
+
+                {/* Edit Mode: Additional Fields */}
+                {isEditMode && (
+                  <>
+                    {/* Playtime + Completion + Rating */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                          <Timer className="w-3 h-3" /> Hours
+                        </label>
+                        <input
+                          type="number"
+                          value={playtimeHours}
+                          onChange={(e) => setPlaytimeHours(e.target.value)}
+                          min="0"
+                          step="0.1"
+                          placeholder="0"
+                          className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                          <Trophy className="w-3 h-3" /> Complete
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={completionPercentage}
+                            onChange={(e) => setCompletionPercentage(e.target.value)}
+                            min="0"
+                            max="100"
+                            placeholder="0"
+                            className="w-full px-3 py-2.5 pr-7 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                          <Star className="w-3 h-3" /> Rating
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={personalRating}
+                            onChange={(e) => setPersonalRating(e.target.value)}
+                            min="1"
+                            max="10"
+                            placeholder="—"
+                            className="w-full px-3 py-2.5 pr-8 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">/10</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hidden Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setIsHidden(!isHidden)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
+                        isHidden
+                          ? 'bg-purple-500/20 border border-purple-500/50'
+                          : 'bg-abyss border border-steel/50 hover:border-steel'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {isHidden ? <EyeOff className="w-4 h-4 text-purple-400" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                        <span className={`text-sm font-medium ${isHidden ? 'text-purple-300' : 'text-gray-400'}`}>
+                          {isHidden ? 'Hidden from library' : 'Visible in library'}
+                        </span>
+                      </div>
+                      <div className={`w-10 h-5 rounded-full transition-all ${isHidden ? 'bg-purple-500' : 'bg-steel'}`}>
+                        <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-all ${isHidden ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
+                      </div>
+                    </button>
+
+                    {/* Notes */}
+                    <div>
+                      <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        <FileText className="w-3 h-3" /> Notes
+                      </label>
+                      <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Your thoughts..."
+                        rows={2}
+                        className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 text-sm resize-none"
+                      />
+                    </div>
+
+                    {/* Tags */}
+                    <div>
+                      <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        <span className="flex items-center gap-1.5"><Tag className="w-3 h-3" /> Tags</span>
+                        <span className="text-gray-600">{tags.length}/10</span>
+                      </label>
+                      <div className="flex flex-wrap gap-1.5 p-2.5 bg-abyss border border-steel/50 rounded-lg min-h-[42px]">
+                        {tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/20 border border-cyan-500/40 rounded text-xs text-cyan-300"
+                          >
+                            <Tag className="w-2.5 h-2.5" />
+                            {tag}
+                            <button type="button" onClick={() => removeTag(tag)} className="hover:text-white">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                        <input
+                          type="text"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput); }
+                            else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) removeTag(tags[tags.length - 1]);
+                          }}
+                          placeholder={tags.length === 0 ? "Add tags..." : ""}
+                          disabled={tags.length >= 10}
+                          className="flex-1 min-w-[80px] bg-transparent text-sm text-white placeholder:text-gray-600 outline-none disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
-
-              {/* Developer */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-400">Developer</label>
-                <input
-                  type="text"
-                  name="developer"
-                  defaultValue={isEditMode ? userGame?.game?.developer ?? '' : ''}
-                  placeholder="Studio name..."
-                  className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-400">Description</label>
-                <textarea
-                  name="description"
-                  rows={3}
-                  defaultValue={isEditMode ? userGame?.game?.description ?? '' : ''}
-                  placeholder="Game description..."
-                  className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm resize-none"
-                />
-              </div>
-
-              {/* Edit Mode Only Fields */}
-              {isEditMode && (
-                <>
-                  {/* Playtime */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-400">Playtime (hours)</label>
-                    <input
-                      type="number"
-                      name="playtimeHours"
-                      min="0"
-                      step="any"
-                      defaultValue={userGame?.playtime_hours}
-                      className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
-                    />
-                  </div>
-
-                  {/* Completion % */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-400">Completion %</label>
-                    <input
-                      type="number"
-                      name="completionPercentage"
-                      min="0"
-                      max="100"
-                      defaultValue={userGame?.completion_percentage}
-                      className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
-                    />
-                  </div>
-
-                  {/* Personal Rating */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-400">Personal Rating (1-10)</label>
-                    <input
-                      type="number"
-                      name="personalRating"
-                      min="1"
-                      max="10"
-                      defaultValue={userGame?.personal_rating ?? ''}
-                      placeholder="Rate this game..."
-                      className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm"
-                    />
-                  </div>
-
-                  {/* Notes */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-400">Notes</label>
-                    <textarea
-                      name="notes"
-                      rows={3}
-                      defaultValue={userGame?.notes ?? ''}
-                      placeholder="Your thoughts about this game..."
-                      className="w-full px-4 py-2 bg-deep border border-steel rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm resize-none"
-                    />
-                  </div>
-                </>
-              )}
             </div>
-          </details>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
-              <p className="text-sm text-red-400">{error}</p>
+            {/* Error Message */}
+            {error && (
+              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 mt-6 pt-4 border-t border-steel/30">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={loading}
+                className="flex-1 px-4 py-3 bg-abyss border border-steel/50 rounded-xl font-semibold text-gray-400 hover:text-white hover:border-steel transition-all disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading || !title.trim()}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-void transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-cyan-500/25"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {isEditMode ? 'Saving...' : 'Adding...'}
+                  </span>
+                ) : (
+                  isEditMode ? 'Save Changes' : 'Add to Library'
+                )}
+              </button>
             </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex items-center gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1 px-6 py-3 bg-deep border border-steel rounded-xl font-semibold text-gray-300 hover:text-white hover:border-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-void transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:shadow-cyan-500/30 transform hover:scale-105"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  {loadingLabel}
-                </span>
-              ) : (
-                submitLabel
-              )}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
 
-      <style jsx global>{MODAL_STYLES}</style>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #06b6d4 0%, #a855f7 100%); border-radius: 3px; }
+        @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes ringExpand {
+          0% { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes gridPulse {
+          0%, 100% { opacity: 0.05; }
+          50% { opacity: 0.15; }
+        }
+      `}</style>
     </BaseModal>
   );
 }

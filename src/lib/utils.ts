@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { UserGame } from "@/app/actions/games"
-import { type SortOption, PRIORITY_ORDER } from "@/lib/constants/platforms"
+import { type SortOption, type SyncSourceId, PRIORITY_ORDER } from "@/lib/constants/platforms"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -12,16 +12,28 @@ export function cn(...inputs: ClassValue[]) {
  */
 export interface GameFilterOptions {
   showHiddenGames: boolean;
-  selectedPlatform: string;
-  selectedPriority: string;
+  selectedPlatforms: string[];
+  selectedPriorities: string[];
   searchQuery: string;
+  selectedSources: SyncSourceId[];
+}
+
+/**
+ * Determine the sync source of a game based on its linked platform IDs
+ */
+export function getGameSyncSource(game: UserGame): SyncSourceId {
+  if (game.game?.steam_appid) return 'steam';
+  if (game.game?.psn_communication_id) return 'psn';
+  if (game.game?.xbox_title_id) return 'xbox';
+  if (game.game?.epic_catalog_item_id) return 'epic';
+  return 'manual';
 }
 
 /**
  * Filter games based on the provided options
  */
 export function filterGames(games: UserGame[], options: GameFilterOptions): UserGame[] {
-  const { showHiddenGames, selectedPlatform, selectedPriority, searchQuery } = options;
+  const { showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, selectedSources } = options;
 
   return games.filter((userGame) => {
     // Hidden filter - when showHiddenGames is true, show ONLY hidden games
@@ -31,23 +43,30 @@ export function filterGames(games: UserGame[], options: GameFilterOptions): User
       if (userGame.hidden) return false;
     }
 
-    // Platform filter - smart matching
-    if (selectedPlatform !== 'All') {
+    // Platform filter - smart matching (empty array = all platforms)
+    if (selectedPlatforms.length > 0) {
       const gamePlatform = userGame.platform.toLowerCase();
-      const filterPlatform = selectedPlatform.toLowerCase();
-
-      // Special case: PC should match exactly
-      if (filterPlatform === 'pc') {
-        if (gamePlatform !== 'pc') return false;
-      } else {
+      const matchesPlatform = selectedPlatforms.some(filterPlatform => {
+        const lowerFilter = filterPlatform.toLowerCase();
+        // Special case: PC should match exactly
+        if (lowerFilter === 'pc') {
+          return gamePlatform === 'pc';
+        }
         // For other platforms, check if game platform contains the filter
-        if (!gamePlatform.includes(filterPlatform)) return false;
-      }
+        return gamePlatform.includes(lowerFilter);
+      });
+      if (!matchesPlatform) return false;
     }
 
-    // Priority filter
-    if (selectedPriority !== 'all' && userGame.priority !== selectedPriority) {
-      return false;
+    // Priority filter (empty array = all priorities)
+    if (selectedPriorities.length > 0) {
+      if (!selectedPriorities.includes(userGame.priority)) return false;
+    }
+
+    // Sync source filter (empty array = all sources)
+    if (selectedSources.length > 0) {
+      const gameSource = getGameSyncSource(userGame);
+      if (!selectedSources.includes(gameSource)) return false;
     }
 
     // Search filter
@@ -83,6 +102,28 @@ export function sortGames(games: UserGame[], sortBy: SortOption): UserGame[] {
         return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1);
       case 'priority-low':
         return (PRIORITY_ORDER[b.priority] ?? 1) - (PRIORITY_ORDER[a.priority] ?? 1);
+      case 'release-newest': {
+        // Games without release dates go to the end
+        const hasDateA = Boolean(a.game?.release_date);
+        const hasDateB = Boolean(b.game?.release_date);
+        if (!hasDateA && !hasDateB) return 0;
+        if (!hasDateA) return 1;
+        if (!hasDateB) return -1;
+        const dateA = new Date(a.game!.release_date!).getTime();
+        const dateB = new Date(b.game!.release_date!).getTime();
+        return dateB - dateA;
+      }
+      case 'release-oldest': {
+        // Games without release dates go to the end
+        const hasDateA = Boolean(a.game?.release_date);
+        const hasDateB = Boolean(b.game?.release_date);
+        if (!hasDateA && !hasDateB) return 0;
+        if (!hasDateA) return 1;
+        if (!hasDateB) return -1;
+        const dateA = new Date(a.game!.release_date!).getTime();
+        const dateB = new Date(b.game!.release_date!).getTime();
+        return dateA - dateB;
+      }
       default:
         return 0;
     }

@@ -30,6 +30,7 @@ export interface SteamPlayer {
     img_logo_url: string;
     has_community_visible_stats?: boolean;
   has_leaderboards?: boolean;
+  rtime_last_played?: number;
   }
   
   export interface SteamAchievement {

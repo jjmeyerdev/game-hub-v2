@@ -111,6 +111,27 @@ export async function searchGames(query: string, limit = 10): Promise<Transforme
 }
 
 /**
+ * Get a game by its IGDB ID
+ */
+export async function getGameById(id: number): Promise<TransformedGame | null> {
+  const results = await igdbFetch<IGDBGameResult[]>(
+    'games',
+    `
+      fields name, cover.url, summary, first_release_date, genres.name, platforms.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher;
+      where id = ${id};
+      limit 1;
+    `
+  );
+
+  if (results.length === 0) {
+    return null;
+  }
+
+  const transformed = transformIGDBResults(results);
+  return transformed[0] ?? null;
+}
+
+/**
  * Search and find the best match for a game title
  */
 export async function findBestMatch(

@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, Gamepad2, Trophy, X, Sparkles } from 'lucide-reac
 interface SyncToastProps {
   isVisible: boolean;
   onClose: () => void;
-  type: 'steam' | 'psn';
+  type: 'steam' | 'psn' | 'xbox' | 'epic';
   result: {
     success: boolean;
     gamesAdded: number;
@@ -42,8 +42,9 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
   if (!isVisible || !result) return null;
 
   const isPsn = type === 'psn';
-  const accentColor = isPsn ? 'blue-600' : 'blue-500';
-  const platformName = isPsn ? 'PlayStation' : 'Steam';
+  const isXbox = type === 'xbox';
+  const isEpic = type === 'epic';
+  const platformName = isPsn ? 'PlayStation' : isXbox ? 'Xbox' : isEpic ? 'Epic Games' : 'Steam';
   const achievementLabel = isPsn ? 'Trophies' : 'Achievements';
   const achievementCount = isPsn ? result.trophiesUpdated : result.achievementsUpdated;
 
@@ -129,6 +130,12 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                     <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.181.76.814.76 1.505v5.876c2.441 1.193 4.362-.002 4.362-3.153 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.391-1.502h-.002z" />
                     </svg>
+                  ) : isXbox ? (
+                    <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4.102 21.033C6.211 22.881 8.977 24 12 24c3.026 0 5.789-1.119 7.902-2.967 1.877-1.912-4.316-8.709-7.902-11.417-3.582 2.708-9.779 9.505-7.898 11.417zm11.16-14.406c2.5 2.961 7.484 10.313 6.076 12.912C23.056 17.036 24 14.62 24 12c0-5.238-3.354-9.691-8.024-11.33.039.071.076.142.108.219.492 1.161.825 2.426.978 3.738zm-6.532 0c.154-1.312.487-2.577.978-3.738.033-.077.07-.148.108-.219C5.354 2.309 2 6.762 2 12c0 2.62.944 5.036 2.662 6.539-1.408-2.599 3.576-9.951 6.068-12.912z"/>
+                    </svg>
+                  ) : isEpic ? (
+                    <span className="w-4 h-4 text-gray-400 font-black text-xs flex items-center justify-center">E</span>
                   ) : (
                     <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
@@ -141,7 +148,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
 
             {/* Stats Grid */}
             {result.success && (
-              <div className="grid grid-cols-4 gap-3 mb-4">
+              <div className={`grid ${isEpic ? 'grid-cols-3' : 'grid-cols-4'} gap-3 mb-4`}>
                 <div
                   className="relative overflow-hidden p-3 bg-deep/50 border border-steel/20 rounded-xl text-center group hover:border-cyan-500/30 transition-all"
                   style={{ animation: 'statPop 0.4s ease-out 0.1s backwards' }}
@@ -172,15 +179,17 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                   <div className="text-[9px] uppercase tracking-wider text-gray-500 font-bold">Updated</div>
                 </div>
 
-                <div
-                  className="relative overflow-hidden p-3 bg-deep/50 border border-steel/20 rounded-xl text-center group hover:border-yellow-500/30 transition-all"
-                  style={{ animation: 'statPop 0.4s ease-out 0.4s backwards' }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-                  <div className="text-2xl font-black text-yellow-400 tabular-nums">{achievementCount || 0}</div>
-                  <div className="text-[9px] uppercase tracking-wider text-gray-500 font-bold">{achievementLabel}</div>
-                </div>
+                {!isEpic && (
+                  <div
+                    className="relative overflow-hidden p-3 bg-deep/50 border border-steel/20 rounded-xl text-center group hover:border-yellow-500/30 transition-all"
+                    style={{ animation: 'statPop 0.4s ease-out 0.4s backwards' }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
+                    <div className="text-2xl font-black text-yellow-400 tabular-nums">{achievementCount || 0}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-gray-500 font-bold">{achievementLabel}</div>
+                  </div>
+                )}
               </div>
             )}
 

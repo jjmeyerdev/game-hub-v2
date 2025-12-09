@@ -4,9 +4,12 @@ import { useState } from 'react';
 import { Gamepad2, Shield, Bell, User } from 'lucide-react';
 import SteamSettings from './SteamSettings';
 import PsnSettings from './PsnSettings';
+import XboxSettings from './XboxSettings';
+import EpicSettings from './EpicSettings';
 import AccountSettings from './AccountSettings';
 import NotificationSettings from './NotificationSettings';
 import PrivacySettings from './PrivacySettings';
+import LibraryManagement from './LibraryManagement';
 
 type TabId = 'platforms' | 'account' | 'notifications' | 'privacy';
 
@@ -131,57 +134,35 @@ function PlatformsContent() {
           </div>
         </div>
 
-        {/* Coming Soon Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Xbox Card */}
-          <div className="group relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/20 via-green-400/10 to-green-500/20 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-all duration-500" />
-            <div className="relative bg-abyss/60 backdrop-blur-sm border border-steel/30 rounded-2xl overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
-              <div className="p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-green-500/60" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4.102 21.033C6.211 22.881 8.977 24 12 24c3.026 0 5.789-1.119 7.902-2.967l-5.904-5.904c-.693.46-1.522.721-2.398.721-.874 0-1.703-.26-2.396-.72l-5.102 5.903zM12 6c1.665 0 3.202.616 4.39 1.634l5.576-5.576C19.668.809 16.025 0 12 0 7.973 0 4.329.809 2.031 2.058l5.579 5.576C8.798 6.616 10.335 6 12 6z"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-400">Xbox Live</h3>
-                    <p className="text-sm text-gray-600">Xbox & PC Game Pass</p>
-                  </div>
-                  <div className="px-3 py-1 bg-gray-500/10 border border-gray-500/20 rounded-full">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Coming Soon</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500">
-                  Xbox Live integration will sync your Xbox and PC Game Pass library, achievements, and gamerscore.
-                </p>
-              </div>
+        {/* Xbox Card */}
+        <div className="group relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500/30 via-green-400/20 to-green-500/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-abyss/90 backdrop-blur-sm border border-steel/50 rounded-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent" />
+            <div className="p-6">
+              <XboxSettings />
             </div>
           </div>
+        </div>
 
-          {/* Epic Card */}
-          <div className="group relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-400/20 via-gray-300/10 to-gray-400/20 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-all duration-500" />
-            <div className="relative bg-abyss/60 backdrop-blur-sm border border-steel/30 rounded-2xl overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-transparent via-gray-400/50 to-transparent" />
-              <div className="p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center">
-                    <span className="text-xl font-black text-gray-500/60">E</span>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-400">Epic Games</h3>
-                    <p className="text-sm text-gray-600">Epic Games Store</p>
-                  </div>
-                  <div className="px-3 py-1 bg-gray-500/10 border border-gray-500/20 rounded-full">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Coming Soon</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500">
-                  Epic Games integration will sync your library including free games claimed from the store.
-                </p>
-              </div>
+        {/* Epic Games Card */}
+        <div className="group relative">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-500/30 via-gray-400/20 to-gray-500/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-abyss/90 backdrop-blur-sm border border-steel/50 rounded-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent" />
+            <div className="p-6">
+              <EpicSettings />
+            </div>
+          </div>
+        </div>
+
+        {/* Library Management Section */}
+        <div className="group relative mt-6">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500/20 via-red-400/10 to-red-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-abyss/90 backdrop-blur-sm border border-steel/50 rounded-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+            <div className="p-6">
+              <LibraryManagement />
             </div>
           </div>
         </div>

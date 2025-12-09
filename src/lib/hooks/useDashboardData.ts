@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { getUserGames, getNowPlayingGames, getUserStats, type UserGame } from '@/app/actions/games';
+import { libraryEvents } from '@/lib/events/libraryEvents';
 
 interface DashboardUser {
   email: string;
@@ -38,7 +39,16 @@ export function useDashboardData(includeHidden = false) {
       if (authUser) {
         const email = authUser.email || '';
         const emailName = email.split('@')[0] || 'User';
+
+        // Try to get name from profiles table first
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', authUser.id)
+          .single();
+
         const name =
+          profile?.full_name ||
           authUser.user_metadata?.full_name ||
           authUser.user_metadata?.name ||
           emailName.charAt(0).toUpperCase() + emailName.slice(1);
@@ -74,6 +84,14 @@ export function useDashboardData(includeHidden = false) {
 
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  // Subscribe to library refresh events (from settings pages, etc.)
+  useEffect(() => {
+    const unsubscribe = libraryEvents.subscribe(() => {
+      loadData();
+    });
+    return unsubscribe;
   }, [loadData]);
 
   return {

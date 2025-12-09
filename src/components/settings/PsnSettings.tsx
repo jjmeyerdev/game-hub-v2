@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { getPsnProfile, linkPsnAccount, unlinkPsnAccount, syncPsnLibrary } from '@/app/actions/psn';
 import { SyncToast } from '@/components/ui/SyncToast';
+import { SyncProgressModal } from '@/components/ui/SyncProgressModal';
+import { triggerLibraryRefresh } from '@/lib/events/libraryEvents';
 import type { PsnProfile, PsnSyncResult } from '@/lib/types/psn';
 
 export default function PsnSettings() {
@@ -114,6 +116,8 @@ export default function PsnSettings() {
       setSyncResult(result);
       setShowSyncToast(true);
       await loadProfile();
+      // Notify other pages to refresh their data
+      triggerLibraryRefresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sync PSN library');
     } finally {
@@ -391,6 +395,12 @@ export default function PsnSettings() {
           </div>
         </div>
       )}
+
+      {/* Sync Progress Modal */}
+      <SyncProgressModal
+        isOpen={syncing}
+        platform="psn"
+      />
 
       {/* Sync Toast */}
       <SyncToast
