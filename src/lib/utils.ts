@@ -16,6 +16,7 @@ export interface GameFilterOptions {
   selectedPriorities: string[];
   searchQuery: string;
   selectedSources: SyncSourceId[];
+  selectedConsoles?: string[];
 }
 
 /**
@@ -30,10 +31,18 @@ export function getGameSyncSource(game: UserGame): SyncSourceId {
 }
 
 /**
+ * Extract console name from platform string (e.g., "PlayStation (PS5)" -> "PS5")
+ */
+export function extractConsoleName(platform: string): string {
+  const match = platform.match(/\(([^)]+)\)$/);
+  return match ? match[1] : platform;
+}
+
+/**
  * Filter games based on the provided options
  */
 export function filterGames(games: UserGame[], options: GameFilterOptions): UserGame[] {
-  const { showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, selectedSources } = options;
+  const { showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, selectedSources, selectedConsoles } = options;
 
   return games.filter((userGame) => {
     // Hidden filter - when showHiddenGames is true, show ONLY hidden games
@@ -56,6 +65,12 @@ export function filterGames(games: UserGame[], options: GameFilterOptions): User
         return gamePlatform.includes(lowerFilter);
       });
       if (!matchesPlatform) return false;
+    }
+
+    // Console filter - specific console matching (empty array = all consoles)
+    if (selectedConsoles && selectedConsoles.length > 0) {
+      const consoleName = extractConsoleName(userGame.platform);
+      if (!selectedConsoles.includes(consoleName)) return false;
     }
 
     // Priority filter (empty array = all priorities)

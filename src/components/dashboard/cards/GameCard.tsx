@@ -17,7 +17,8 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
   const isCompleted = game.status === 'completed' || game.status === '100_completed';
-  const shouldCensor = game.hidden && censorHidden;
+  const isAdult = game.tags?.includes('adult') ?? false;
+  const shouldCensor = isAdult && censorHidden;
   const hasPlaytime = game.playtime_hours > 0;
 
   const handleClick = () => {
@@ -113,20 +114,20 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
         {/* Top section - Platform & sync badges */}
         <div className="absolute top-0 left-0 right-0 p-2.5 z-10">
           <div className="flex items-start justify-between">
-            {/* Platform badge with physical indicator */}
-            <div className="flex flex-col gap-1">
-              {/* Physical copy badge */}
-              {game.is_physical && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 backdrop-blur-md text-[9px] font-bold text-amber-300 rounded ring-1 ring-amber-500/40 uppercase tracking-wide w-fit">
-                  <Disc className="w-2.5 h-2.5" />
-                  Physical
-                </span>
-              )}
-              {/* Platform and sync badges row */}
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-0.5 bg-void/70 backdrop-blur-md text-[10px] font-bold text-gray-300 rounded-md ring-1 ring-white/10 uppercase tracking-wide">
-                  {game.platform}
-                </span>
+            {/* Platform badge - show console name if available, otherwise full platform */}
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 bg-void/70 backdrop-blur-md text-[10px] font-bold text-gray-300 rounded-md ring-1 ring-white/10 uppercase tracking-wide">
+                {(() => {
+                  // Extract console from "Platform (Console)" format
+                  const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
+                  if (match) {
+                    // Has console - show only the console name
+                    return match[2];
+                  }
+                  // No console - show full platform name
+                  return game.platform;
+                })()}
+              </span>
 
               {/* Sync badges */}
               {game.game?.steam_appid && (
@@ -167,19 +168,23 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                   <span className="text-[10px] font-black text-white">E</span>
                 </span>
               )}
-              </div>
             </div>
 
             {/* Status indicators */}
             <div className="flex items-center gap-1">
+              {game.is_physical && (
+                <span className="w-6 h-5 bg-amber-500/20 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-amber-500/40" title="Physical Copy">
+                  <Disc className="w-3 h-3 text-amber-400" />
+                </span>
+              )}
               {game.priority === 'high' && (
                 <span className="w-6 h-5 bg-red-500/20 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-red-500/40" title="High Priority">
                   <Flame className="w-3 h-3 text-red-400" />
                 </span>
               )}
               {isCompleted && (
-                <span className="w-6 h-5 bg-amber-500/20 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-amber-500/40" title="Completed">
-                  <Trophy className="w-3 h-3 text-amber-400" />
+                <span className="w-6 h-5 bg-cyan-500/20 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-cyan-500/40" title="Completed">
+                  <Trophy className="w-3 h-3 text-cyan-400" />
                 </span>
               )}
             </div>

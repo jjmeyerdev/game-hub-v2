@@ -18,11 +18,8 @@ import {
 } from '@/components/modals';
 import { RateLimitToast } from '@/components/ui/RateLimitToast';
 import type { UserGame } from '@/app/actions/games';
-import { updateAllSteamCovers } from '@/app/actions/games';
-import { getSteamProfile, syncSteamLibrary } from '@/app/actions/steam';
-import { getPsnProfile, syncPsnLibrary } from '@/app/actions/psn';
+import { getSteamProfile } from '@/app/actions/steam';
 import type { SteamProfile } from '@/lib/types/steam';
-import type { PsnProfile } from '@/lib/types/psn';
 
 export default function DashboardPage() {
   const [showEditGameModal, setShowEditGameModal] = useState(false);
@@ -30,27 +27,20 @@ export default function DashboardPage() {
   const [showSteamImportModal, setShowSteamImportModal] = useState(false);
   const [selectedGame, setSelectedGame] = useState<UserGame | null>(null);
   const [steamProfile, setSteamProfile] = useState<SteamProfile | null>(null);
-  const [steamSyncing, setSteamSyncing] = useState(false);
-  const [updatingSteamCovers, setUpdatingSteamCovers] = useState(false);
-  const [psnProfile, setPsnProfile] = useState<PsnProfile | null>(null);
-  const [psnSyncing, setPsnSyncing] = useState(false);
+
   // Load all dashboard data with custom hook
   const { user, userGames, nowPlaying, stats, loading, refreshData } = useDashboardData();
 
   // Session tracking (only enabled if Steam is connected)
   const { activeSession, sessionDuration, todayPlaytime, isRateLimited, clearRateLimitWarning } = useSessionTracking(!!steamProfile);
 
-  // Load platform profiles
+  // Load Steam profile for session tracking
   useEffect(() => {
-    async function loadProfiles() {
-      const [steamData, psnData] = await Promise.all([
-        getSteamProfile(),
-        getPsnProfile(),
-      ]);
+    async function loadSteamProfile() {
+      const steamData = await getSteamProfile();
       setSteamProfile(steamData);
-      setPsnProfile(psnData);
     }
-    loadProfiles();
+    loadSteamProfile();
   }, []);
 
   // Refresh dashboard data when active session changes (updates Now Playing)
@@ -71,53 +61,6 @@ export default function DashboardPage() {
   const handleDeleteGame = (game: UserGame) => {
     setSelectedGame(game);
     setShowDeleteModal(true);
-    };
-
-  const handleSteamSync = async () => {
-    setSteamSyncing(true);
-    try {
-      await syncSteamLibrary();
-      await refreshData();
-      // Reload Steam profile to update last sync time
-      const profile = await getSteamProfile();
-      setSteamProfile(profile);
-    } catch {
-      // Steam sync failed silently
-    } finally {
-      setSteamSyncing(false);
-    }
-  };
-
-  const handleUpdateSteamCovers = async () => {
-    setUpdatingSteamCovers(true);
-    try {
-      const result = await updateAllSteamCovers();
-      if (result.error) {
-        alert(`Error: ${result.error}`);
-      } else {
-        alert(result.message || 'Covers updated successfully!');
-        await refreshData();
-      }
-    } catch {
-      alert('Failed to update covers');
-    } finally {
-      setUpdatingSteamCovers(false);
-    }
-  };
-
-  const handlePsnSync = async () => {
-    setPsnSyncing(true);
-    try {
-      await syncPsnLibrary();
-      await refreshData();
-      // Reload PSN profile to update last sync time
-      const profile = await getPsnProfile();
-      setPsnProfile(profile);
-    } catch {
-      // PSN sync failed silently
-    } finally {
-      setPsnSyncing(false);
-    }
   };
 
   return (
@@ -126,16 +69,6 @@ export default function DashboardPage() {
       <DashboardHeader
         userName={user.name}
         greeting={user.greeting}
-        steamConnected={!!steamProfile}
-        steamLastSync={steamProfile?.steam_last_sync}
-        onSteamSync={handleSteamSync}
-        steamSyncing={steamSyncing}
-        onUpdateSteamCovers={handleUpdateSteamCovers}
-        updatingSteamCovers={updatingSteamCovers}
-        psnConnected={!!psnProfile}
-        psnLastSync={psnProfile?.psn_last_sync}
-        onPsnSync={handlePsnSync}
-        psnSyncing={psnSyncing}
       />
 
       {/* Active Session Widget */}

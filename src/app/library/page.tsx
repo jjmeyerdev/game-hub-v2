@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Library, Grid3x3, List, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, X, ShieldOff, Shield, Plus, Copy, Link2 } from 'lucide-react';
+import { Library, Grid3x3, List, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, X, ShieldOff, Shield, Plus, Copy, Link2, Monitor } from 'lucide-react';
 import { useDashboardData } from '@/lib/hooks';
 import { DashboardLayout } from '@/components/layouts';
 import { GameCard } from '@/components/dashboard/cards/GameCard';
 import { GameListItem } from '@/components/dashboard/cards/GameListItem';
 import { GameFormModal, DeleteConfirmModal, DuplicateFinderModal } from '@/components/modals';
 import { SyncServiceDropdown } from '@/components/library/SyncServiceDropdown';
+import { ConsoleFilter } from '@/components/library/ConsoleFilter';
 import { Button } from '@/components/ui/button';
 import { filterAndSortGames, getGameSyncSource } from '@/lib/utils';
-import { LIBRARY_FILTER_PLATFORMS, SYNC_SOURCE_OPTIONS, type SortOption, type SyncSourceId } from '@/lib/constants/platforms';
+import { LIBRARY_FILTER_PLATFORMS, SYNC_SOURCE_OPTIONS, CONSOLE_GENERATIONS, type SortOption, type SyncSourceId } from '@/lib/constants/platforms';
 import type { UserGame } from '@/app/actions/games';
 
 type ViewMode = 'grid' | 'list';
@@ -38,6 +39,7 @@ export default function LibraryPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
   const [selectedSources, setSelectedSources] = useState<SyncSourceId[]>([]);
+  const [selectedConsoles, setSelectedConsoles] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('title-asc');
   const [showHiddenGames, setShowHiddenGames] = useState(false);
@@ -65,6 +67,14 @@ export default function LibraryPage() {
       prev.includes(source)
         ? prev.filter(s => s !== source)
         : [...prev, source]
+    );
+  };
+
+  const toggleConsole = (console: string) => {
+    setSelectedConsoles(prev =>
+      prev.includes(console)
+        ? prev.filter(c => c !== console)
+        : [...prev, console]
     );
   };
 
@@ -116,14 +126,15 @@ export default function LibraryPage() {
           selectedPriorities,
           searchQuery,
           selectedSources,
+          selectedConsoles,
         },
         sortBy
       ),
-    [userGames, showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, selectedSources, sortBy]
+    [userGames, showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, selectedSources, selectedConsoles, sortBy]
   );
 
   // Check if any filters are active
-  const hasActiveFilters = selectedPlatforms.length > 0 || selectedPriorities.length > 0 || selectedSources.length > 0;
+  const hasActiveFilters = selectedPlatforms.length > 0 || selectedPriorities.length > 0 || selectedSources.length > 0 || selectedConsoles.length > 0;
 
   // Count games by source for the filter badges
   const sourceCounts = useMemo(() => {
@@ -136,11 +147,15 @@ export default function LibraryPage() {
     return counts;
   }, [userGames, showHiddenGames]);
 
-  // Stats
-  const totalGames = userGames.filter(g => !g.hidden || showHiddenGames).length;
-  const nowPlayingCount = userGames.filter(g => g.status === 'playing' && (!g.hidden || showHiddenGames)).length;
-  const completedCount = userGames.filter(g => (g.status === 'completed' || g.status === '100_completed') && (!g.hidden || showHiddenGames)).length;
-  const totalPlaytime = Math.round(userGames.filter(g => !g.hidden || showHiddenGames).reduce((acc, g) => acc + g.playtime_hours, 0));
+  // Stats - always include ALL games (including hidden) for accurate totals
+  const totalGames = userGames.length;
+  const nowPlayingCount = userGames.filter(g => g.status === 'playing').length;
+  const completedCount = userGames.filter(g => g.status === 'completed' || g.status === '100_completed').length;
+  const totalPlaytime = Math.round(userGames.reduce((acc, g) => acc + g.playtime_hours, 0));
+
+  // Visible games count (for the filtered display)
+  const visibleGames = userGames.filter(g => !g.hidden || showHiddenGames).length;
+  const hiddenGamesCount = userGames.filter(g => g.hidden).length;
 
   return (
     <DashboardLayout>
@@ -464,6 +479,22 @@ export default function LibraryPage() {
             </div>
           </div>
 
+          {/* Console Filter */}
+          <div className="mt-4 pt-4 border-t border-steel/30">
+            <div className="flex items-center gap-2 mb-3">
+              <Monitor className="w-3.5 h-3.5 text-gray-500" />
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Console</span>
+              {selectedConsoles.length > 0 && (
+                <span className="text-[10px] text-cyan-400 font-medium">({selectedConsoles.length})</span>
+              )}
+            </div>
+            <ConsoleFilter
+              userGames={userGames.filter(g => !g.hidden || showHiddenGames)}
+              selectedConsoles={selectedConsoles}
+              onToggleConsole={toggleConsole}
+            />
+          </div>
+
           {/* Active Filters Summary */}
           {hasActiveFilters && (
             <div className="flex items-center gap-2 mt-4 pt-3 border-t border-steel/30">
@@ -480,6 +511,21 @@ export default function LibraryPage() {
                     </button>
                   </span>
                 ))}
+                {selectedConsoles.map(console => {
+                  const generation = CONSOLE_GENERATIONS.find(g => g.consoles.some(c => c.id === console));
+                  return (
+                    <span key={console} className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 text-cyan-400 text-xs rounded-md font-mono">
+                      <Monitor className="w-3 h-3" />
+                      {generation?.icon} {console}
+                      <button
+                        onClick={() => toggleConsole(console)}
+                        className="hover:text-cyan-300 transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  );
+                })}
                 {selectedPriorities.map(priority => {
                   const priorityInfo = PRIORITY_OPTIONS.find(p => p.id === priority);
                   const PriorityIcon = priorityInfo?.icon;
@@ -527,6 +573,7 @@ export default function LibraryPage() {
                   setSelectedPlatforms([]);
                   setSelectedPriorities([]);
                   setSelectedSources([]);
+                  setSelectedConsoles([]);
                 }}
                 className="ml-auto text-xs text-gray-500 hover:text-white transition-colors"
               >
@@ -542,6 +589,11 @@ export default function LibraryPage() {
             Showing <span className="text-cyan-400 font-bold">{sortedGames.length}</span> of{' '}
             <span className="text-white font-bold">{totalGames}</span> games
             {hasActiveFilters && ' (filtered)'}
+            {hiddenGamesCount > 0 && !showHiddenGames && (
+              <span className="text-purple-400 ml-2">
+                • {hiddenGamesCount} hidden
+              </span>
+            )}
           </p>
         </div>
 

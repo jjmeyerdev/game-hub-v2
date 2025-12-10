@@ -30,6 +30,9 @@ import {
   Package,
   Heart,
   Disc,
+  ShieldAlert,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { addGameToLibrary, editUserGame, updateGameCoverFromIGDB, fetchIGDBMetadata } from '@/app/actions/games';
 import type { UserGame } from '@/app/actions/games';
@@ -85,6 +88,7 @@ export default function GameFormModal({
   const [selectedStatus, setSelectedStatus] = useState<keyof typeof STATUS_CONFIG>('unplayed');
   const [selectedPriority, setSelectedPriority] = useState<keyof typeof PRIORITY_CONFIG>('medium');
   const [isHidden, setIsHidden] = useState(false);
+  const [isAdult, setIsAdult] = useState(false);
   const [ownershipStatus, setOwnershipStatus] = useState<'owned' | 'wishlist' | 'unowned'>('owned');
   const [isPhysical, setIsPhysical] = useState(false);
   const [playtimeHours, setPlaytimeHours] = useState('');
@@ -101,6 +105,18 @@ export default function GameFormModal({
   const [updatingCover, setUpdatingCover] = useState(false);
   const [refreshingMetadata, setRefreshingMetadata] = useState(false);
   const [activeSection, setActiveSection] = useState<'search' | 'manual'>('search');
+
+  // Locked fields - prevent overwriting on IGDB search/refresh
+  const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
+
+  const toggleFieldLock = (field: string) => {
+    setLockedFields(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const isFieldLocked = (field: string) => !!lockedFields[field];
 
   // IGDB search
   const {
@@ -145,6 +161,9 @@ export default function GameFormModal({
       setSelectedStatus((userGame.status as keyof typeof STATUS_CONFIG) ?? 'unplayed');
       setSelectedPriority((userGame.priority as keyof typeof PRIORITY_CONFIG) ?? 'medium');
       setIsHidden(userGame.hidden ?? false);
+      // Detect adult content by checking for 'adult' tag
+      const hasAdultTag = userGame.tags?.includes('adult') ?? false;
+      setIsAdult(hasAdultTag);
       // Map the ownership_status field or derive from owned boolean for backwards compatibility
       const ownership = userGame.ownership_status ?? (userGame.owned ? 'owned' : 'wishlist');
       setOwnershipStatus(ownership as 'owned' | 'wishlist' | 'unowned');
@@ -179,6 +198,7 @@ export default function GameFormModal({
         setSelectedStatus('unplayed');
         setSelectedPriority('medium');
         setIsHidden(false);
+        setIsAdult(false);
         setOwnershipStatus('owned');
         setIsPhysical(false);
         setPlaytimeHours('');
@@ -189,6 +209,7 @@ export default function GameFormModal({
         setTagInput('');
         setActiveSection('search');
         setRefreshingMetadata(false);
+        setLockedFields({});
         clearResults();
       }, 300);
       return () => clearTimeout(timer);
@@ -215,12 +236,12 @@ export default function GameFormModal({
       if (result.error) {
         setError(result.error);
       } else if (result.success && result.data) {
-        // Update all fields with IGDB data
-        if (result.data.coverUrl) setCoverUrl(result.data.coverUrl);
-        if (result.data.description) setDescription(result.data.description);
-        if (result.data.developer) setDeveloper(result.data.developer);
-        if (result.data.releaseDate) setReleaseDate(result.data.releaseDate);
-        if (result.data.genres && result.data.genres.length > 0) setGenres(result.data.genres);
+        // Update fields with IGDB data, respecting locks
+        if (result.data.coverUrl && !isFieldLocked('cover')) setCoverUrl(result.data.coverUrl);
+        if (result.data.description && !isFieldLocked('description')) setDescription(result.data.description);
+        if (result.data.developer && !isFieldLocked('developer')) setDeveloper(result.data.developer);
+        if (result.data.releaseDate && !isFieldLocked('releaseDate')) setReleaseDate(result.data.releaseDate);
+        if (result.data.genres && result.data.genres.length > 0 && !isFieldLocked('genres')) setGenres(result.data.genres);
       }
     } catch {
       setError('Failed to fetch from IGDB');
@@ -262,20 +283,20 @@ export default function GameFormModal({
     setGenres(prev => prev.filter(g => g !== genreToRemove));
   }, []);
 
-  const handleSelectGame = useCallback((game: IGDBGame) => {
+  const handleSelectGame = (game: IGDBGame) => {
     setShowResults(false);
     clearResults();
     setSearchQuery('');
 
-    // Populate all fields from IGDB
-    setTitle(game.name);
-    setCoverUrl(game.cover ?? '');
-    setDescription(game.summary ?? '');
-    setDeveloper(game.developer ?? '');
-    setReleaseDate(game.releaseDate ?? '');
-    setGenres(game.genres ?? []);
+    // Populate fields from IGDB, respecting locks
+    if (!isFieldLocked('title')) setTitle(game.name);
+    if (!isFieldLocked('cover')) setCoverUrl(game.cover ?? '');
+    if (!isFieldLocked('description')) setDescription(game.summary ?? '');
+    if (!isFieldLocked('developer')) setDeveloper(game.developer ?? '');
+    if (!isFieldLocked('releaseDate')) setReleaseDate(game.releaseDate ?? '');
+    if (!isFieldLocked('genres')) setGenres(game.genres ?? []);
     setActiveSection('manual');
-  }, [setShowResults, clearResults, setSearchQuery]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -307,14 +328,26 @@ export default function GameFormModal({
     // User game data
     formData.set('status', selectedStatus);
     formData.set('priority', selectedPriority);
-    formData.set('tags', JSON.stringify(tags));
+
+    // Handle adult content: add 'adult' tag and set hidden
+    let finalTags = [...tags];
+    if (isAdult && !finalTags.includes('adult')) {
+      finalTags.push('adult');
+    } else if (!isAdult && finalTags.includes('adult')) {
+      finalTags = finalTags.filter(t => t !== 'adult');
+    }
+    formData.set('tags', JSON.stringify(finalTags));
+
+    // Adult content is always hidden
+    const shouldBeHidden = isAdult || isHidden;
+    formData.set('hidden', shouldBeHidden.toString());
+
     formData.set('ownership_status', ownershipStatus);
     formData.set('is_physical', isPhysical.toString());
 
     if (isEditMode && userGame) {
       formData.set('userGameId', userGame.id);
       formData.set('gameId', userGame.game_id);
-      formData.set('hidden', isHidden.toString());
       formData.set('playtimeHours', playtimeHours);
       formData.set('completionPercentage', completionPercentage);
       formData.set('personalRating', personalRating);
@@ -426,6 +459,7 @@ export default function GameFormModal({
                       setSelectedConsole('');
                       setSelectedStatus('unplayed');
                       setSelectedPriority('medium');
+                      setIsAdult(false);
                       setTags([]);
                       setTagInput('');
                       setActiveSection('search');
@@ -631,29 +665,67 @@ export default function GameFormModal({
                   {/* Title + Cover URL */}
                   <div className="flex-1 space-y-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                        Title <span className="text-red-400">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Game title..."
-                        className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
-                        required
-                      />
+                      <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        <span>Title <span className="text-red-400">*</span></span>
+                        <button
+                          type="button"
+                          onClick={() => toggleFieldLock('title')}
+                          className={`p-1 rounded transition-all ${isFieldLocked('title') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
+                          title={isFieldLocked('title') ? 'Unlock field' : 'Lock field from IGDB updates'}
+                        >
+                          {isFieldLocked('title') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="Game title..."
+                          className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm ${isFieldLocked('title') ? 'border-amber-500/50' : 'border-steel/50'}`}
+                          required
+                        />
+                        {title && (
+                          <button
+                            type="button"
+                            onClick={() => setTitle('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                        Cover URL
-                      </label>
-                      <input
-                        type="url"
-                        value={coverUrl}
-                        onChange={(e) => setCoverUrl(e.target.value)}
-                        placeholder="https://..."
-                        className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm font-mono"
-                      />
+                      <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        <span>Cover URL</span>
+                        <button
+                          type="button"
+                          onClick={() => toggleFieldLock('cover')}
+                          className={`p-1 rounded transition-all ${isFieldLocked('cover') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
+                          title={isFieldLocked('cover') ? 'Unlock field' : 'Lock field from IGDB updates'}
+                        >
+                          {isFieldLocked('cover') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="url"
+                          value={coverUrl}
+                          onChange={(e) => setCoverUrl(e.target.value)}
+                          placeholder="https://..."
+                          className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm font-mono ${isFieldLocked('cover') ? 'border-amber-500/50' : 'border-steel/50'}`}
+                        />
+                        {coverUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setCoverUrl('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -661,50 +733,118 @@ export default function GameFormModal({
                 {/* Developer + Publisher */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                      <Building2 className="w-3 h-3" /> Developer
-                    </label>
-                    <input
-                      type="text"
-                      value={developer}
-                      onChange={(e) => setDeveloper(e.target.value)}
-                      placeholder="Studio name..."
-                      className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
-                    />
+                    <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                      <span className="flex items-center gap-1.5"><Building2 className="w-3 h-3" /> Developer</span>
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldLock('developer')}
+                        className={`p-1 rounded transition-all ${isFieldLocked('developer') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
+                        title={isFieldLocked('developer') ? 'Unlock field' : 'Lock field from IGDB updates'}
+                      >
+                        {isFieldLocked('developer') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={developer}
+                        onChange={(e) => setDeveloper(e.target.value)}
+                        placeholder="Studio name..."
+                        className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm ${isFieldLocked('developer') ? 'border-amber-500/50' : 'border-steel/50'}`}
+                      />
+                      {developer && (
+                        <button
+                          type="button"
+                          onClick={() => setDeveloper('')}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                       <Users className="w-3 h-3" /> Publisher
                     </label>
-                    <input
-                      type="text"
-                      value={publisher}
-                      onChange={(e) => setPublisher(e.target.value)}
-                      placeholder="Publisher name..."
-                      className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={publisher}
+                        onChange={(e) => setPublisher(e.target.value)}
+                        placeholder="Publisher name..."
+                        className="w-full px-3 py-2.5 pr-8 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
+                      />
+                      {publisher && (
+                        <button
+                          type="button"
+                          onClick={() => setPublisher('')}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 {/* Release Date */}
                 <div>
-                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                    <Calendar className="w-3 h-3" /> Release Date
-                  </label>
-                  <input
-                    type="date"
-                    value={releaseDate}
-                    onChange={(e) => setReleaseDate(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50 text-sm [color-scheme:dark]"
-                  />
+                  <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Release Date</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleFieldLock('releaseDate')}
+                      className={`p-1 rounded transition-all ${isFieldLocked('releaseDate') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
+                      title={isFieldLocked('releaseDate') ? 'Unlock field' : 'Lock field from IGDB updates'}
+                    >
+                      {isFieldLocked('releaseDate') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={releaseDate}
+                      onChange={(e) => setReleaseDate(e.target.value)}
+                      className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white focus:outline-none focus:border-cyan-500/50 text-sm [color-scheme:dark] ${isFieldLocked('releaseDate') ? 'border-amber-500/50' : 'border-steel/50'}`}
+                    />
+                    {releaseDate && (
+                      <button
+                        type="button"
+                        onClick={() => setReleaseDate('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Genres */}
                 <div>
-                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                    <Layers className="w-3 h-3" /> Genres
-                  </label>
-                  <div className="flex flex-wrap gap-1.5 p-2.5 bg-abyss border border-steel/50 rounded-lg min-h-[42px]">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <span className="flex items-center gap-1.5"><Layers className="w-3 h-3" /> Genres</span>
+                    <div className="flex items-center gap-2">
+                      {genres.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setGenres([])}
+                          className="text-gray-600 hover:text-red-400 transition-colors"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldLock('genres')}
+                        className={`p-1 rounded transition-all ${isFieldLocked('genres') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
+                        title={isFieldLocked('genres') ? 'Unlock field' : 'Lock field from IGDB updates'}
+                      >
+                        {isFieldLocked('genres') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className={`flex flex-wrap gap-1.5 p-2.5 bg-abyss border rounded-lg min-h-[42px] ${isFieldLocked('genres') ? 'border-amber-500/50' : 'border-steel/50'}`}>
                     {genres.map((genre) => (
                       <span
                         key={genre}
@@ -731,15 +871,34 @@ export default function GameFormModal({
 
                 {/* Description */}
                 <div>
-                  <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                    <FileText className="w-3 h-3" /> Description
-                  </label>
+                  <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <span className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Description</span>
+                    <div className="flex items-center gap-2">
+                      {description && (
+                        <button
+                          type="button"
+                          onClick={() => setDescription('')}
+                          className="text-gray-600 hover:text-red-400 transition-colors"
+                        >
+                          Clear
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldLock('description')}
+                        className={`p-1 rounded transition-all ${isFieldLocked('description') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
+                        title={isFieldLocked('description') ? 'Unlock field' : 'Lock field from IGDB updates'}
+                      >
+                        {isFieldLocked('description') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                      </button>
+                    </div>
+                  </div>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Game description..."
                     rows={3}
-                    className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm resize-none"
+                    className={`w-full px-3 py-2.5 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm resize-none ${isFieldLocked('description') ? 'border-amber-500/50' : 'border-steel/50'}`}
                   />
                 </div>
               </div>
@@ -754,15 +913,32 @@ export default function GameFormModal({
 
                 {/* Platform Selection */}
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">
-                    Platform <span className="text-red-400">*</span>
+                  <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    <span>Platform</span>
+                    {selectedPlatform && (
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedPlatform(''); setSelectedConsole(''); }}
+                        className="text-gray-600 hover:text-red-400 transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
                   </label>
                   <div className="grid grid-cols-3 gap-1.5">
-                    {PLATFORMS.filter(p => ['PC', 'Steam', 'PlayStation', 'Xbox', 'Epic Games', 'EA App', 'Nintendo', 'Battle.net', 'Physical'].includes(p.id)).sort((a, b) => a.label.localeCompare(b.label)).map((platform) => (
+                    {PLATFORMS.filter(p => ['PC', 'Steam', 'PlayStation', 'Xbox', 'Epic Games', 'EA App', 'Nintendo', 'Battle.net'].includes(p.id)).sort((a, b) => a.label.localeCompare(b.label)).map((platform) => (
                       <button
                         key={platform.id}
                         type="button"
-                        onClick={() => { setSelectedPlatform(platform.id); setSelectedConsole(''); }}
+                        onClick={() => {
+                          if (selectedPlatform === platform.id) {
+                            setSelectedPlatform('');
+                            setSelectedConsole('');
+                          } else {
+                            setSelectedPlatform(platform.id);
+                            setSelectedConsole('');
+                          }
+                        }}
                         className={`px-2 py-2 rounded-lg text-[11px] font-semibold transition-all ${
                           selectedPlatform === platform.id
                             ? `bg-gradient-to-r ${platform.color} text-white shadow-lg`
@@ -780,7 +956,13 @@ export default function GameFormModal({
                         <button
                           key={consoleName}
                           type="button"
-                          onClick={() => setSelectedConsole(consoleName)}
+                          onClick={() => {
+                            if (selectedConsole === consoleName) {
+                              setSelectedConsole('');
+                            } else {
+                              setSelectedConsole(consoleName);
+                            }
+                          }}
                           className={`px-2 py-1.5 rounded text-[10px] font-medium transition-all ${
                             selectedConsole === consoleName
                               ? 'bg-purple-500/30 border border-purple-500/50 text-purple-300'
@@ -917,6 +1099,32 @@ export default function GameFormModal({
                   </div>
                 </button>
 
+                {/* Adult Content Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setIsAdult(!isAdult)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
+                    isAdult
+                      ? 'bg-rose-500/20 border border-rose-500/50'
+                      : 'bg-abyss border border-steel/50 hover:border-steel'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className={`w-4 h-4 ${isAdult ? 'text-rose-400' : 'text-gray-500'}`} />
+                    <div className="flex flex-col items-start">
+                      <span className={`text-sm font-medium ${isAdult ? 'text-rose-300' : 'text-gray-400'}`}>
+                        Adult Content
+                      </span>
+                      <span className="text-[10px] text-gray-600">
+                        Hides game and blurs cover
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full transition-all ${isAdult ? 'bg-rose-500' : 'bg-steel'}`}>
+                    <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-all ${isAdult ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
+                  </div>
+                </button>
+
                 {/* Edit Mode: Additional Fields */}
                 {isEditMode && (
                   <>
@@ -926,15 +1134,26 @@ export default function GameFormModal({
                         <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                           <Timer className="w-3 h-3" /> Hours
                         </label>
-                        <input
-                          type="number"
-                          value={playtimeHours}
-                          onChange={(e) => setPlaytimeHours(e.target.value)}
-                          min="0"
-                          step="0.1"
-                          placeholder="0"
-                          className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
-                        />
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={playtimeHours}
+                            onChange={(e) => setPlaytimeHours(e.target.value)}
+                            min="0"
+                            step="0.1"
+                            placeholder="0"
+                            className="w-full px-3 py-2.5 pr-7 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                          />
+                          {playtimeHours && (
+                            <button
+                              type="button"
+                              onClick={() => setPlaytimeHours('')}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
@@ -948,9 +1167,18 @@ export default function GameFormModal({
                             min="0"
                             max="100"
                             placeholder="0"
-                            className="w-full px-3 py-2.5 pr-7 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                            className="w-full px-3 py-2.5 pr-12 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+                          <span className="absolute right-7 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+                          {completionPercentage && (
+                            <button
+                              type="button"
+                              onClick={() => setCompletionPercentage('')}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       </div>
                       <div>
@@ -965,9 +1193,18 @@ export default function GameFormModal({
                             min="1"
                             max="10"
                             placeholder="—"
-                            className="w-full px-3 py-2.5 pr-8 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                            className="w-full px-3 py-2.5 pr-12 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">/10</span>
+                          <span className="absolute right-7 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">/10</span>
+                          {personalRating && (
+                            <button
+                              type="button"
+                              onClick={() => setPersonalRating('')}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -995,8 +1232,17 @@ export default function GameFormModal({
 
                     {/* Notes */}
                     <div>
-                      <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                        <FileText className="w-3 h-3" /> Notes
+                      <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                        <span className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Notes</span>
+                        {notes && (
+                          <button
+                            type="button"
+                            onClick={() => setNotes('')}
+                            className="text-gray-600 hover:text-red-400 transition-colors"
+                          >
+                            Clear
+                          </button>
+                        )}
                       </label>
                       <textarea
                         value={notes}
@@ -1011,7 +1257,18 @@ export default function GameFormModal({
                     <div>
                       <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
                         <span className="flex items-center gap-1.5"><Tag className="w-3 h-3" /> Tags</span>
-                        <span className="text-gray-600">{tags.length}/10</span>
+                        <span className="flex items-center gap-2">
+                          {tags.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setTags([])}
+                              className="text-gray-600 hover:text-red-400 transition-colors"
+                            >
+                              Clear all
+                            </button>
+                          )}
+                          <span className="text-gray-600">{tags.length}/10</span>
+                        </span>
                       </label>
                       <div className="flex flex-wrap gap-1.5 p-2.5 bg-abyss border border-steel/50 rounded-lg min-h-[42px]">
                         {tags.map((tag) => (

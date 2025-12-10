@@ -176,11 +176,30 @@ export async function addGameToLibrary(formData: FormData) {
     }
 
     gameId = newGame.id;
+  } else {
+    // Update existing game with new metadata if provided
+    const updateData: Record<string, unknown> = {};
+    if (description) updateData.description = description;
+    if (coverUrl) updateData.cover_url = coverUrl;
+    if (developer) updateData.developer = developer;
+    if (publisher) updateData.publisher = publisher;
+    if (releaseDate) updateData.release_date = releaseDate;
+    if (genres.length > 0) updateData.genres = genres;
+
+    if (Object.keys(updateData).length > 0) {
+      await supabase
+        .from('games')
+        .update(updateData)
+        .eq('id', existingGame.id);
+    }
   }
 
   // Get ownership status from form (defaults to 'owned')
   const ownershipStatus = (formData.get('ownership_status') as OwnershipStatus) || 'owned';
   const isPhysical = formData.get('is_physical') === 'true';
+  const isHidden = formData.get('hidden') === 'true';
+  const tagsJson = formData.get('tags') as string;
+  const tags: string[] = tagsJson ? JSON.parse(tagsJson) : [];
 
   // Add to user's library
   const { error: userGameError } = await supabase.from('user_games').insert({
@@ -194,6 +213,8 @@ export async function addGameToLibrary(formData: FormData) {
     last_played_at: status === 'playing' ? new Date().toISOString() : null,
     ownership_status: ownershipStatus,
     is_physical: isPhysical,
+    hidden: isHidden,
+    tags: tags.length > 0 ? tags : null,
   });
 
   if (userGameError) {
@@ -323,6 +344,7 @@ export async function editUserGame(formData: FormData) {
   }
 
   revalidatePath('/dashboard');
+  revalidatePath('/library');
   return { success: true };
 }
 
