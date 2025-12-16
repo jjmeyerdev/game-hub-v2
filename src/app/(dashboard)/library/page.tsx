@@ -160,7 +160,7 @@ export default function LibraryPage() {
   // Stats - always include ALL games (including hidden) for accurate totals
   const totalGames = userGames.length;
   const nowPlayingCount = userGames.filter(g => g.status === 'playing').length;
-  const completedCount = userGames.filter(g => g.status === 'completed' || g.status === '100_completed').length;
+  const completedCount = userGames.filter(g => g.status === 'completed' || g.status === 'finished').length;
   const totalPlaytime = Math.round(userGames.reduce((acc, g) => acc + g.playtime_hours, 0));
 
   // Visible games count (for the filtered display)

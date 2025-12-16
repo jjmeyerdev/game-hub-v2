@@ -394,7 +394,7 @@ export async function getUserStats() {
   const hoursPlayed = games.reduce((sum, g) => sum + (g.playtime_hours || 0), 0);
   const achievements = games.reduce((sum, g) => sum + (g.achievements_earned || 0), 0);
   const completedGames = games.filter(
-    (g) => g.status === 'completed' || g.status === '100_completed'
+    (g) => g.status === 'completed' || g.status === 'finished'
   ).length;
   const completionRate = totalGames > 0 ? Math.round((completedGames / totalGames) * 100) : 0;
 
@@ -1197,7 +1197,7 @@ export async function mergeStatsAcrossCopies(gameIds: string[]) {
     'playing': 2,
     'played': 3,
     'completed': 4,
-    '100_completed': 5,
+    'finished': 5,
   };
 
   const priorityOrder: Record<string, number> = {
@@ -1346,7 +1346,7 @@ export async function mergeSelectedKeepRest(selectedIds: string[]) {
     'playing': 2,
     'played': 3,
     'completed': 4,
-    '100_completed': 5,
+    'finished': 5,
   };
 
   const priorityOrder: Record<string, number> = {
