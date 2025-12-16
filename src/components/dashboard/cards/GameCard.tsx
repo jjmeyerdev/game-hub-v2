@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { UserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 import { getGameSyncSource } from '@/lib/utils';
 
 interface GameCardProps {

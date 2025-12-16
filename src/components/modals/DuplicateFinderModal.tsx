@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Merge, Gamepad2, Clock, Trophy, Check, Layers, Sparkles, ArrowRight, Play, Ban, RotateCw, RefreshCcw } from 'lucide-react';
-import { findDuplicateGames, mergeDuplicateGames, mergeStatsAcrossCopies, deleteUserGame, dismissDuplicateGroup, clearAllDismissedDuplicates } from '@/app/_actions/games';
-import type { DuplicateGroup, UserGame, Game } from '@/app/_actions/games';
+import { findDuplicateGames, mergeDuplicateGames, mergeStatsAcrossCopies, deleteUserGame, dismissDuplicateGroup, clearAllDismissedDuplicates } from '@/app/(dashboard)/_actions/games';
+import type { DuplicateGroup, UserGame, Game } from '@/app/(dashboard)/_actions/games';
 
 interface DuplicateFinderModalProps {
   isOpen: boolean;

@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { Gamepad2, X, Zap, Shield, Loader2, AlertCircle } from 'lucide-react';
-import { signIn } from '@/app/_actions/auth';
+import { signIn } from '@/app/(auth)/_actions/auth';
 
 export default function LoginPage() {
   const [state, formAction] = useActionState<{ error?: string } | undefined, FormData>(signIn, undefined);

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Loader2, CheckCircle, XCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { BaseModal } from '@/components/modals';
-import { syncSteamLibrary } from '@/app/_actions/steam';
+import { syncSteamLibrary } from '@/app/(dashboard)/_actions/steam';
 import type { SteamSyncResult } from '@/lib/types/steam';
 
 interface SteamImportModalProps {

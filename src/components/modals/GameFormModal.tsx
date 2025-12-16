@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Gamepad2, Loader2, Edit3 } from 'lucide-react';
-import { addGameToLibrary, editUserGame, fetchIGDBMetadata } from '@/app/_actions/games';
-import type { UserGame } from '@/app/_actions/games';
+import { addGameToLibrary, editUserGame, fetchIGDBMetadata } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 import { BaseModal } from '@/components/modals';
 import { useIGDBSearch } from '@/lib/hooks';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';

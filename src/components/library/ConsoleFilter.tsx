@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { CONSOLE_GENERATIONS } from '@/lib/constants/platforms';
 import { getGameSyncSource } from '@/lib/utils';
-import type { UserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 import type { SyncSourceId } from '@/lib/constants/platforms';
 
 interface ConsoleFilterProps {

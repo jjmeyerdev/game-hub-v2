@@ -19,8 +19,8 @@ import {
 } from 'lucide-react';
 import { useDashboardData } from '@/lib/hooks';
 import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
-import { updateUserGame } from '@/app/_actions/games';
-import type { UserGame } from '@/app/_actions/games';
+import { updateUserGame } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 
 type PriorityLevel = 'high' | 'medium' | 'low';
 

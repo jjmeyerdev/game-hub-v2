@@ -16,8 +16,8 @@ import {
   SteamImportModal,
 } from '@/components/modals';
 import { RateLimitToast } from '@/components/ui/RateLimitToast';
-import type { UserGame } from '@/app/_actions/games';
-import { getSteamProfile } from '@/app/_actions/steam';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
+import { getSteamProfile } from '@/app/(dashboard)/_actions/steam';
 import type { SteamProfile } from '@/lib/types/steam';
 
 export default function DashboardPage() {

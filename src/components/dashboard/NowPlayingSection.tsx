@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Crosshair, ChevronRight, Gamepad2, Target } from 'lucide-react';
-import type { UserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 import { NowPlayingCarousel } from './NowPlayingCarousel';
 
 interface NowPlayingSectionProps {

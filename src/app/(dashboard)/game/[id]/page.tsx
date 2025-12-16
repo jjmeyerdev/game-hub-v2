@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
 import { isPcPlatform } from '@/lib/constants/platforms';
-import type { UserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 
 export default function GameDetailPage() {
   const params = useParams();

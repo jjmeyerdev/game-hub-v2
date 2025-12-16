@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { syncSessionWithSteam, getTodayPlaytime } from '@/app/_actions/sessions';
+import { syncSessionWithSteam, getTodayPlaytime } from '@/app/(dashboard)/_actions/sessions';
 import type { GameSession } from '@/lib/types/steam';
 
 // Polling intervals - conservative to avoid Steam API rate limits

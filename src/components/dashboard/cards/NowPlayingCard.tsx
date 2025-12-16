@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Library, Edit3, Trash2, Eye, EyeOff, Unlock, Trophy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { UserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 
 interface NowPlayingCardProps {
   game: UserGame;

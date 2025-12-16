@@ -16,7 +16,7 @@ import {
   ChevronDown,
   Radio,
 } from 'lucide-react';
-import { signOut } from '@/app/_actions/auth';
+import { signOut } from '@/app/(auth)/_actions/auth';
 import { NavItem } from './NavItem';
 
 interface DashboardSidebarProps {

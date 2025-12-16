@@ -1,5 +1,5 @@
 import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar } from 'lucide-react';
-import type { UserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 
 interface GameListItemProps {
   game: UserGame;
