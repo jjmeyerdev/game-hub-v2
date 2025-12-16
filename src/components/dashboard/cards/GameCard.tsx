@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Library, Edit3, Trash2, Trophy, EyeOff, Flame, Clock, Gamepad2, Disc } from 'lucide-react';
+import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { UserGame } from '@/app/actions/games';
+import type { UserGame } from '@/app/_actions/games';
+import { getGameSyncSource } from '@/lib/utils';
 
 interface GameCardProps {
   game: UserGame;
@@ -16,9 +17,10 @@ interface GameCardProps {
 export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }: GameCardProps) {
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
-  const isCompleted = game.status === 'completed' || game.status === '100_completed';
+  const [isRevealed, setIsRevealed] = useState(false);
+  const isCompleted = game.status === 'completed' || game.status === 'finished';
   const isAdult = game.tags?.includes('adult') ?? false;
-  const shouldCensor = isAdult && censorHidden;
+  const shouldCensor = isAdult && censorHidden && !isRevealed;
   const hasPlaytime = game.playtime_hours > 0;
 
   const handleClick = () => {
@@ -36,9 +38,10 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
   const getStatusColor = () => {
     switch (game.status) {
       case 'playing': return 'from-emerald-500 to-cyan-500';
-      case 'completed': return 'from-amber-400 to-orange-500';
-      case '100_completed': return 'from-fuchsia-500 to-purple-600';
-      case 'on_hold': return 'from-blue-400 to-indigo-500';
+      case 'played': return 'from-purple-500 to-violet-500';
+      case 'completed': return 'from-cyan-400 to-blue-500';
+      case 'finished': return 'from-amber-400 to-orange-500';
+      case 'on_hold': return 'from-rose-400 to-pink-500';
       case 'dropped': return 'from-red-500 to-rose-600';
       default: return 'from-gray-500 to-gray-600';
     }
@@ -108,7 +111,45 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
               <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl" />
             </div>
             <span className="mt-3 text-[10px] font-bold text-purple-300/80 uppercase tracking-[0.2em]">Private</span>
+
+            {/* Reveal button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRevealed(true);
+              }}
+              className="mt-4 group/reveal relative px-4 py-1.5 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+            >
+              {/* Animated gradient border */}
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 opacity-50 group-hover/reveal:opacity-100 transition-opacity" style={{ backgroundSize: '200% 100%', animation: 'shimmer 2s linear infinite' }} />
+              <div className="absolute inset-[1px] rounded-[7px] bg-void/90 backdrop-blur-sm" />
+
+              {/* Button content */}
+              <div className="relative flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-purple-300 group-hover/reveal:text-cyan-300 transition-colors" />
+                <span className="text-[10px] font-bold text-purple-300 group-hover/reveal:text-cyan-300 uppercase tracking-wider transition-colors">
+                  Reveal
+                </span>
+              </div>
+
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 rounded-lg opacity-0 group-hover/reveal:opacity-100 transition-opacity pointer-events-none" style={{ boxShadow: '0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(6, 182, 212, 0.2)' }} />
+            </button>
           </div>
+        )}
+
+        {/* Re-hide button when revealed */}
+        {isAdult && censorHidden && isRevealed && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsRevealed(false);
+            }}
+            className="absolute top-2.5 right-2.5 z-20 p-1.5 rounded-lg bg-void/80 backdrop-blur-md ring-1 ring-purple-500/30 hover:ring-purple-500 hover:bg-purple-500/20 transition-all duration-200 hover:scale-110 group/hide"
+            title="Hide content"
+          >
+            <EyeOff className="w-3.5 h-3.5 text-purple-400 group-hover/hide:text-purple-300 transition-colors" />
+          </button>
         )}
 
         {/* Top section - Platform & sync badges */}
@@ -129,45 +170,37 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                 })()}
               </span>
 
-              {/* Sync badges */}
-              {game.game?.steam_appid && (
-                <span
-                  className="w-6 h-5 bg-[#1b2838]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10"
-                  title="Steam"
-                >
-                  <svg className="w-3 h-3 text-[#66c0f4]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0z"/>
-                  </svg>
-                </span>
-              )}
-              {game.game?.psn_communication_id && (
-                <span
-                  className="w-6 h-5 bg-[#003791]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10"
-                  title="PlayStation"
-                >
-                  <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.181.76.814.76 1.505v5.876c2.441 1.193 4.362-.002 4.362-3.153 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.391-1.502h-.002zm4.656 16.242l6.296-2.275c.715-.258.826-.625.246-.818-.586-.192-1.637-.139-2.357.123l-4.205 1.5v-2.385l.24-.085s1.201-.42 2.913-.615c1.696-.18 3.792.03 5.437.661 1.848.596 2.063 1.473 1.597 2.085-.466.611-1.635 1.04-1.635 1.04l-8.532 3.047v-2.278zM1.004 18.241c-1.513-.453-1.775-1.396-1.08-1.985.654-.556 1.77-.96 1.77-.96l5.572-1.99v2.316l-4.049 1.446c-.715.257-.826.625-.247.817.587.193 1.637.14 2.358-.12l1.938-.707v2.068c-.127.026-.262.047-.39.07-1.765.286-3.655.078-5.872-.955z"/>
-                  </svg>
-                </span>
-              )}
-              {game.game?.xbox_title_id && (
-                <span
-                  className="w-6 h-5 bg-[#107c10]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10"
-                  title="Xbox"
-                >
-                  <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6.43 3.72A9.449 9.449 0 0 0 5.4 4.63c-.43.43.64 2.12 1.97 3.56 1.32 1.45 3.32 3.53 4.63 5.97 1.31-2.44 3.31-4.52 4.63-5.97 1.33-1.44 2.4-3.13 1.97-3.56a9.449 9.449 0 0 0-1.03-.91C14.93 2.23 13.09 2 12 2c-1.09 0-2.93.23-5.57 1.72zm-3.65 4.6c-1.58 2.05-2.3 4.1-2.3 6.2 0 1.59.29 2.97.85 4.18 1.07-1.46 2.4-3.73 3.66-5.95 1.26-2.23 2.37-3.98 3.16-4.92-1.42-1.52-3.46-3.67-4.08-3.16-.28.23-.8.87-1.29 1.65zm18.45 0c-.5-.78-1.01-1.42-1.3-1.65-.61-.51-2.65 1.64-4.07 3.16.79.94 1.9 2.69 3.16 4.92 1.26 2.22 2.59 4.49 3.66 5.95.56-1.21.85-2.59.85-4.18 0-2.1-.72-4.15-2.3-6.2zM12 13.61c-1.62 2.93-3.49 6.13-4.31 7.45.92.42 2.04.94 4.31.94 2.27 0 3.39-.52 4.31-.94-.82-1.32-2.69-4.52-4.31-7.45z"/>
-                  </svg>
-                </span>
-              )}
-              {game.game?.epic_catalog_item_id && (
-                <span
-                  className="w-6 h-5 bg-[#2a2a2a]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10"
-                  title="Epic Games"
-                >
-                  <span className="text-[10px] font-black text-white">E</span>
-                </span>
-              )}
+              {/* Sync badge - based on user's platform, not shared game IDs */}
+              {(() => {
+                const syncSource = getGameSyncSource(game);
+                if (syncSource === 'steam') return (
+                  <span className="w-6 h-5 bg-[#1b2838]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10" title="Steam">
+                    <svg className="w-3 h-3 text-[#66c0f4]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0z"/>
+                    </svg>
+                  </span>
+                );
+                if (syncSource === 'psn') return (
+                  <span className="w-6 h-5 bg-[#003791]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10" title="PlayStation">
+                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.181.76.814.76 1.505v5.876c2.441 1.193 4.362-.002 4.362-3.153 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.391-1.502h-.002zm4.656 16.242l6.296-2.275c.715-.258.826-.625.246-.818-.586-.192-1.637-.139-2.357.123l-4.205 1.5v-2.385l.24-.085s1.201-.42 2.913-.615c1.696-.18 3.792.03 5.437.661 1.848.596 2.063 1.473 1.597 2.085-.466.611-1.635 1.04-1.635 1.04l-8.532 3.047v-2.278zM1.004 18.241c-1.513-.453-1.775-1.396-1.08-1.985.654-.556 1.77-.96 1.77-.96l5.572-1.99v2.316l-4.049 1.446c-.715.257-.826.625-.247.817.587.193 1.637.14 2.358-.12l1.938-.707v2.068c-.127.026-.262.047-.39.07-1.765.286-3.655.078-5.872-.955z"/>
+                    </svg>
+                  </span>
+                );
+                if (syncSource === 'xbox') return (
+                  <span className="w-6 h-5 bg-[#107c10]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10" title="Xbox">
+                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6.43 3.72A9.449 9.449 0 0 0 5.4 4.63c-.43.43.64 2.12 1.97 3.56 1.32 1.45 3.32 3.53 4.63 5.97 1.31-2.44 3.31-4.52 4.63-5.97 1.33-1.44 2.4-3.13 1.97-3.56a9.449 9.449 0 0 0-1.03-.91C14.93 2.23 13.09 2 12 2c-1.09 0-2.93.23-5.57 1.72zm-3.65 4.6c-1.58 2.05-2.3 4.1-2.3 6.2 0 1.59.29 2.97.85 4.18 1.07-1.46 2.4-3.73 3.66-5.95 1.26-2.23 2.37-3.98 3.16-4.92-1.42-1.52-3.46-3.67-4.08-3.16-.28.23-.8.87-1.29 1.65zm18.45 0c-.5-.78-1.01-1.42-1.3-1.65-.61-.51-2.65 1.64-4.07 3.16.79.94 1.9 2.69 3.16 4.92 1.26 2.22 2.59 4.49 3.66 5.95.56-1.21.85-2.59.85-4.18 0-2.1-.72-4.15-2.3-6.2zM12 13.61c-1.62 2.93-3.49 6.13-4.31 7.45.92.42 2.04.94 4.31.94 2.27 0 3.39-.52 4.31-.94-.82-1.32-2.69-4.52-4.31-7.45z"/>
+                    </svg>
+                  </span>
+                );
+                if (syncSource === 'epic') return (
+                  <span className="w-6 h-5 bg-[#2a2a2a]/90 backdrop-blur-md rounded flex items-center justify-center ring-1 ring-white/10" title="Epic Games">
+                    <span className="text-[10px] font-black text-white">E</span>
+                  </span>
+                );
+                return null; // manual - no badge
+              })()}
             </div>
 
             {/* Status indicators */}
@@ -219,8 +252,9 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                   style={{
                     width: game.status === 'unplayed' ? '0%' :
                            game.status === 'playing' ? '50%' :
+                           game.status === 'played' ? '75%' :
                            game.status === 'completed' ? '100%' :
-                           game.status === '100_completed' ? '100%' : '25%'
+                           game.status === 'finished' ? '100%' : '25%'
                   }}
                 />
               </div>

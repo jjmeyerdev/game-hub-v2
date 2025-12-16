@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { RefreshCw, ChevronDown, Check, AlertCircle } from 'lucide-react';
-import { getSteamProfile, syncSteamLibrary } from '@/app/actions/steam';
-import { getPsnProfile, syncPsnLibrary } from '@/app/actions/psn';
-import { getXboxProfile, syncXboxLibrary } from '@/app/actions/xbox';
-import { getEpicProfile, syncEpicLibrary } from '@/app/actions/epic';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { RefreshCw, ChevronDown, Check, AlertCircle, Clock } from 'lucide-react';
+import { getSteamProfile, syncSteamLibrary } from '@/app/_actions/steam';
+import { getPsnProfile, syncPsnLibrary } from '@/app/_actions/psn';
+import { getXboxProfile, syncXboxLibrary } from '@/app/_actions/xbox';
+import { getEpicProfile, syncEpicLibrary } from '@/app/_actions/epic';
 import { SyncProgressModal } from '@/components/ui/SyncProgressModal';
 import { SyncToast } from '@/components/ui/SyncToast';
 import { triggerLibraryRefresh } from '@/lib/events/libraryEvents';
@@ -75,9 +75,61 @@ const SERVICE_CONFIG = {
   },
 } as const;
 
+// Per-service cooldown periods based on API rate limits
+// Steam: 100,000+ requests/day - very generous, 1 minute cooldown
+// PSN: 300 requests/15 min via psn-api - 3 minute cooldown
+// Xbox: 150 requests/hour via OpenXBL - most restrictive, 5 minute cooldown
+// Epic: Moderate limits - 2 minute cooldown
+const SERVICE_COOLDOWNS: Record<ServiceKey, number> = {
+  steam: 1 * 60 * 1000,   // 1 minute
+  psn: 3 * 60 * 1000,     // 3 minutes
+  xbox: 5 * 60 * 1000,    // 5 minutes (OpenXBL: 150 req/hour)
+  epic: 2 * 60 * 1000,    // 2 minutes
+};
+
+function getCooldownRemaining(lastSync: string | null, service: ServiceKey): number {
+  if (!lastSync) return 0;
+  const lastSyncTime = new Date(lastSync).getTime();
+  const now = Date.now();
+  const elapsed = now - lastSyncTime;
+  const cooldownMs = SERVICE_COOLDOWNS[service];
+  const remaining = cooldownMs - elapsed;
+  return Math.max(0, remaining);
+}
+
+function formatTimeRemaining(ms: number): string {
+  const totalSeconds = Math.ceil(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function formatLastSync(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  // Show relative time for recent syncs
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  // Show date and time for older syncs
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 export function SyncServiceDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<ServiceStatus>({
     steam: null,
     psn: null,
@@ -87,10 +139,52 @@ export function SyncServiceDropdown() {
   const [syncingService, setSyncingService] = useState<ServiceKey | null>(null);
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [cooldowns, setCooldowns] = useState<Record<ServiceKey, number>>({
+    steam: 0,
+    psn: 0,
+    xbox: 0,
+    epic: 0,
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const hasLoadedRef = useRef(false);
+
+  // Get last sync time for a service
+  const getLastSync = useCallback((service: ServiceKey): string | null => {
+    const profile = services[service];
+    if (!profile) return null;
+    switch (service) {
+      case 'steam':
+        return (profile as SteamProfile).steam_last_sync;
+      case 'psn':
+        return (profile as PsnProfile).psn_last_sync;
+      case 'xbox':
+        return (profile as XboxDbProfile).xbox_last_sync;
+      case 'epic':
+        return (profile as EpicProfile).epic_last_sync;
+    }
+  }, [services]);
+
+  // Update cooldowns every second
+  useEffect(() => {
+    const updateCooldowns = () => {
+      setCooldowns({
+        steam: getCooldownRemaining(getLastSync('steam'), 'steam'),
+        psn: getCooldownRemaining(getLastSync('psn'), 'psn'),
+        xbox: getCooldownRemaining(getLastSync('xbox'), 'xbox'),
+        epic: getCooldownRemaining(getLastSync('epic'), 'epic'),
+      });
+    };
+
+    updateCooldowns();
+    const interval = setInterval(updateCooldowns, 1000);
+    return () => clearInterval(interval);
+  }, [getLastSync]);
+
   // Load all service profiles
-  async function loadProfiles() {
+  async function loadProfiles(forceReload = false) {
+    if (hasLoadedRef.current && !forceReload) return;
+    hasLoadedRef.current = true;
     setLoading(true);
     const [steam, psn, xbox, epic] = await Promise.all([
       getSteamProfile(),
@@ -102,10 +196,12 @@ export function SyncServiceDropdown() {
     setLoading(false);
   }
 
-  // Load profiles on mount
+  // Load profiles when dropdown opens for the first time
   useEffect(() => {
-    loadProfiles();
-  }, []);
+    if (isOpen && !hasLoadedRef.current) {
+      loadProfiles();
+    }
+  }, [isOpen]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -146,7 +242,7 @@ export function SyncServiceDropdown() {
       setShowToast(true);
       triggerLibraryRefresh();
       // Reload profiles to update last sync timestamps
-      await loadProfiles();
+      await loadProfiles(true);
     } catch (error) {
       console.error(`Failed to sync ${service}:`, error);
       setSyncResult({
@@ -190,7 +286,7 @@ export function SyncServiceDropdown() {
     setSyncingService(null);
     triggerLibraryRefresh();
     // Reload profiles to update last sync timestamps
-    await loadProfiles();
+    await loadProfiles(true);
     setSyncResult({
       success: true,
       gamesAdded: 0,
@@ -201,18 +297,21 @@ export function SyncServiceDropdown() {
     setShowToast(true);
   }
 
+  // Button should be enabled before profiles load (to trigger lazy load)
+  const hasLoadedAndNoServices = hasLoadedRef.current && !hasConnectedServices;
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Main Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        disabled={loading || !hasConnectedServices || syncingService !== null}
+        disabled={hasLoadedAndNoServices || syncingService !== null}
         className={`
           relative group flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm
           transition-all duration-300 overflow-hidden
-          ${hasConnectedServices
-            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40'
-            : 'bg-deep border border-steel text-gray-500 cursor-not-allowed'
+          ${hasLoadedAndNoServices
+            ? 'bg-deep border border-steel text-gray-500 cursor-not-allowed'
+            : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40'
           }
           disabled:opacity-50 disabled:cursor-not-allowed
         `}
@@ -226,7 +325,7 @@ export function SyncServiceDropdown() {
           <RefreshCw className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500" />
         )}
         <span>{syncingService ? 'Syncing...' : 'Sync'}</span>
-        {hasConnectedServices && !syncingService && (
+        {!syncingService && (
           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         )}
 
@@ -252,7 +351,7 @@ export function SyncServiceDropdown() {
       </button>
 
       {/* Dropdown Menu */}
-      {isOpen && hasConnectedServices && (
+      {isOpen && (loading || hasConnectedServices) && (
         <div
           className="absolute right-0 top-full mt-2 w-72 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
         >
@@ -272,7 +371,18 @@ export function SyncServiceDropdown() {
 
             {/* Service List */}
             <div className="py-2">
-              {connectedServices.map(([service, profile]) => {
+              {loading ? (
+                <div className="px-4 py-6 text-center">
+                  <RefreshCw className="w-6 h-6 animate-spin text-purple-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">Loading services...</p>
+                </div>
+              ) : !hasConnectedServices ? (
+                <div className="px-4 py-6 text-center">
+                  <AlertCircle className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">No services connected</p>
+                  <p className="text-xs text-gray-500 mt-1">Connect services in Settings</p>
+                </div>
+              ) : connectedServices.map(([service, profile]) => {
                 const config = SERVICE_CONFIG[service];
                 const lastSync =
                   service === 'steam' ? (profile as SteamProfile).steam_last_sync :
@@ -280,74 +390,172 @@ export function SyncServiceDropdown() {
                   service === 'xbox' ? (profile as XboxDbProfile).xbox_last_sync :
                   (profile as EpicProfile).epic_last_sync;
 
+                const cooldownMs = cooldowns[service];
+                const isOnCooldown = cooldownMs > 0;
+                const serviceCooldown = SERVICE_COOLDOWNS[service];
+                const cooldownProgress = isOnCooldown
+                  ? ((serviceCooldown - cooldownMs) / serviceCooldown) * 100
+                  : 100;
+
                 return (
-                  <button
-                    key={service}
-                    onClick={() => handleSync(service)}
-                    disabled={syncingService !== null}
-                    className={`
-                      w-full px-4 py-3 flex items-center gap-3 transition-all duration-200
-                      hover:bg-gradient-to-r ${config.hoverColor} hover:${config.bgColor}
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      group/item
-                    `}
-                  >
-                    {/* Service Icon */}
-                    <div className={`
-                      w-9 h-9 rounded-xl flex items-center justify-center
-                      ${config.bgColor} ${config.borderColor} border
-                      ${config.textColor}
-                      transition-transform group-hover/item:scale-110
-                    `}>
-                      {config.icon}
-                    </div>
-
-                    {/* Service Info */}
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-sm">{config.name}</span>
-                        <Check className={`w-3 h-3 ${config.textColor}`} />
-                      </div>
-                      <div className="text-[11px] text-gray-500">
-                        {lastSync
-                          ? `Last sync: ${new Date(lastSync).toLocaleDateString()}`
-                          : 'Never synced'
+                  <div key={service} className="relative">
+                    <button
+                      onClick={() => handleSync(service)}
+                      disabled={syncingService !== null || isOnCooldown}
+                      className={`
+                        w-full px-4 py-3 flex items-center gap-3 transition-all duration-200
+                        ${isOnCooldown
+                          ? 'opacity-75 cursor-not-allowed'
+                          : `hover:bg-gradient-to-r ${config.hoverColor} hover:${config.bgColor}`
                         }
+                        disabled:cursor-not-allowed
+                        group/item
+                      `}
+                    >
+                      {/* Service Icon */}
+                      <div className={`
+                        relative w-9 h-9 rounded-xl flex items-center justify-center
+                        ${config.bgColor} ${config.borderColor} border
+                        ${config.textColor}
+                        transition-transform ${!isOnCooldown ? 'group-hover/item:scale-110' : ''}
+                      `}>
+                        {config.icon}
+                        {/* Circular cooldown overlay */}
+                        {isOnCooldown && (
+                          <svg
+                            className="absolute inset-0 w-full h-full -rotate-90"
+                            viewBox="0 0 36 36"
+                          >
+                            <circle
+                              cx="18"
+                              cy="18"
+                              r="16"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeDasharray={`${cooldownProgress} 100`}
+                              className="opacity-40"
+                              style={{
+                                strokeLinecap: 'round',
+                                transition: 'stroke-dasharray 1s linear',
+                              }}
+                            />
+                          </svg>
+                        )}
                       </div>
-                    </div>
 
-                    {/* Sync indicator */}
-                    <RefreshCw className={`
-                      w-4 h-4 text-gray-500 transition-all
-                      group-hover/item:text-white group-hover/item:rotate-90
-                    `} />
-                  </button>
+                      {/* Service Info */}
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white text-sm">{config.name}</span>
+                          <Check className={`w-3 h-3 ${config.textColor}`} />
+                        </div>
+
+                        {/* Cooldown timer or last sync info */}
+                        {isOnCooldown ? (
+                          <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1 text-[11px] text-amber-400/90">
+                              <Clock className="w-3 h-3" />
+                              <span className="font-mono font-medium tracking-wide">
+                                {formatTimeRemaining(cooldownMs)}
+                              </span>
+                            </div>
+                            {/* Mini progress bar */}
+                            <div className="flex-1 h-1 bg-steel/30 rounded-full overflow-hidden max-w-16">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-500/60 to-amber-400/80 rounded-full transition-all duration-1000 ease-linear"
+                                style={{ width: `${cooldownProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-[11px] text-gray-500">
+                            {lastSync
+                              ? `Synced ${formatLastSync(lastSync)}`
+                              : 'Never synced'
+                            }
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Sync indicator */}
+                      {isOnCooldown ? (
+                        <div className="relative w-4 h-4 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-amber-500/20 rounded-full animate-ping" />
+                          <Clock className="w-3.5 h-3.5 text-amber-400/70" />
+                        </div>
+                      ) : (
+                        <RefreshCw className={`
+                          w-4 h-4 text-gray-500 transition-all
+                          group-hover/item:text-white group-hover/item:rotate-90
+                        `} />
+                      )}
+                    </button>
+
+                    {/* Bottom progress line for cooldown */}
+                    {isOnCooldown && (
+                      <div className="absolute bottom-0 left-4 right-4 h-px bg-steel/20 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-500/50 via-amber-400/70 to-amber-500/50 transition-all duration-1000 ease-linear"
+                          style={{ width: `${cooldownProgress}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
 
+
             {/* Sync All Footer */}
-            {connectedServices.length > 1 && (
-              <div className="px-3 py-2 border-t border-steel/30 bg-deep/50">
-                <button
-                  onClick={handleSyncAll}
-                  disabled={syncingService !== null}
-                  className="
-                    w-full px-4 py-2.5 rounded-xl
-                    bg-gradient-to-r from-cyan-500/20 to-purple-500/20
-                    hover:from-cyan-500/30 hover:to-purple-500/30
-                    border border-cyan-500/30
-                    text-sm font-semibold text-cyan-400
-                    transition-all duration-200
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    flex items-center justify-center gap-2
-                  "
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Sync All Services
-                </button>
-              </div>
-            )}
+            {connectedServices.length > 1 && (() => {
+              const servicesOnCooldown = connectedServices.filter(([service]) => cooldowns[service] > 0);
+              const allOnCooldown = servicesOnCooldown.length === connectedServices.length;
+              const someOnCooldown = servicesOnCooldown.length > 0;
+              const maxCooldown = someOnCooldown
+                ? Math.max(...servicesOnCooldown.map(([service]) => cooldowns[service]))
+                : 0;
+
+              return (
+                <div className="px-3 py-2 border-t border-steel/30 bg-deep/50">
+                  <button
+                    onClick={handleSyncAll}
+                    disabled={syncingService !== null || allOnCooldown}
+                    className={`
+                      w-full px-4 py-2.5 rounded-xl
+                      ${allOnCooldown
+                        ? 'bg-amber-500/10 border-amber-500/20'
+                        : 'bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 border-cyan-500/30'
+                      }
+                      border
+                      text-sm font-semibold
+                      ${allOnCooldown ? 'text-amber-400/70' : 'text-cyan-400'}
+                      transition-all duration-200
+                      disabled:opacity-70 disabled:cursor-not-allowed
+                      flex items-center justify-center gap-2
+                    `}
+                  >
+                    {allOnCooldown ? (
+                      <>
+                        <Clock className="w-4 h-4" />
+                        <span>Available in </span>
+                        <span className="font-mono">{formatTimeRemaining(maxCooldown)}</span>
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4" />
+                        <span>Sync All Services</span>
+                        {someOnCooldown && (
+                          <span className="text-[10px] text-amber-400/70 ml-1">
+                            ({connectedServices.length - servicesOnCooldown.length} ready)
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

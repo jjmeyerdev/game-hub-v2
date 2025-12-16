@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { X, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
-import { deleteUserGame } from '@/app/actions/games';
-import type { UserGame } from '@/app/actions/games';
+import { deleteUserGame } from '@/app/_actions/games';
+import type { UserGame } from '@/app/_actions/games';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;

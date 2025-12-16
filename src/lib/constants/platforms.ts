@@ -50,10 +50,11 @@ export const CONSOLE_OPTIONS: Record<string, readonly string[]> = {
 } as const;
 
 export const STATUSES = [
-  { id: 'unplayed', label: 'Unplayed', icon: '⏸️' },
-  { id: 'playing', label: 'Playing', icon: '▶️' },
+  { id: 'unplayed', label: 'Unplayed', icon: '○' },
+  { id: 'playing', label: 'Playing', icon: '▶' },
   { id: 'played', label: 'Played', icon: '●' },
   { id: 'completed', label: 'Completed', icon: '✓' },
+  { id: 'finished', label: 'Finished', icon: '⚑' },
   { id: 'on_hold', label: 'On Hold', icon: '⏸' },
 ] as const;
 
@@ -61,6 +62,8 @@ export const PRIORITIES = [
   { id: 'high', label: 'High', color: 'from-red-500 to-orange-500', bgColor: 'bg-red-500', textColor: 'text-red-400', borderColor: 'border-red-500' },
   { id: 'medium', label: 'Medium', color: 'from-yellow-500 to-amber-500', bgColor: 'bg-yellow-500', textColor: 'text-yellow-400', borderColor: 'border-yellow-500' },
   { id: 'low', label: 'Low', color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-500', textColor: 'text-blue-400', borderColor: 'border-blue-500' },
+  { id: 'none', label: 'No Priority', color: 'from-gray-500 to-gray-600', bgColor: 'bg-gray-500', textColor: 'text-gray-400', borderColor: 'border-gray-500' },
+  { id: 'finished', label: 'Finished', color: 'from-emerald-500 to-green-500', bgColor: 'bg-emerald-500', textColor: 'text-emerald-400', borderColor: 'border-emerald-500' },
 ] as const;
 
 export type PlatformId = (typeof PLATFORMS)[number]['id'];
@@ -94,8 +97,8 @@ export type SyncSourceId = (typeof SYNC_SOURCE_OPTIONS)[number]['id'];
 
 export type SortOption = 'title-asc' | 'title-desc' | 'recent' | 'completion-asc' | 'completion-desc' | 'playtime-asc' | 'playtime-desc' | 'priority-high' | 'priority-low' | 'release-newest' | 'release-oldest';
 
-// Priority order mapping for sorting
-export const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+// Priority order mapping for sorting (finished is lowest priority since game is done)
+export const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2, none: 3, finished: 4 };
 
 // Console generation hierarchy for advanced filtering
 export interface ConsoleInfo {
@@ -158,20 +161,6 @@ export const CONSOLE_GENERATIONS: ConsoleGeneration[] = [
       { id: 'NES', label: 'NES', year: '1983' },
       { id: 'Game Boy', label: 'Game Boy', year: '1989' },
       { id: 'GBA', label: 'GBA', year: '2001' },
-    ],
-  },
-  {
-    family: 'PC',
-    icon: '💻',
-    gradient: 'from-slate-600/10 to-gray-600/10',
-    glow: 'rgba(148, 163, 184, 0.4)',
-    consoles: [
-      { id: 'Steam', label: 'Steam', year: '' },
-      { id: 'Epic Games', label: 'Epic Games', year: '' },
-      { id: 'GOG', label: 'GOG', year: '' },
-      { id: 'EA App', label: 'EA App', year: '' },
-      { id: 'Battle.net', label: 'Battle.net', year: '' },
-      { id: 'Windows', label: 'Windows', year: '' },
     ],
   },
   {

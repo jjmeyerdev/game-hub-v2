@@ -71,6 +71,13 @@ export interface GetOwnedGamesResponse {
   };
 }
 
+export interface GetRecentlyPlayedGamesResponse {
+  response: {
+    total_count: number;
+    games: SteamGame[];
+  };
+}
+
 export interface GetPlayerAchievementsResponse {
   playerstats: {
     steamID: string;
@@ -90,9 +97,12 @@ export interface SteamSyncResult {
   success: boolean;
   gamesAdded: number;
   gamesUpdated: number;
+  gamesSkipped: number; // Games that failed to sync
   achievementsUpdated: number;
+  achievementsPrivate: number; // Games where achievements couldn't be fetched (likely privacy issue)
   errors: string[];
-  totalGames: number;
+  warnings: string[]; // Non-fatal issues like privacy warnings
+  totalGames: number; // Total games returned by Steam API
 }
 
 export interface SteamGameSyncResult {

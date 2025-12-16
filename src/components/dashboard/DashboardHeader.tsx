@@ -9,63 +9,95 @@ export function DashboardHeader({
   userName,
   greeting,
 }: DashboardHeaderProps) {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const dateString = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
+
   return (
-    <header className="bg-abyss/80 backdrop-blur-xl border-b border-steel px-8 py-6 sticky top-0 z-40 overflow-hidden">
-      {/* Animated scan line effect */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent"
-          style={{
-            animation: 'scanline 3s linear infinite',
-            top: '0',
-          }}
-        />
+    <header className="relative bg-gradient-to-r from-void via-abyss to-void border-b border-cyan-500/20 overflow-hidden">
+      {/* Tactical grid background */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `
+          linear-gradient(rgba(0, 217, 255, 0.5) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 217, 255, 0.5) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px'
+      }} />
+
+      {/* Horizontal scan line */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent animate-command-scan" />
       </div>
 
-      <div className="flex items-center justify-between w-full relative">
-        {/* Left: Greeting Section */}
-        <div className="flex-1">
-          {/* Dashboard label with cyber styling */}
-          <div className="flex items-center gap-3 mb-2">
-            <h1
-              className="text-sm font-bold tracking-[0.2em] uppercase text-cyan-400/60"
-              style={{ fontFamily: 'var(--font-rajdhani)' }}
-            >
-              ▸ Dashboard
-            </h1>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-semibold text-emerald-400/80 tracking-wide">
-                ONLINE
-              </span>
+      {/* Corner accents */}
+      <div className="absolute top-0 left-0 w-24 h-24">
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 to-transparent" />
+        <div className="absolute top-0 left-0 h-full w-[2px] bg-gradient-to-b from-cyan-500 to-transparent" />
+      </div>
+      <div className="absolute top-0 right-0 w-24 h-24">
+        <div className="absolute top-0 right-0 w-full h-[2px] bg-gradient-to-l from-cyan-500 to-transparent" />
+        <div className="absolute top-0 right-0 h-full w-[2px] bg-gradient-to-b from-cyan-500 to-transparent" />
+      </div>
+
+      <div className="relative px-8 py-6">
+        <div className="flex items-center justify-between">
+          {/* Left: Command designation */}
+          <div className="flex items-center gap-6">
+            {/* Status indicator cluster */}
+            <div className="flex flex-col items-center gap-1">
+              <div className="relative">
+                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
+                <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping opacity-75" />
+              </div>
+              <span className="text-[10px] font-bold tracking-[0.15em] text-emerald-400/80">LIVE</span>
+            </div>
+
+            {/* Divider */}
+            <div className="h-12 w-px bg-gradient-to-b from-transparent via-steel to-transparent" />
+
+            {/* Greeting block */}
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-bold tracking-[0.2em] text-cyan-500/60">COMMANDER</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/40 to-transparent w-16" />
+              </div>
+              <div className="flex items-baseline gap-3">
+                <span className="text-sm text-gray-500 font-medium tracking-wide" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+                  {greeting},
+                </span>
+                <h2 className="text-2xl font-black tracking-wide text-white" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+                  {userName}
+                </h2>
+              </div>
             </div>
           </div>
 
-          {/* Dynamic greeting with holographic effect */}
-          <div className="flex items-baseline gap-2">
-            <span
-              className="text-lg text-gray-400 font-medium"
-              style={{ fontFamily: 'var(--font-rajdhani)' }}
-            >
-              {greeting},
-            </span>
-            <div className="relative group">
-              <h2
-                className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent animate-shimmer"
-                style={{
-                  fontFamily: 'var(--font-rajdhani)',
-                  backgroundSize: '200% auto',
-                }}
-              >
-                {userName}
-              </h2>
-              {/* Holographic glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 blur-xl opacity-50 group-hover:opacity-70 transition-opacity -z-10" />
+          {/* Right: System time display */}
+          <div className="flex items-center gap-6">
+            {/* Date block */}
+            <div className="text-right">
+              <div className="text-[10px] font-bold tracking-[0.2em] text-gray-600 mb-0.5">STARDATE</div>
+              <div className="text-sm font-bold tracking-wider text-gray-400" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+                {dateString}
+              </div>
+            </div>
+
+            {/* Time block */}
+            <div className="relative">
+              <div className="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded">
+                <div className="text-2xl font-black tracking-wider text-cyan-400 tabular-nums" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+                  {timeString}
+                </div>
+              </div>
+              {/* Subtle glow */}
+              <div className="absolute inset-0 bg-cyan-500/20 blur-xl -z-10" />
             </div>
           </div>
         </div>
-
       </div>
+
+      {/* Bottom edge highlight */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
     </header>
   );
 }

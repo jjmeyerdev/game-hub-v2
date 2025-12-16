@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Library, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, X, ShieldOff, Shield } from 'lucide-react';
-import type { UserGame } from '@/app/actions/games';
+import type { UserGame } from '@/app/_actions/games';
 import { GameCard } from './cards/GameCard';
 import { filterAndSortGames } from '@/lib/utils';
 import { LIBRARY_FILTER_PLATFORMS, type SortOption } from '@/lib/constants/platforms';
