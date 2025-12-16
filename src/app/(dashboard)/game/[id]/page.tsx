@@ -86,20 +86,21 @@ export default function GameDetailPage() {
   // Check if this is a PC platform that supports session tracking
   const canHaveActiveSession = isPcPlatform(game.platform);
 
-  const statusConfig: Record<string, { label: string; color: string; gradient: string; icon: string }> = {
+  const statusConfig: Record<string, { label: string; color: string; hex: string; gradient: string; icon: string }> = {
     playing: {
       label: canHaveActiveSession ? 'Active Session' : 'Now Playing',
       color: 'emerald-500',
+      hex: '#00ff9f',
       gradient: 'from-emerald-500/20 via-emerald-500/5 to-transparent',
       icon: '▶'
     },
-    played: { label: 'Played', color: 'purple-500', gradient: 'from-purple-500/20 via-purple-500/5 to-transparent', icon: '●' },
-    completed: { label: 'Mission Complete', color: 'cyan-500', gradient: 'from-cyan-500/20 via-cyan-500/5 to-transparent', icon: '✓' },
-    finished: { label: 'Finished', color: 'amber-500', gradient: 'from-amber-500/20 via-amber-500/5 to-transparent', icon: '⚑' },
-    on_hold: { label: 'On Hold', color: 'rose-500', gradient: 'from-rose-500/20 via-rose-500/5 to-transparent', icon: '⏸' },
-    paused: { label: 'On Standby', color: 'yellow-500', gradient: 'from-yellow-500/20 via-yellow-500/5 to-transparent', icon: '⏸' },
-    dropped: { label: 'Terminated', color: 'red-500', gradient: 'from-red-500/20 via-red-500/5 to-transparent', icon: '✕' },
-    unplayed: { label: 'Queued', color: 'gray-500', gradient: 'from-gray-500/20 via-gray-500/5 to-transparent', icon: '○' },
+    played: { label: 'Played', color: 'purple-500', hex: '#b845ff', gradient: 'from-purple-500/20 via-purple-500/5 to-transparent', icon: '●' },
+    completed: { label: 'Mission Complete', color: 'cyan-500', hex: '#00d9ff', gradient: 'from-cyan-500/20 via-cyan-500/5 to-transparent', icon: '✓' },
+    finished: { label: 'Finished', color: 'amber-500', hex: '#f59e0b', gradient: 'from-amber-500/20 via-amber-500/5 to-transparent', icon: '⚑' },
+    on_hold: { label: 'On Hold', color: 'rose-500', hex: '#f43f5e', gradient: 'from-rose-500/20 via-rose-500/5 to-transparent', icon: '⏸' },
+    paused: { label: 'On Standby', color: 'yellow-500', hex: '#eab308', gradient: 'from-yellow-500/20 via-yellow-500/5 to-transparent', icon: '⏸' },
+    dropped: { label: 'Terminated', color: 'red-500', hex: '#ef4444', gradient: 'from-red-500/20 via-red-500/5 to-transparent', icon: '✕' },
+    unplayed: { label: 'Queued', color: 'gray-500', hex: '#6b7280', gradient: 'from-gray-500/20 via-gray-500/5 to-transparent', icon: '○' },
   };
 
   const status = statusConfig[game.status] || statusConfig.unplayed;
@@ -235,11 +236,11 @@ export default function GameDetailPage() {
                   {canHaveActiveSession && (
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)]">
                       <div
-                        className={`relative px-6 py-4 bg-${status.color}/20 backdrop-blur-xl border-2 border-${status.color}/50 rounded-xl overflow-hidden`}
+                        className="relative px-6 py-4 backdrop-blur-xl border-2 rounded-xl overflow-hidden"
                         style={{
-                          background: `linear-gradient(135deg, rgba(var(--color-${status.color}), 0.2), rgba(var(--color-${status.color}), 0.05))`,
-                          borderColor: `rgba(var(--color-${status.color}), 0.5)`,
-                          boxShadow: `0 0 30px rgba(var(--color-${status.color}), 0.3)`,
+                          background: `linear-gradient(135deg, ${status.hex}33, ${status.hex}0d)`,
+                          borderColor: `${status.hex}80`,
+                          boxShadow: `0 0 30px ${status.hex}4d`,
                         }}
                       >
                         <div className="flex items-center justify-center gap-3">
