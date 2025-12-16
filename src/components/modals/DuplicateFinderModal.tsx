@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Merge, Gamepad2, Clock, Trophy, Check, Layers, Sparkles, ArrowRight, Play } from 'lucide-react';
-import { findDuplicateGames, mergeDuplicateGames, mergeStatsAcrossCopies, deleteUserGame } from '@/app/actions/games';
-import type { DuplicateGroup, UserGame, Game } from '@/app/actions/games';
+import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Merge, Gamepad2, Clock, Trophy, Check, Layers, Sparkles, ArrowRight, Play, Ban, RotateCw, RefreshCcw } from 'lucide-react';
+import { findDuplicateGames, mergeDuplicateGames, mergeStatsAcrossCopies, deleteUserGame, dismissDuplicateGroup, clearAllDismissedDuplicates } from '@/app/_actions/games';
+import type { DuplicateGroup, UserGame, Game } from '@/app/_actions/games';
 
 interface DuplicateFinderModalProps {
   isOpen: boolean;
@@ -23,6 +23,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
   const [processingGroup, setProcessingGroup] = useState<string | null>(null);
   const [scanProgress, setScanProgress] = useState(0);
   const [resolvedGroups, setResolvedGroups] = useState<Set<string>>(new Set());
+  const [isClearing, setIsClearing] = useState(false);
+  const [clearedCount, setClearedCount] = useState<number | null>(null);
 
   const resetState = useCallback(() => {
     setPhase('idle');
@@ -32,7 +34,33 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     setProcessingGroup(null);
     setScanProgress(0);
     setResolvedGroups(new Set());
+    setClearedCount(null);
   }, []);
+
+  const handleClearDismissed = async () => {
+    setIsClearing(true);
+    setError(null);
+    setClearedCount(null);
+
+    try {
+      const result = await clearAllDismissedDuplicates();
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setClearedCount(result.count);
+        // Auto-start scan after clearing
+        if (result.count > 0) {
+          setTimeout(() => {
+            startScan();
+          }, 1000);
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to clear dismissed duplicates');
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -61,7 +89,14 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
       }
 
       await new Promise(resolve => setTimeout(resolve, 300));
-      setDuplicates(result.data || []);
+
+      // Sort duplicates by game title
+      const sortedDuplicates = (result.data || []).sort((a, b) => {
+        const titleA = ((a.games[0]?.game as Game)?.title || '').toLowerCase();
+        const titleB = ((b.games[0]?.game as Game)?.title || '').toLowerCase();
+        return titleA.localeCompare(titleB);
+      });
+      setDuplicates(sortedDuplicates);
 
       // Initialize: all entries default to "keep"
       const actions: Record<string, Record<string, EntryAction>> = {};
@@ -178,7 +213,12 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     }
   };
 
-  const handleDismiss = (group: DuplicateGroup) => {
+  const handleDismiss = async (group: DuplicateGroup, remember: boolean = false) => {
+    if (remember) {
+      // Save the dismissal to the database so it's remembered for future scans
+      const gameIds = group.games.map(g => g.id);
+      await dismissDuplicateGroup(group.normalizedTitle, gameIds);
+    }
     setResolvedGroups(prev => new Set([...prev, group.normalizedTitle]));
   };
 
@@ -197,10 +237,24 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
 
         {/* Header */}
         <div className="relative px-6 py-5 border-b border-[#1e2a35] flex-shrink-0">
+          {/* Animated scan line accent */}
+          {phase === 'scanning' && (
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden">
+              <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-[shimmer_1.5s_ease-in-out_infinite]"
+                style={{ animation: 'shimmer 1.5s ease-in-out infinite' }} />
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
-                <Scan className="w-5 h-5 text-cyan-400" />
+              <div className={`p-2.5 rounded-xl border transition-all duration-300 ${
+                phase === 'scanning'
+                  ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/40 shadow-lg shadow-cyan-500/20'
+                  : 'bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20'
+              }`}>
+                <Scan className={`w-5 h-5 text-cyan-400 transition-transform duration-300 ${
+                  phase === 'scanning' ? 'animate-pulse' : ''
+                }`} />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-white">Duplicate Scanner</h2>
@@ -212,12 +266,47 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-500 hover:text-white" />
-            </button>
+
+            <div className="flex items-center gap-2">
+              {/* Rescan Button - only visible when scan is complete */}
+              {phase === 'complete' && (
+                <button
+                  onClick={() => {
+                    resetState();
+                    startScan();
+                  }}
+                  className="group relative flex items-center gap-2 px-3 py-2 rounded-lg overflow-hidden transition-all duration-300 hover:pr-4"
+                >
+                  {/* Background layers */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg transition-all duration-300" />
+
+                  {/* Scan line effect on hover */}
+                  <div className="absolute inset-0 overflow-hidden rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  </div>
+
+                  {/* Icon with rotation animation */}
+                  <RotateCw className="relative w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition-all duration-300 group-hover:rotate-180" />
+
+                  {/* Label */}
+                  <span className="relative text-sm font-medium text-gray-500 group-hover:text-cyan-400 transition-colors duration-300">
+                    Rescan
+                  </span>
+
+                  {/* Decorative dot */}
+                  <div className="absolute right-2 w-1 h-1 rounded-full bg-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100" />
+                </button>
+              )}
+
+              {/* Close button */}
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500 hover:text-white" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -251,13 +340,42 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                 Find games that appear multiple times in your library and choose what to do with each copy.
               </p>
 
+              {/* Success message after clearing */}
+              {clearedCount !== null && (
+                <div className="mb-4 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <p className="text-sm text-emerald-400">
+                    {clearedCount > 0
+                      ? `Cleared ${clearedCount} dismissed ${clearedCount === 1 ? 'pair' : 'pairs'}. Starting fresh scan...`
+                      : 'No dismissed pairs to clear'}
+                  </p>
+                </div>
+              )}
+
               <button
                 onClick={startScan}
-                className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-[#0a0f14] font-semibold rounded-xl transition-colors flex items-center gap-2"
+                disabled={isClearing}
+                className="px-6 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-gray-600 text-[#0a0f14] font-semibold rounded-xl transition-colors flex items-center gap-2"
               >
                 <Scan className="w-4 h-4" />
                 Start Scan
               </button>
+
+              {/* Reset dismissed duplicates button */}
+              <button
+                onClick={handleClearDismissed}
+                disabled={isClearing}
+                className="mt-4 group flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-amber-400 transition-colors"
+              >
+                {isClearing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                )}
+                {isClearing ? 'Clearing...' : 'Reset "Not Duplicates" list'}
+              </button>
+              <p className="mt-1 text-xs text-gray-600 text-center max-w-xs">
+                Previously dismissed pairs will appear again in scans
+              </p>
             </div>
           )}
 
@@ -324,22 +442,95 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
               {/* No Duplicates */}
               {unresolvedDuplicates.length === 0 && duplicates.length === 0 && (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-emerald-400" />
+                  <div className="relative w-20 h-20 mx-auto mb-5">
+                    {/* Animated ring */}
+                    <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20" />
+                    <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-400/60 animate-spin" style={{ animationDuration: '3s' }} />
+                    {/* Inner circle */}
+                    <div className="absolute inset-2 rounded-full bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center">
+                      <CheckCircle className="w-8 h-8 text-emerald-400" />
+                    </div>
                   </div>
-                  <h3 className="text-lg font-medium text-white mb-1">No Duplicates Found</h3>
-                  <p className="text-sm text-gray-500">Your library is clean!</p>
+                  <h3 className="text-lg font-semibold text-white mb-1">No Duplicates Found</h3>
+                  <p className="text-sm text-gray-500 mb-6">Your library is clean!</p>
+
+                  {/* Actions */}
+                  <div className="flex flex-col items-center gap-3">
+                    {/* Rescan button */}
+                    <button
+                      onClick={() => {
+                        resetState();
+                        startScan();
+                      }}
+                      className="group inline-flex items-center gap-2 px-4 py-2 bg-[#0d1318] hover:bg-[#141c24] border border-[#1e2a35] hover:border-cyan-500/30 rounded-lg transition-all duration-300"
+                    >
+                      <RotateCw className="w-4 h-4 text-gray-500 group-hover:text-cyan-400 group-hover:rotate-180 transition-all duration-500" />
+                      <span className="text-sm text-gray-400 group-hover:text-white transition-colors">Scan Again</span>
+                    </button>
+
+                    {/* Reset dismissed */}
+                    <button
+                      onClick={async () => {
+                        setIsClearing(true);
+                        const result = await clearAllDismissedDuplicates();
+                        setIsClearing(false);
+                        if (result.count > 0) {
+                          resetState();
+                          startScan();
+                        } else {
+                          setError('No dismissed pairs to reset');
+                        }
+                      }}
+                      disabled={isClearing}
+                      className="group inline-flex items-center gap-2 px-3 py-1.5 text-xs text-gray-500 hover:text-amber-400 transition-colors"
+                    >
+                      {isClearing ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <RefreshCcw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" />
+                      )}
+                      <span>Reset dismissed pairs & scan again</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
               {/* All Resolved */}
               {unresolvedDuplicates.length === 0 && duplicates.length > 0 && (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-emerald-400" />
+                  <div className="relative w-20 h-20 mx-auto mb-5">
+                    {/* Success burst effect */}
+                    <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping" style={{ animationDuration: '2s' }} />
+                    {/* Inner circle */}
+                    <div className="relative w-full h-full rounded-full bg-gradient-to-br from-emerald-500/15 to-cyan-500/10 border border-emerald-500/30 flex items-center justify-center">
+                      <CheckCircle className="w-8 h-8 text-emerald-400" />
+                    </div>
                   </div>
-                  <h3 className="text-lg font-medium text-white mb-1">All Done!</h3>
-                  <p className="text-sm text-gray-500">All duplicate groups have been resolved.</p>
+                  <h3 className="text-lg font-semibold text-white mb-1">All Done!</h3>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {resolvedGroups.size} duplicate {resolvedGroups.size === 1 ? 'group' : 'groups'} resolved
+                  </p>
+                  <p className="text-xs text-gray-600 mb-6">Changes have been saved to your library</p>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => {
+                        resetState();
+                        startScan();
+                      }}
+                      className="group inline-flex items-center gap-2 px-4 py-2 bg-[#0d1318] hover:bg-[#141c24] border border-[#1e2a35] hover:border-cyan-500/30 rounded-lg transition-all duration-300"
+                    >
+                      <RotateCw className="w-4 h-4 text-gray-500 group-hover:text-cyan-400 group-hover:rotate-180 transition-all duration-500" />
+                      <span className="text-sm text-gray-400 group-hover:text-white transition-colors">Scan Again</span>
+                    </button>
+                    <button
+                      onClick={onClose}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-lg transition-all duration-300"
+                    >
+                      <span className="text-sm font-medium">Done</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -353,7 +544,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                   onCycleAction={(id) => cycleAction(group.normalizedTitle, id)}
                   onSetAllActions={(action) => setAllActions(group.normalizedTitle, action)}
                   onApply={() => handleApplyActions(group)}
-                  onDismiss={() => handleDismiss(group)}
+                  onDismiss={(remember) => handleDismiss(group, remember)}
                   isProcessing={processingGroup === group.normalizedTitle}
                 />
               ))}
@@ -372,7 +563,7 @@ interface DuplicateGroupCardProps {
   onCycleAction: (id: string) => void;
   onSetAllActions: (action: EntryAction) => void;
   onApply: () => void;
-  onDismiss: () => void;
+  onDismiss: (remember: boolean) => void;
   isProcessing: boolean;
 }
 
@@ -432,23 +623,36 @@ function DuplicateGroupCard({
       {/* Expanded Content */}
       {expanded && (
         <div className="px-4 pb-4 border-t border-[#1e2a35]">
-          {/* Similar match dismissal */}
-          {group.matchType === 'similar' && (
-            <button
-              onClick={onDismiss}
-              className="w-full mt-3 p-2.5 bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/20 rounded-lg text-left transition-colors group"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-amber-400">Not duplicates?</p>
-                  <p className="text-xs text-gray-500">Click to dismiss if these are different games</p>
-                </div>
-                <span className="text-xs text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Dismiss →
-                </span>
+          {/* Not duplicates option - works for both exact and similar matches */}
+          <button
+            onClick={() => onDismiss(true)}
+            className={`w-full mt-3 p-2.5 border rounded-lg text-left transition-colors group ${
+              group.matchType === 'exact'
+                ? 'bg-rose-500/5 hover:bg-rose-500/10 border-rose-500/20'
+                : 'bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-sm font-medium flex items-center gap-1.5 ${
+                  group.matchType === 'exact' ? 'text-rose-400' : 'text-amber-400'
+                }`}>
+                  <Ban className="w-3.5 h-3.5" />
+                  Not duplicates
+                </p>
+                <p className="text-xs text-gray-500">
+                  {group.matchType === 'exact'
+                    ? 'Same game on different platforms - won\'t show again'
+                    : 'These are different games - won\'t show again'}
+                </p>
               </div>
-            </button>
-          )}
+              <span className={`text-xs opacity-0 group-hover:opacity-100 transition-opacity ${
+                group.matchType === 'exact' ? 'text-rose-400' : 'text-amber-400'
+              }`}>
+                Remember →
+              </span>
+            </div>
+          </button>
 
           {/* Quick actions */}
           <div className="flex items-center gap-2 mt-3 mb-2">
@@ -525,6 +729,11 @@ function DuplicateGroupCard({
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
+                      {/* Game title */}
+                      <p className={`text-sm font-medium truncate mb-1 ${action === 'delete' ? 'text-gray-500' : 'text-white'}`}>
+                        {game?.title || 'Unknown'}
+                      </p>
+
                       <div className="flex items-center gap-2">
                         <span className="text-xs px-1.5 py-0.5 bg-[#1e2a35] rounded text-gray-400">
                           {(() => {
@@ -599,7 +808,7 @@ function DuplicateGroupCard({
                 {hasChanges ? 'Apply Changes' : 'Done'}
               </button>
               <button
-                onClick={onDismiss}
+                onClick={() => onDismiss(false)}
                 disabled={isProcessing}
                 className="px-4 py-2.5 bg-[#1e2a35] hover:bg-[#2a3a45] text-gray-300 font-medium rounded-lg transition-colors"
               >

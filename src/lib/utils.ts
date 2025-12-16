@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { UserGame } from "@/app/actions/games"
+import type { UserGame } from "@/app/_actions/games"
 import { type SortOption, type SyncSourceId, PRIORITY_ORDER } from "@/lib/constants/platforms"
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,13 +20,27 @@ export interface GameFilterOptions {
 }
 
 /**
- * Determine the sync source of a game based on its linked platform IDs
+ * Determine the sync source of a game
+ * Only returns a platform source if the game was actually SYNCED from that platform
  */
 export function getGameSyncSource(game: UserGame): SyncSourceId {
-  if (game.game?.steam_appid) return 'steam';
-  if (game.game?.psn_communication_id) return 'psn';
-  if (game.game?.xbox_title_id) return 'xbox';
-  if (game.game?.epic_catalog_item_id) return 'epic';
+  // Check user_games level platform IDs - these are set when syncing
+  const userGame = game as UserGame & { steam_appid?: number; xbox_title_id?: string };
+
+  // Steam: user_games.steam_appid is set during Steam sync
+  if (userGame.steam_appid) return 'steam';
+
+  // Xbox: user_games.xbox_title_id is set during Xbox sync
+  if (userGame.xbox_title_id) return 'xbox';
+
+  // Epic: check platform AND shared game has epic_catalog_item_id
+  // (Epic sync sets platform to "Epic Games" and stores ID on games table)
+  if (game.platform === 'Epic Games' && game.game?.epic_catalog_item_id) return 'epic';
+
+  // PSN: check platform contains PlayStation AND shared game has psn_communication_id
+  const platformLower = game.platform.toLowerCase();
+  if ((platformLower.includes('playstation') || platformLower.startsWith('ps')) && game.game?.psn_communication_id) return 'psn';
+
   return 'manual';
 }
 
@@ -57,6 +71,10 @@ export function filterGames(games: UserGame[], options: GameFilterOptions): User
       const gamePlatform = userGame.platform.toLowerCase();
       const matchesPlatform = selectedPlatforms.some(filterPlatform => {
         const lowerFilter = filterPlatform.toLowerCase();
+        // Special case: Physical should check is_physical flag
+        if (lowerFilter === 'physical') {
+          return userGame.is_physical === true;
+        }
         // Special case: PC should match exactly
         if (lowerFilter === 'pc') {
           return gamePlatform === 'pc';

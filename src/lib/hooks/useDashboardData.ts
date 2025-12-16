@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { getUserGames, getNowPlayingGames, getUserStats, type UserGame } from '@/app/actions/games';
+import { getUserGames, getNowPlayingGames, getUserStats, type UserGame } from '@/app/_actions/games';
 import { libraryEvents } from '@/lib/events/libraryEvents';
 
 interface DashboardUser {
@@ -69,8 +69,8 @@ export function useDashboardData(includeHidden = false) {
         getUserStats(),
       ]);
 
-      if (gamesResult.error) throw new Error(typeof gamesResult.error === 'string' ? gamesResult.error : gamesResult.error.message);
-      if (nowPlayingResult.error) throw new Error(typeof nowPlayingResult.error === 'string' ? nowPlayingResult.error : nowPlayingResult.error.message);
+      if (gamesResult.error) throw new Error(gamesResult.error);
+      if (nowPlayingResult.error) throw new Error(nowPlayingResult.error);
 
       setUserGames(gamesResult.data || []);
       setNowPlaying(nowPlayingResult.data || []);

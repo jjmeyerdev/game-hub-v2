@@ -1,5 +1,5 @@
 import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar } from 'lucide-react';
-import type { UserGame } from '@/app/actions/games';
+import type { UserGame } from '@/app/_actions/games';
 
 interface GameListItemProps {
   game: UserGame;
@@ -9,27 +9,33 @@ interface GameListItemProps {
 }
 
 const STATUS_LABELS: Record<string, string> = {
+  unplayed: 'UNPLAYED',
   backlog: 'BACKLOG',
   playing: 'NOW PLAYING',
+  played: 'PLAYED',
   completed: 'COMPLETED',
-  '100_completed': '100% COMPLETE',
+  finished: 'FINISHED',
+  on_hold: 'ON HOLD',
   paused: 'PAUSED',
   dropped: 'DROPPED',
   plan_to_play: 'PLANNED',
 };
 
 const STATUS_COLORS: Record<string, string> = {
+  unplayed: 'text-gray-400',
   backlog: 'text-gray-400',
-  playing: 'text-purple-400',
-  completed: 'text-emerald-400',
-  '100_completed': 'text-cyan-400',
+  playing: 'text-emerald-400',
+  played: 'text-purple-400',
+  completed: 'text-cyan-400',
+  finished: 'text-amber-400',
+  on_hold: 'text-rose-400',
   paused: 'text-yellow-400',
   dropped: 'text-red-400',
   plan_to_play: 'text-blue-400',
 };
 
 export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProps) {
-  const isCompleted = game.status === 'completed' || game.status === '100_completed';
+  const isCompleted = game.status === 'completed' || game.status === 'finished';
 
   return (
     <div

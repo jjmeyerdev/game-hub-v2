@@ -2,6 +2,7 @@
 import {
   GetPlayerSummariesResponse,
   GetOwnedGamesResponse,
+  GetRecentlyPlayedGamesResponse,
   GetPlayerAchievementsResponse,
   GetSchemaForGameResponse,
   SteamPlayer,
@@ -194,6 +195,32 @@ export async function getOwnedGames(steamId: string): Promise<SteamGame[]> {
       throw error;
     }
     throw new SteamPrivacyError();
+  }
+}
+
+/**
+ * Get recently played games for a Steam user (games played in the last 2 weeks)
+ * Note: User's profile and game details must be public
+ */
+export async function getRecentlyPlayedGames(steamId: string): Promise<SteamGame[]> {
+  const validSteamId = validateSteamId(steamId);
+  const apiKey = process.env.STEAM_WEB_API_KEY;
+
+  const url = `${STEAM_API_BASE}/IPlayerService/GetRecentlyPlayedGames/v1/?key=${apiKey}&steamid=${validSteamId}`;
+
+  try {
+    const data = await steamApiRequest<GetRecentlyPlayedGamesResponse>(url);
+
+    if (!data.response.games) {
+      // No recently played games or private profile
+      return [];
+    }
+
+    return data.response.games;
+  } catch (error) {
+    // Silently fail for recently played - return empty array
+    console.error('[Steam] Failed to fetch recently played games:', error);
+    return [];
   }
 }
 

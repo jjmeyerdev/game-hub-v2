@@ -9,9 +9,11 @@ import {
   getUserTrophyProfileSummary,
   getUserTrophiesEarnedForTitle,
   getProfileFromAccountId,
+  getUserPlayedGames,
   type AuthorizationPayload,
   type TrophyTitle,
   type UserTrophiesEarnedForTitleResponse,
+  type UserPlayedGamesResponse,
 } from 'psn-api';
 
 import {
@@ -407,4 +409,103 @@ export function canMakePsnRequest(): boolean {
  */
 export function getPsnRateLimitWaitTime(): number {
   return rateLimiter.getWaitTime();
+}
+
+/**
+ * Parse ISO 8601 duration string to minutes
+ * Format: PT228H56M33S = 228 hours, 56 minutes, 33 seconds
+ */
+export function parseIsoDuration(duration: string): number {
+  if (!duration) return 0;
+
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+
+  const hours = parseInt(match[1] || '0', 10);
+  const minutes = parseInt(match[2] || '0', 10);
+  const seconds = parseInt(match[3] || '0', 10);
+
+  // Return total minutes (rounded)
+  return hours * 60 + minutes + Math.round(seconds / 60);
+}
+
+/**
+ * Title from getUserPlayedGames response
+ */
+export interface PsnPlayedTitle {
+  titleId: string;
+  name: string;
+  imageUrl: string;
+  category: string;
+  playCount: number;
+  firstPlayedDateTime: string;
+  lastPlayedDateTime: string;
+  playDuration: string; // ISO 8601 duration (e.g., "PT228H56M33S")
+}
+
+/**
+ * Get user's played games with playtime information
+ * This is a separate endpoint from trophy titles that includes play duration
+ * Note: This API has a max limit of 200 per request, so we paginate to get all games
+ */
+export async function getPlayedGamesWithPlaytime(
+  accessToken: string,
+  accountId: string = 'me'
+): Promise<PsnPlayedTitle[]> {
+  const auth: AuthorizationPayload = { accessToken };
+  const allTitles: PsnPlayedTitle[] = [];
+  const pageLimit = 200; // API max limit
+  let offset = 0;
+  let hasMore = true;
+
+  try {
+    while (hasMore) {
+      checkRateLimit();
+      rateLimiter.recordRequest();
+
+      const response: UserPlayedGamesResponse = await getUserPlayedGames(auth, accountId, {
+        limit: pageLimit,
+        offset,
+      });
+
+      const titles = response.titles.map((title) => ({
+        titleId: title.titleId,
+        name: title.name,
+        imageUrl: title.imageUrl,
+        category: title.category,
+        playCount: title.playCount,
+        firstPlayedDateTime: title.firstPlayedDateTime,
+        lastPlayedDateTime: title.lastPlayedDateTime,
+        playDuration: title.playDuration,
+      }));
+
+      allTitles.push(...titles);
+
+      // Check if we have more pages
+      if (titles.length < pageLimit || allTitles.length >= response.totalItemCount) {
+        hasMore = false;
+      } else {
+        offset += pageLimit;
+      }
+    }
+
+    return allTitles;
+  } catch (error) {
+    if (error instanceof PsnAPIError) {
+      throw error;
+    }
+
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
+    if (message.includes('401') || message.includes('unauthorized')) {
+      throw new PsnAuthError();
+    }
+    if (message.includes('403') || message.includes('forbidden')) {
+      throw new PsnPrivacyError('Unable to fetch played games. Please ensure your PSN profile is public.');
+    }
+
+    // Return empty array on error - playtime is optional enhancement
+    console.error('Failed to fetch played games:', message);
+    return [];
+  }
 }

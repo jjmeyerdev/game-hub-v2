@@ -20,6 +20,10 @@
   --color-emerald-500: #00ff9f;
   --color-emerald-400: #33ffb3;
 
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+
   --font-family-display: "Rajdhani", "Orbitron", system-ui, sans-serif;
   --font-family-body: "Inter", system-ui, sans-serif;
 }
@@ -273,4 +277,218 @@ body::before {
 
 .animate-card-scanline {
   animation: cardScanline 2s linear infinite;
+}
+
+/* Censor Blur Effect Animations */
+@keyframes censorScanline {
+  0%, 100% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(200%);
+  }
+}
+
+@keyframes censorGlitchR {
+  0%, 100% {
+    transform: translateX(2px);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translateX(-1px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(3px);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translateX(0px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes censorGlitchB {
+  0%, 100% {
+    transform: translateX(-2px);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translateX(1px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(-3px);
+    opacity: 0.3;
+  }
+  75% {
+    transform: translateX(0px);
+    opacity: 0.5;
+  }
+}
+
+@keyframes censorTextGlitch {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10% {
+    transform: translateX(-2px);
+  }
+  20% {
+    transform: translateX(2px);
+  }
+  30% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes censorDecrypt {
+  0% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+}
+
+@keyframes censorDecryptLine {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+.animate-censor-scanline {
+  animation: censorScanline 3s ease-in-out infinite;
+}
+
+.animate-censor-glitch-r {
+  animation: censorGlitchR 2s ease-in-out infinite;
+}
+
+.animate-censor-glitch-b {
+  animation: censorGlitchB 2s ease-in-out infinite;
+}
+
+.animate-censor-text-glitch {
+  animation: censorTextGlitch 3s ease-in-out infinite;
+}
+
+.animate-censor-decrypt {
+  animation: censorDecrypt 0.6s ease-out forwards;
+}
+
+.animate-censor-decrypt-line {
+  animation: censorDecryptLine 0.6s ease-out forwards;
+}
+
+/* Command Center Dashboard Animations */
+@keyframes commandScan {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-command-scan {
+  animation: commandScan 4s linear infinite;
+}
+
+@keyframes holoScan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+.animate-holo-scan {
+  animation: holoScan 1.5s ease-in-out infinite;
+}
+
+@keyframes missionPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.5;
+  }
+}
+
+.animate-mission-pulse {
+  animation: missionPulse 3s ease-in-out infinite;
+}
+
+@keyframes missionScan {
+  0% {
+    top: -2px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-mission-scan {
+  animation: missionScan 2.5s linear infinite;
+}
+
+@keyframes cardRevealNew {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-card-reveal {
+  animation: cardRevealNew 0.5s ease-out both;
+}
+
+/* Carousel Animations */
+@keyframes carouselBtnScan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+.animate-carousel-btn-scan {
+  animation: carouselBtnScan 0.8s ease-out;
 }

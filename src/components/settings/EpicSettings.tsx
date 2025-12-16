@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, Link as LinkIcon, Unlink, RefreshCw, ExternalLink, CheckCircle, XCircle, Copy, Info } from 'lucide-react';
-import { getEpicProfile, linkEpicAccount, unlinkEpicAccount, syncEpicLibrary } from '@/app/actions/epic';
+import { Loader2, Link as LinkIcon, Unlink, RefreshCw, ExternalLink, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
+import { getEpicProfile, linkEpicAccount, unlinkEpicAccount, syncEpicLibrary } from '@/app/_actions/epic';
 import { SyncToast } from '@/components/ui/SyncToast';
 import { SyncProgressModal } from '@/components/ui/SyncProgressModal';
 import { triggerLibraryRefresh } from '@/lib/events/libraryEvents';
+import { addSyncLog, notifySyncLogUpdate } from '@/components/settings/SyncLogs';
 import type { EpicProfile, EpicSyncResult } from '@/lib/types/epic';
 
 export default function EpicSettings() {
@@ -19,9 +20,9 @@ export default function EpicSettings() {
   const [success, setSuccess] = useState('');
   const [syncResult, setSyncResult] = useState<EpicSyncResult | null>(null);
   const [showSyncToast, setShowSyncToast] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [showAuthInput, setShowAuthInput] = useState(false);
 
-  // Epic authorization URL
   const EPIC_AUTH_URL = 'https://www.epicgames.com/id/api/redirect?clientId=34a02cf8f4414e29b15921876da36f9a&responseType=code';
 
   useEffect(() => {
@@ -56,26 +57,25 @@ export default function EpicSettings() {
       if (result.error) {
         setError(result.error);
       } else if (result.success) {
-        setSuccess('Epic Games account linked successfully!');
+        setSuccess('Epic Games account linked!');
         setAuthCodeInput('');
-        setShowInstructions(false);
+        setShowAuthInput(false);
         await loadProfile();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to link Epic Games account');
+      setError(err instanceof Error ? err.message : 'Failed to link');
     } finally {
       setLinking(false);
     }
   }
 
   async function handleUnlinkAccount() {
-    if (!confirm('Are you sure you want to unlink your Epic Games account? Your games will remain in your library.')) {
+    if (!confirm('Are you sure you want to unlink your Epic Games account?')) {
       return;
     }
 
     setUnlinking(true);
     setError('');
-    setSuccess('');
 
     try {
       const result = await unlinkEpicAccount();
@@ -83,12 +83,12 @@ export default function EpicSettings() {
       if (result.error) {
         setError(result.error);
       } else if (result.success) {
-        setSuccess('Epic Games account unlinked successfully');
+        setSuccess('Epic Games account unlinked');
         setProfile(null);
         setSyncResult(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to unlink Epic Games account');
+      setError(err instanceof Error ? err.message : 'Failed to unlink');
     } finally {
       setUnlinking(false);
     }
@@ -97,18 +97,43 @@ export default function EpicSettings() {
   async function handleSyncLibrary() {
     setSyncing(true);
     setError('');
-    setSuccess('');
     setSyncResult(null);
+
+    const startTime = Date.now();
 
     try {
       const result = await syncEpicLibrary();
       setSyncResult(result);
       setShowSyncToast(true);
       await loadProfile();
-      // Notify other pages to refresh their data
       triggerLibraryRefresh();
+
+      // Store sync log
+      addSyncLog({
+        service: 'epic',
+        success: result.success,
+        gamesAdded: result.gamesAdded,
+        gamesUpdated: result.gamesUpdated,
+        totalGames: result.totalGames,
+        errors: result.errors,
+        duration: Date.now() - startTime,
+      });
+      notifySyncLogUpdate();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sync Epic Games library');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to sync';
+      setError(errorMessage);
+
+      // Store failed sync log
+      addSyncLog({
+        service: 'epic',
+        success: false,
+        gamesAdded: 0,
+        gamesUpdated: 0,
+        totalGames: 0,
+        errors: [errorMessage],
+        duration: Date.now() - startTime,
+      });
+      notifySyncLogUpdate();
     } finally {
       setSyncing(false);
     }
@@ -116,229 +141,153 @@ export default function EpicSettings() {
 
   function handleOpenAuthUrl() {
     window.open(EPIC_AUTH_URL, '_blank', 'noopener,noreferrer');
-    setShowInstructions(true);
+    setShowAuthInput(true);
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="flex items-center justify-center py-6">
+        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-600/20 to-gray-700/20 border border-gray-500/30 flex items-center justify-center">
-          <span className="text-xl font-black text-gray-400">E</span>
-        </div>
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-white">Epic Games</h3>
-          <p className="text-sm text-gray-400">
-            Import your library from Epic Games Store
-          </p>
-        </div>
-        {profile && (
-          <div className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Connected</span>
-          </div>
-        )}
-      </div>
-
+    <div className="space-y-3">
       {/* Messages */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl flex items-start gap-3">
-          <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="flex items-center gap-2 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+          <p className="text-xs text-red-400">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/50 rounded-xl flex items-start gap-3">
-          <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-emerald-400">{success}</p>
+        <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+          <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <p className="text-xs text-emerald-400">{success}</p>
         </div>
       )}
 
       {profile ? (
         /* Connected State */
-        <div className="space-y-5">
-          {/* Profile Card */}
-          <div className="flex items-center gap-4 p-4 bg-deep/50 border border-steel/30 rounded-xl">
-            <div className="w-14 h-14 rounded-xl border-2 border-gray-500/50 bg-gray-700/50 flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-400">
+        <div className="space-y-3">
+          {/* User Row */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg border border-gray-500/30 bg-gray-700/50 flex items-center justify-center">
+              <span className="text-lg font-bold text-gray-400">
                 {profile.epic_display_name?.charAt(0).toUpperCase() || 'E'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-white truncate">{profile.epic_display_name}</h4>
-              <p className="text-sm text-gray-500">Epic Games Account</p>
+              <p className="text-sm font-semibold text-white truncate">{profile.epic_display_name}</p>
+              <p className="text-[10px] text-gray-500">Epic Games Account</p>
             </div>
             {profile.epic_last_sync && (
-              <p className="text-xs text-gray-500 hidden md:block">
-                Synced {new Date(profile.epic_last_sync).toLocaleDateString()}
+              <p className="text-[10px] text-gray-500 hidden sm:block">
+                {new Date(profile.epic_last_sync).toLocaleDateString()}
               </p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleSyncLibrary}
               disabled={syncing}
-              className="flex-1 px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 rounded-xl font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-3 py-1.5 bg-gray-600/20 hover:bg-gray-600/30 border border-gray-500/30 rounded-lg text-xs font-semibold text-gray-400 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
-              {syncing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Syncing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4" />
-                  Sync Library
-                </>
-              )}
+              {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+              {syncing ? 'Syncing...' : 'Sync'}
             </button>
-
             <button
               onClick={handleUnlinkAccount}
               disabled={unlinking}
-              className="px-5 py-2.5 bg-deep/50 border border-steel/50 hover:border-red-500/50 hover:bg-red-500/10 rounded-xl font-medium text-gray-400 hover:text-red-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-3 py-1.5 bg-steel/20 hover:bg-red-500/10 border border-steel/30 hover:border-red-500/30 rounded-lg text-xs font-medium text-gray-400 hover:text-red-400 transition-all disabled:opacity-50 flex items-center gap-1.5"
             >
-              {unlinking ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Unlink className="w-4 h-4" />
-              )}
-              <span className="hidden sm:inline">Disconnect</span>
+              {unlinking ? <Loader2 className="w-3 h-3 animate-spin" /> : <Unlink className="w-3 h-3" />}
+              <span className="hidden sm:inline">Unlink</span>
             </button>
           </div>
 
-          {/* Sync Results */}
+          {/* Sync Results - Collapsible */}
           {syncResult && (
-            <div className="p-4 bg-deep/30 border border-steel/20 rounded-xl space-y-3">
-              <h4 className="text-sm font-semibold text-gray-300">Sync Results</h4>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="text-center p-2 bg-abyss/50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-400">{syncResult.totalGames}</div>
-                  <div className="text-[10px] text-gray-500 uppercase">Total</div>
-                </div>
-                <div className="text-center p-2 bg-abyss/50 rounded-lg">
-                  <div className="text-lg font-bold text-emerald-400">{syncResult.gamesAdded}</div>
-                  <div className="text-[10px] text-gray-500 uppercase">Added</div>
-                </div>
-                <div className="text-center p-2 bg-abyss/50 rounded-lg">
-                  <div className="text-lg font-bold text-purple-400">{syncResult.gamesUpdated}</div>
-                  <div className="text-[10px] text-gray-500 uppercase">Updated</div>
-                </div>
-              </div>
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="w-full flex items-center justify-between px-3 py-2 bg-abyss/50 border border-steel/20 rounded-lg text-xs"
+            >
+              <span className="text-gray-400">
+                <span className="text-emerald-400 font-semibold">+{syncResult.gamesAdded}</span> added,{' '}
+                <span className="text-purple-400 font-semibold">{syncResult.gamesUpdated}</span> updated
+              </span>
+              <ChevronDown className={`w-3 h-3 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+            </button>
+          )}
 
-              {syncResult.errors.length > 0 && (
-                <div className="pt-2 border-t border-steel/10">
-                  <p className="text-xs font-medium text-red-400 mb-1">Errors:</p>
-                  <ul className="text-[11px] text-gray-500 space-y-0.5">
-                    {syncResult.errors.slice(0, 3).map((err, i) => (
-                      <li key={i} className="truncate">• {err}</li>
-                    ))}
-                    {syncResult.errors.length > 3 && (
-                      <li>• +{syncResult.errors.length - 3} more</li>
-                    )}
-                  </ul>
-                </div>
-              )}
+          {syncResult && expanded && (
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2 bg-gray-500/5 border border-gray-500/10 rounded">
+                <div className="text-sm font-bold text-gray-400">{syncResult.totalGames}</div>
+                <div className="text-[9px] text-gray-600 uppercase">Total</div>
+              </div>
+              <div className="p-2 bg-emerald-500/5 border border-emerald-500/10 rounded">
+                <div className="text-sm font-bold text-emerald-400">{syncResult.gamesAdded}</div>
+                <div className="text-[9px] text-gray-600 uppercase">Added</div>
+              </div>
+              <div className="p-2 bg-purple-500/5 border border-purple-500/10 rounded">
+                <div className="text-sm font-bold text-purple-400">{syncResult.gamesUpdated}</div>
+                <div className="text-[9px] text-gray-600 uppercase">Updated</div>
+              </div>
             </div>
           )}
         </div>
       ) : (
         /* Disconnected State */
-        <div className="space-y-5">
-          {/* Link Instructions */}
-          <div className="p-5 bg-deep/50 border border-steel/30 rounded-xl">
-            <div className="flex flex-col gap-4">
-              <div className="text-center sm:text-left">
-                <h4 className="font-semibold text-white mb-1">Connect Epic Games</h4>
-                <p className="text-sm text-gray-500">
-                  Link your Epic Games account to import your library
-                </p>
-              </div>
+        <div className="space-y-3">
+          {/* Sign in Button */}
+          <button
+            onClick={handleOpenAuthUrl}
+            className="w-full px-3 py-2 bg-gray-600/20 hover:bg-gray-600/30 border border-gray-500/30 rounded-lg text-xs font-semibold text-gray-300 transition-all flex items-center justify-center gap-2"
+          >
+            <LinkIcon className="w-3 h-3" />
+            Sign in with Epic Games
+            <ExternalLink className="w-2.5 h-2.5" />
+          </button>
 
-              <button
-                onClick={handleOpenAuthUrl}
-                className="px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2"
-              >
-                <LinkIcon className="w-4 h-4" />
-                Sign in with Epic Games
-                <ExternalLink className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-
-          {/* Instructions Panel */}
-          {showInstructions && (
-            <div className="p-5 bg-blue-500/5 border border-blue-500/20 rounded-xl space-y-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Complete the connection</h4>
-                  <ol className="text-sm text-gray-400 space-y-2 list-decimal list-inside">
-                    <li>Sign in to your Epic Games account in the new window</li>
-                    <li>After signing in, you&apos;ll see a JSON response with <code className="text-blue-400 bg-blue-500/10 px-1 rounded">authorizationCode</code></li>
-                    <li>Copy the code value and paste it below</li>
-                  </ol>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  value={authCodeInput}
-                  onChange={(e) => setAuthCodeInput(e.target.value)}
-                  placeholder="Paste authorization code here"
-                  className="w-full px-4 py-2.5 bg-deep/50 border border-steel/30 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm font-mono"
-                />
-                <div className="flex justify-end">
-                  <button
-                    onClick={handleLinkAccount}
-                    disabled={linking || !authCodeInput.trim()}
-                    className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 rounded-lg font-medium text-sm text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    {linking ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <LinkIcon className="w-4 h-4" />
-                    )}
-                    Link Account
-                  </button>
-                </div>
+          {/* Auth Code Input - Shows after clicking sign in */}
+          {showAuthInput && (
+            <div className="space-y-2 p-3 bg-deep/50 border border-steel/20 rounded-lg">
+              <p className="text-[10px] text-gray-400">
+                After signing in, paste the <code className="text-gray-300 bg-steel/30 px-1 rounded">authorizationCode</code> from the JSON response:
+              </p>
+              <input
+                type="text"
+                value={authCodeInput}
+                onChange={(e) => setAuthCodeInput(e.target.value)}
+                placeholder="Paste authorization code..."
+                className="w-full px-3 py-1.5 bg-deep/50 border border-steel/30 rounded-lg text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-gray-500/50 font-mono"
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={handleLinkAccount}
+                  disabled={linking || !authCodeInput.trim()}
+                  className="px-3 py-1 bg-gray-600/20 hover:bg-gray-600/30 border border-gray-500/30 rounded text-[10px] font-semibold text-gray-300 disabled:opacity-50 flex items-center gap-1"
+                >
+                  {linking && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
+                  Link Account
+                </button>
               </div>
             </div>
           )}
 
-          {/* Info Notice */}
-          <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
-            <p className="text-xs text-amber-400/80">
-              <strong>Note:</strong> Epic Games doesn&apos;t provide playtime or achievement data through their API. Only your game library will be synced.
-            </p>
-          </div>
+          <p className="text-[10px] text-amber-400/60">
+            Epic doesn&apos;t provide playtime or achievements
+          </p>
         </div>
       )}
 
-      {/* Sync Progress Modal */}
-      <SyncProgressModal
-        isOpen={syncing}
-        platform="epic"
-      />
-
-      {/* Sync Toast */}
-      <SyncToast
-        isVisible={showSyncToast}
-        onClose={() => setShowSyncToast(false)}
-        type="epic"
-        result={syncResult}
-      />
+      <SyncProgressModal isOpen={syncing} platform="epic" />
+      <SyncToast isVisible={showSyncToast} onClose={() => setShowSyncToast(false)} type="epic" result={syncResult} />
     </div>
   );
 }
