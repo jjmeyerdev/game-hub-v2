@@ -189,31 +189,6 @@ export default function LibraryPage() {
 
                 {/* Sync Dropdown */}
                 <SyncServiceDropdown />
-
-                {/* Find Duplicates */}
-                <button
-                  onClick={() => setShowDuplicateFinderModal(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white/[0.03] border border-white/[0.06] text-white/60 hover:text-white hover:border-white/[0.12] rounded-xl transition-all"
-                >
-                  <Copy className="w-4 h-4" />
-                  <span className="hidden sm:inline">Duplicates</span>
-                </button>
-
-                {/* View Toggle */}
-                <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white/[0.08] text-white' : 'text-white/40 hover:text-white/70'}`}
-                  >
-                    <Grid3x3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white/[0.08] text-white' : 'text-white/40 hover:text-white/70'}`}
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -349,37 +324,59 @@ export default function LibraryPage() {
                       const isSelected = selectedPlatforms.includes(platform);
 
                       const getPlatformStyle = () => {
-                        if (!isSelected) return 'bg-white/[0.03] text-white/50 hover:text-white border-transparent hover:border-white/[0.08]';
                         switch (platform) {
-                          case 'Steam': return 'bg-[#1b2838]/40 text-[#66c0f4] border-[#66c0f4]/30';
-                          case 'PlayStation': return 'bg-[#003791]/30 text-[#0070cc] border-[#0070cc]/30';
-                          case 'Xbox': return 'bg-[#107c10]/30 text-[#52b043] border-[#52b043]/30';
-                          case 'Nintendo': return 'bg-[#e60012]/20 text-[#e60012] border-[#e60012]/30';
-                          case 'Epic Games': return 'bg-white/10 text-white/70 border-white/20';
-                          case 'GOG': return 'bg-[#86328a]/30 text-[#a358ff] border-[#a358ff]/30';
-                          case 'EA App': return 'bg-[#ff4747]/20 text-[#ff4747] border-[#ff4747]/30';
-                          case 'Battle.net': return 'bg-[#00aeff]/20 text-[#00aeff] border-[#00aeff]/30';
-                          case 'Ubisoft Connect': return 'bg-[#0070ff]/20 text-[#0070ff] border-[#0070ff]/30';
-                          case 'Windows': return 'bg-[#0078d4]/20 text-[#0078d4] border-[#0078d4]/30';
-                          case 'Physical': return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
-                          default: return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+                          case 'Steam': return isSelected
+                            ? 'bg-[#1b2838]/40 text-white border-[#66c0f4]/40'
+                            : 'bg-white/[0.03] text-white border-[#66c0f4]/20 hover:border-[#66c0f4]/40';
+                          case 'PlayStation': return isSelected
+                            ? 'bg-[#003791]/30 text-white border-[#0070cc]/40'
+                            : 'bg-white/[0.03] text-white border-[#0070cc]/20 hover:border-[#0070cc]/40';
+                          case 'Xbox': return isSelected
+                            ? 'bg-[#107c10]/30 text-white border-[#52b043]/40'
+                            : 'bg-white/[0.03] text-white border-[#52b043]/20 hover:border-[#52b043]/40';
+                          case 'Nintendo': return isSelected
+                            ? 'bg-[#e60012]/20 text-white border-[#e60012]/40'
+                            : 'bg-white/[0.03] text-white border-[#e60012]/20 hover:border-[#e60012]/40';
+                          case 'Epic Games': return isSelected
+                            ? 'bg-white/10 text-white border-white/30'
+                            : 'bg-white/[0.03] text-white border-white/10 hover:border-white/20';
+                          case 'GOG': return isSelected
+                            ? 'bg-[#86328a]/30 text-white border-[#a358ff]/40'
+                            : 'bg-white/[0.03] text-white border-[#a358ff]/20 hover:border-[#a358ff]/40';
+                          case 'EA App': return isSelected
+                            ? 'bg-[#ff4747]/20 text-white border-[#ff4747]/40'
+                            : 'bg-white/[0.03] text-white border-[#ff4747]/20 hover:border-[#ff4747]/40';
+                          case 'Battle.net': return isSelected
+                            ? 'bg-[#00aeff]/20 text-white border-[#00aeff]/40'
+                            : 'bg-white/[0.03] text-white border-[#00aeff]/20 hover:border-[#00aeff]/40';
+                          case 'Ubisoft Connect': return isSelected
+                            ? 'bg-[#0070ff]/20 text-white border-[#0070ff]/40'
+                            : 'bg-white/[0.03] text-white border-[#0070ff]/20 hover:border-[#0070ff]/40';
+                          case 'Windows': return isSelected
+                            ? 'bg-[#0078d4]/20 text-white border-[#0078d4]/40'
+                            : 'bg-white/[0.03] text-white border-[#0078d4]/20 hover:border-[#0078d4]/40';
+                          case 'Physical': return isSelected
+                            ? 'bg-amber-500/20 text-white border-amber-500/40'
+                            : 'bg-white/[0.03] text-white border-amber-500/20 hover:border-amber-500/40';
+                          default: return isSelected
+                            ? 'bg-cyan-500/20 text-white border-cyan-500/40'
+                            : 'bg-white/[0.03] text-white border-white/[0.08] hover:border-white/[0.15]';
                         }
                       };
 
                       const getPlatformLogo = () => {
-                        const logoClass = isSelected ? '' : 'text-white/40';
                         switch (platform) {
-                          case 'Steam': return <SteamLogo size="sm" className={isSelected ? 'text-[#66c0f4]' : logoClass} />;
-                          case 'PlayStation': return <PlayStationLogo size="sm" className={isSelected ? 'text-[#0070cc]' : logoClass} />;
-                          case 'Xbox': return <XboxLogo size="sm" className={isSelected ? 'text-[#52b043]' : logoClass} />;
-                          case 'Nintendo': return <NintendoLogo size="sm" className={isSelected ? 'text-[#e60012]' : logoClass} />;
-                          case 'Epic Games': return <EpicLogo size="sm" className={isSelected ? 'text-white/70' : logoClass} />;
-                          case 'GOG': return <GOGLogo size="sm" className={isSelected ? 'text-[#a358ff]' : logoClass} />;
-                          case 'EA App': return <EALogo size="sm" className={isSelected ? 'text-[#ff4747]' : logoClass} />;
-                          case 'Battle.net': return <BattleNetLogo size="sm" className={isSelected ? 'text-[#00aeff]' : logoClass} />;
-                          case 'Ubisoft Connect': return <UbisoftLogo size="sm" className={isSelected ? 'text-[#0070ff]' : logoClass} />;
-                          case 'Windows': return <WindowsLogo size="sm" className={isSelected ? 'text-[#0078d4]' : logoClass} />;
-                          case 'Physical': return <Disc className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : logoClass}`} />;
+                          case 'Steam': return <SteamLogo size="sm" className={isSelected ? 'text-[#66c0f4]' : 'text-[#66c0f4]/60'} />;
+                          case 'PlayStation': return <PlayStationLogo size="sm" className={isSelected ? 'text-[#0070cc]' : 'text-[#0070cc]/60'} />;
+                          case 'Xbox': return <XboxLogo size="sm" className={isSelected ? 'text-[#52b043]' : 'text-[#52b043]/60'} />;
+                          case 'Nintendo': return <NintendoLogo size="sm" className={isSelected ? 'text-[#e60012]' : 'text-[#e60012]/60'} />;
+                          case 'Epic Games': return <EpicLogo size="sm" className={isSelected ? 'text-white' : 'text-white/50'} />;
+                          case 'GOG': return <GOGLogo size="sm" className={isSelected ? 'text-[#a358ff]' : 'text-[#a358ff]/60'} />;
+                          case 'EA App': return <EALogo size="sm" className={isSelected ? 'text-[#ff4747]' : 'text-[#ff4747]/60'} />;
+                          case 'Battle.net': return <BattleNetLogo size="sm" className={isSelected ? 'text-[#00aeff]' : 'text-[#00aeff]/60'} />;
+                          case 'Ubisoft Connect': return <UbisoftLogo size="sm" className={isSelected ? 'text-[#0070ff]' : 'text-[#0070ff]/60'} />;
+                          case 'Windows': return <WindowsLogo size="sm" className={isSelected ? 'text-[#0078d4]' : 'text-[#0078d4]/60'} />;
+                          case 'Physical': return <Disc className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-amber-400/60'}`} />;
                           default: return null;
                         }
                       };
@@ -408,15 +405,38 @@ export default function LibraryPage() {
                     {PRIORITY_OPTIONS.filter(p => p.id !== 'all').map((priority) => {
                       const Icon = priority.icon;
                       const isSelected = selectedPriorities.includes(priority.id);
+
+                      const getPriorityStyle = () => {
+                        switch (priority.id) {
+                          case 'high': return isSelected
+                            ? 'bg-red-500/20 text-white border-red-500/40'
+                            : 'bg-white/[0.03] text-white border-red-500/20 hover:border-red-500/40';
+                          case 'medium': return isSelected
+                            ? 'bg-amber-500/20 text-white border-amber-500/40'
+                            : 'bg-white/[0.03] text-white border-amber-500/20 hover:border-amber-500/40';
+                          case 'low': return isSelected
+                            ? 'bg-blue-500/20 text-white border-blue-500/40'
+                            : 'bg-white/[0.03] text-white border-blue-500/20 hover:border-blue-500/40';
+                          default: return 'bg-white/[0.03] text-white border-white/[0.08] hover:border-white/[0.15]';
+                        }
+                      };
+
+                      const getPriorityIconColor = () => {
+                        switch (priority.id) {
+                          case 'high': return isSelected ? 'text-red-400' : 'text-red-400/60';
+                          case 'medium': return isSelected ? 'text-amber-400' : 'text-amber-400/60';
+                          case 'low': return isSelected ? 'text-blue-400' : 'text-blue-400/60';
+                          default: return 'text-white/40';
+                        }
+                      };
+
                       return (
                         <button
                           key={priority.id}
                           onClick={() => togglePriority(priority.id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                            isSelected ? priority.activeClass : 'bg-white/[0.03] text-white/50 hover:text-white border-transparent hover:border-white/[0.08]'
-                          }`}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${getPriorityStyle()}`}
                         >
-                          {Icon && <Icon className="w-3.5 h-3.5" />}
+                          {Icon && <Icon className={`w-3.5 h-3.5 ${getPriorityIconColor()}`} />}
                           {priority.label}
                         </button>
                       );
@@ -438,24 +458,35 @@ export default function LibraryPage() {
                       const hasGames = count > 0;
 
                       const getSourceStyle = () => {
-                        if (!isSelected) return 'bg-white/[0.03] text-white/50 hover:text-white border-transparent hover:border-white/[0.08]';
                         switch (sourceId) {
-                          case 'steam': return 'bg-[#1b2838]/40 text-[#66c0f4] border-[#66c0f4]/30';
-                          case 'psn': return 'bg-[#003791]/30 text-[#0070cc] border-[#0070cc]/30';
-                          case 'xbox': return 'bg-[#107c10]/30 text-[#52b043] border-[#52b043]/30';
-                          case 'epic': return 'bg-white/10 text-white/70 border-white/20';
-                          case 'manual': return 'bg-violet-500/20 text-violet-400 border-violet-500/30';
-                          default: return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+                          case 'steam': return isSelected
+                            ? 'bg-[#1b2838]/40 text-white border-[#66c0f4]/40'
+                            : 'bg-white/[0.03] text-white border-[#66c0f4]/20 hover:border-[#66c0f4]/40';
+                          case 'psn': return isSelected
+                            ? 'bg-[#003791]/30 text-white border-[#0070cc]/40'
+                            : 'bg-white/[0.03] text-white border-[#0070cc]/20 hover:border-[#0070cc]/40';
+                          case 'xbox': return isSelected
+                            ? 'bg-[#107c10]/30 text-white border-[#52b043]/40'
+                            : 'bg-white/[0.03] text-white border-[#52b043]/20 hover:border-[#52b043]/40';
+                          case 'epic': return isSelected
+                            ? 'bg-white/10 text-white border-white/30'
+                            : 'bg-white/[0.03] text-white border-white/10 hover:border-white/20';
+                          case 'manual': return isSelected
+                            ? 'bg-[#701a75]/30 text-white border-[#e879f9]/60'
+                            : 'bg-white/[0.03] text-white border-[#e879f9]/35 hover:border-[#e879f9]/60';
+                          default: return isSelected
+                            ? 'bg-cyan-500/20 text-white border-cyan-500/40'
+                            : 'bg-white/[0.03] text-white border-white/[0.08] hover:border-white/[0.15]';
                         }
                       };
 
                       const getSourceLogo = () => {
                         switch (sourceId) {
-                          case 'steam': return <SteamLogo size="sm" className={isSelected ? 'text-[#66c0f4]' : 'text-white/40'} />;
-                          case 'psn': return <PlayStationLogo size="sm" className={isSelected ? 'text-[#0070cc]' : 'text-white/40'} />;
-                          case 'xbox': return <XboxLogo size="sm" className={isSelected ? 'text-[#52b043]' : 'text-white/40'} />;
-                          case 'epic': return <EpicLogo size="sm" className={isSelected ? 'text-white/70' : 'text-white/40'} />;
-                          case 'manual': return <Pencil className={`w-3.5 h-3.5 ${isSelected ? 'text-violet-400' : 'text-white/40'}`} />;
+                          case 'steam': return <SteamLogo size="sm" className={isSelected ? 'text-[#66c0f4]' : 'text-[#66c0f4]/60'} />;
+                          case 'psn': return <PlayStationLogo size="sm" className={isSelected ? 'text-[#0070cc]' : 'text-[#0070cc]/60'} />;
+                          case 'xbox': return <XboxLogo size="sm" className={isSelected ? 'text-[#52b043]' : 'text-[#52b043]/60'} />;
+                          case 'epic': return <EpicLogo size="sm" className={isSelected ? 'text-white' : 'text-white/50'} />;
+                          case 'manual': return <Pencil className="w-3.5 h-3.5" style={{ color: isSelected ? '#e879f9' : 'rgba(232, 121, 249, 0.6)' }} />;
                           default: return null;
                         }
                       };
@@ -538,7 +569,7 @@ export default function LibraryPage() {
           </div>
 
           {/* Results Count */}
-          <div className="mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <p className="text-sm font-mono text-white/40">
               <span className="text-[10px] text-white/30 uppercase tracking-wider">// RESULTS:</span>{' '}
               <span className="text-white font-medium">{sortedGames.length}</span> of {totalGames} games
@@ -547,6 +578,36 @@ export default function LibraryPage() {
                 <span className="text-violet-400/60 ml-2">• {hiddenGamesCount} hidden</span>
               )}
             </p>
+
+            <div className="flex items-center gap-3">
+              {/* Find Duplicates */}
+              <button
+                onClick={() => setShowDuplicateFinderModal(true)}
+                className="group relative flex items-center gap-2 px-3 py-2 overflow-hidden rounded-lg transition-all duration-300 bg-white/[0.03] border border-violet-500/20 hover:border-violet-500/40"
+                title="Find duplicate games"
+              >
+                <Copy className="w-4 h-4 text-violet-400/70 group-hover:text-violet-400 transition-colors" />
+                <span className="hidden sm:inline text-xs font-medium text-white/50 group-hover:text-white/70 transition-colors">
+                  Duplicates
+                </span>
+              </button>
+
+              {/* View Toggle */}
+              <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-white/40 hover:text-white/70 border border-transparent'}`}
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-white/40 hover:text-white/70 border border-transparent'}`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Game Grid/List */}

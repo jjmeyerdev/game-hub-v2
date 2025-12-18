@@ -132,7 +132,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   if (p.includes('steam')) {
     return {
       bg: 'bg-[#1b2838]',
-      text: 'text-[#66c0f4]',
+      text: 'text-white',
       border: 'border-[#66c0f4]/30',
       glow: 'shadow-[0_0_8px_rgba(102,192,244,0.3)]',
     };
@@ -142,7 +142,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   if (p.includes('playstation') || p.includes('ps5') || p.includes('ps4') || p.includes('ps3') || p.includes('ps2') || p.includes('ps1') || p.includes('psp') || p.includes('vita') || p === 'psn') {
     return {
       bg: 'bg-[#003087]',
-      text: 'text-[#00aef0]',
+      text: 'text-white',
       border: 'border-[#0070d1]/40',
       glow: 'shadow-[0_0_8px_rgba(0,112,209,0.35)]',
     };
@@ -152,7 +152,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   if (p.includes('xbox') || p.includes('series x') || p.includes('series s')) {
     return {
       bg: 'bg-[#107c10]',
-      text: 'text-[#9bf00b]',
+      text: 'text-white',
       border: 'border-[#52b043]/40',
       glow: 'shadow-[0_0_8px_rgba(16,124,16,0.4)]',
     };
@@ -222,7 +222,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   if (p.includes('physical') || p.includes('dvd') || p.includes('disc')) {
     return {
       bg: 'bg-amber-600',
-      text: 'text-amber-100',
+      text: 'text-white',
       border: 'border-amber-500/40',
       glow: 'shadow-[0_0_8px_rgba(217,119,6,0.35)]',
     };
@@ -232,7 +232,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   if (p.includes('pc') || p.includes('windows')) {
     return {
       bg: 'bg-slate-600',
-      text: 'text-slate-200',
+      text: 'text-white',
       border: 'border-slate-500/40',
     };
   }
@@ -240,7 +240,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   // Default fallback
   return {
     bg: 'bg-white/10',
-    text: 'text-white/70',
+    text: 'text-white',
     border: 'border-white/[0.08]',
   };
 }
