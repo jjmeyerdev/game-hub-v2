@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, ChevronDown, Check, AlertCircle, Clock, Zap } from 'lucide-react';
-import { getSteamProfile, syncSteamLibrary } from '@/app/(dashboard)/_actions/steam';
-import { getPsnProfile, syncPsnLibrary } from '@/app/(dashboard)/_actions/psn';
-import { getXboxProfile, syncXboxLibrary } from '@/app/(dashboard)/_actions/xbox';
-import { getEpicProfile, syncEpicLibrary } from '@/app/(dashboard)/_actions/epic';
+import { getSteamProfile, syncSteamLibrary } from '@/lib/actions/steam';
+import { getPsnProfile, syncPsnLibrary } from '@/lib/actions/psn';
+import { getXboxProfile, syncXboxLibrary } from '@/lib/actions/xbox';
+import { getEpicProfile, syncEpicLibrary } from '@/lib/actions/epic';
 import { SyncProgressModal } from '@/components/ui/SyncProgressModal';
 import { SyncToast } from '@/components/ui/SyncToast';
 import { triggerLibraryRefresh } from '@/lib/events/libraryEvents';

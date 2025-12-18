@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Link as LinkIcon, Unlink, RefreshCw, ExternalLink, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
-import { getEpicProfile, linkEpicAccount, unlinkEpicAccount, syncEpicLibrary } from '@/app/(dashboard)/_actions/epic';
+import { getEpicProfile, linkEpicAccount, unlinkEpicAccount, syncEpicLibrary } from '@/lib/actions/epic';
 import { SyncToast } from '@/components/ui/SyncToast';
 import { SyncProgressModal } from '@/components/ui/SyncProgressModal';
 import { triggerLibraryRefresh } from '@/lib/events/libraryEvents';

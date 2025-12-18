@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Trash2, AlertTriangle, Loader2, RefreshCw, Sparkles, ChevronDown, CheckCircle, XCircle } from 'lucide-react';
-import { removeSyncedGames, getSyncedGameCounts, enrichAllGamesFromIGDB } from '@/app/(dashboard)/_actions/games';
+import { removeSyncedGames, getSyncedGameCounts, enrichAllGamesFromIGDB } from '@/lib/actions/games';
 
 interface SyncedCounts {
   steam: number;

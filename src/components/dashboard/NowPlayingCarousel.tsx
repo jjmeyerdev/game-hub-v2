@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { UserGame } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/lib/actions/games';
 import { NowPlayingCard } from './cards/NowPlayingCard';
 
 interface NowPlayingCarouselProps {

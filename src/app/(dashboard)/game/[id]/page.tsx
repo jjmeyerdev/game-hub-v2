@@ -45,7 +45,7 @@ import {
   UbisoftLogo,
   WindowsLogo,
 } from '@/components/icons/PlatformLogos';
-import type { UserGame } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/lib/actions/games';
 
 // Helper to get platform logo component
 function getPlatformLogo(platform: string, className?: string) {

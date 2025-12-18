@@ -11,7 +11,7 @@ import { SyncServiceDropdown } from '@/components/library/SyncServiceDropdown';
 import { ConsoleFilter } from '@/components/library/ConsoleFilter';
 import { filterAndSortGames, getGameSyncSource } from '@/lib/utils';
 import { LIBRARY_FILTER_PLATFORMS, SYNC_SOURCE_OPTIONS, CONSOLE_GENERATIONS, type SortOption, type SyncSourceId } from '@/lib/constants/platforms';
-import type { UserGame } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/lib/actions/games';
 
 type ViewMode = 'grid' | 'list';
 

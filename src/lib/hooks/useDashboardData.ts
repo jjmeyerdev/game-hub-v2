@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { getUserGames, getNowPlayingGames, getUserStats, type UserGame } from '@/app/(dashboard)/_actions/games';
+import { getUserGames, getNowPlayingGames, getUserStats, type UserGame } from '@/lib/actions/games';
 import { libraryEvents } from '@/lib/events/libraryEvents';
 
 interface DashboardUser {

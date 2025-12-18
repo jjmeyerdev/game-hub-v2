@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Unlink, RefreshCw, ExternalLink, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
-import { getXboxProfile, linkXboxAccount, unlinkXboxAccount, syncXboxLibrary } from '@/app/(dashboard)/_actions/xbox';
+import { getXboxProfile, linkXboxAccount, unlinkXboxAccount, syncXboxLibrary } from '@/lib/actions/xbox';
 import { SyncToast } from '@/components/ui/SyncToast';
 import { SyncProgressModal } from '@/components/ui/SyncProgressModal';
 import { triggerLibraryRefresh } from '@/lib/events/libraryEvents';

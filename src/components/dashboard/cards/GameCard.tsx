@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { UserGame } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/lib/actions/games';
 import { getGameSyncSource } from '@/lib/utils';
 import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
 import { getPlatformBrandStyle } from '@/lib/constants/platforms';
