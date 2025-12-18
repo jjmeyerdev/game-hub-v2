@@ -646,21 +646,13 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
             <div className="grid grid-cols-3 gap-3">
               {/* Waveform */}
               <div
-<<<<<<< HEAD
-                className="col-span-2 relative h-16 rounded-xl overflow-hidden"
-=======
                 className="col-span-2 relative min-h-[5.5rem] rounded-xl overflow-hidden"
->>>>>>> 49b7a6e (Enhance SyncProgressModal with detailed phase descriptions and estimated durations)
                 style={{
                   background: 'rgba(255, 255, 255, 0.02)',
                   border: '1px solid rgba(255, 255, 255, 0.04)',
                 }}
               >
-<<<<<<< HEAD
-                <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-=======
                 <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 88" preserveAspectRatio="none">
->>>>>>> 49b7a6e (Enhance SyncProgressModal with detailed phase descriptions and estimated durations)
                   <defs>
                     <linearGradient id={`waveGrad-${platform}`} x1="0%" y1="0%" x2="0%" y2="100%">
                       <stop offset="0%" stopColor={config.accent} stopOpacity="0.4" />
@@ -671,26 +663,16 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
                     <>
                       <path
                         d={`
-<<<<<<< HEAD
-                          M 0 64
-                          ${waveformData.map((y, i) => `L ${(i / (waveformData.length - 1)) * 100} ${64 - (y * 0.5)}`).join(' ')}
-                          L 100 64 Z
-=======
                           M 0 88
                           ${waveformData.map((y, i) => `L ${(i / (waveformData.length - 1)) * 100} ${88 - (y * 0.7)}`).join(' ')}
                           L 100 88 Z
->>>>>>> 49b7a6e (Enhance SyncProgressModal with detailed phase descriptions and estimated durations)
                         `}
                         fill={`url(#waveGrad-${platform})`}
                         vectorEffect="non-scaling-stroke"
                       />
                       <path
                         d={waveformData.map((y, i) =>
-<<<<<<< HEAD
-                          `${i === 0 ? 'M' : 'L'} ${(i / (waveformData.length - 1)) * 100} ${64 - (y * 0.5)}`
-=======
                           `${i === 0 ? 'M' : 'L'} ${(i / (waveformData.length - 1)) * 100} ${88 - (y * 0.7)}`
->>>>>>> 49b7a6e (Enhance SyncProgressModal with detailed phase descriptions and estimated durations)
                         ).join(' ')}
                         fill="none"
                         stroke={config.accent}
@@ -716,11 +698,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
               {/* Stats panel */}
               <div
-<<<<<<< HEAD
-                className="flex flex-col justify-center items-center p-3 rounded-xl"
-=======
                 className="flex flex-col justify-center items-center p-3 rounded-xl min-h-[5.5rem]"
->>>>>>> 49b7a6e (Enhance SyncProgressModal with detailed phase descriptions and estimated durations)
                 style={{
                   background: 'rgba(255, 255, 255, 0.02)',
                   border: '1px solid rgba(255, 255, 255, 0.04)',
