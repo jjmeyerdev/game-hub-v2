@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Gamepad2, Loader2, Edit3 } from 'lucide-react';
-import { addGameToLibrary, editUserGame, fetchIGDBMetadata } from '@/app/_actions/games';
-import type { UserGame } from '@/app/_actions/games';
+import { addGameToLibrary, editUserGame, fetchIGDBMetadata } from '@/app/(dashboard)/_actions/games';
+import type { UserGame } from '@/app/(dashboard)/_actions/games';
 import { BaseModal } from '@/components/modals';
 import { useIGDBSearch } from '@/lib/hooks';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
@@ -369,8 +369,9 @@ export default function GameFormModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditMode ? 'EDIT GAME' : 'ADD GAME'}
-      icon={isEditMode ? <Edit3 className="w-5 h-5 text-void" /> : <Gamepad2 className="w-5 h-5 text-void" />}
+      title={isEditMode ? 'Edit Game' : 'Add Game'}
+      subtitle={isEditMode ? 'Update game details' : 'Add a new game to your library'}
+      icon={isEditMode ? <Edit3 className="w-5 h-5 text-white/60" /> : <Gamepad2 className="w-5 h-5 text-white/60" />}
       maxWidth="4xl"
     >
       <div className="relative">
@@ -382,7 +383,7 @@ export default function GameFormModal({
           />
         )}
 
-        <div className="max-h-[80vh] overflow-y-auto custom-scrollbar">
+        <div className="max-h-[75vh] overflow-y-auto">
           <IGDBSearchSection
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -396,7 +397,7 @@ export default function GameFormModal({
           />
 
           <form onSubmit={handleSubmit} className="p-5">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <GameMetadataSection
                 title={title}
                 setTitle={setTitle}
@@ -459,24 +460,24 @@ export default function GameFormModal({
             </div>
 
             {error && (
-              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
+              <div className="mt-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
                 <p className="text-sm text-red-400">{error}</p>
               </div>
             )}
 
-            <div className="flex items-center gap-3 mt-6 pt-4 border-t border-steel/30">
+            <div className="flex items-center gap-3 mt-6 pt-5 border-t border-white/[0.04]">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1 px-4 py-3 bg-abyss border border-steel/50 rounded-xl font-semibold text-gray-400 hover:text-white hover:border-steel transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl font-medium text-white/50 hover:text-white hover:border-white/[0.12] transition-all disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading || !title.trim()}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-void transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-cyan-500/25"
+                className="flex-1 px-4 py-3 bg-white hover:bg-cyan-400 rounded-xl font-semibold text-[#030304] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -493,18 +494,10 @@ export default function GameFormModal({
       </div>
 
       <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #06b6d4 0%, #a855f7 100%); border-radius: 3px; }
-        @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        @keyframes ringExpand {
-          0% { transform: scale(1); opacity: 0.6; }
-          100% { transform: scale(2); opacity: 0; }
-        }
-        @keyframes gridPulse {
-          0%, 100% { opacity: 0.05; }
-          50% { opacity: 0.15; }
-        }
+        .max-h-\\[75vh\\]::-webkit-scrollbar { width: 6px; }
+        .max-h-\\[75vh\\]::-webkit-scrollbar-track { background: transparent; }
+        .max-h-\\[75vh\\]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+        .max-h-\\[75vh\\]::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
       `}</style>
     </BaseModal>
   );

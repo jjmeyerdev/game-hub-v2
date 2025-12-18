@@ -1,282 +1,293 @@
 'use client';
 
 import Link from 'next/link';
-import { TrendingUp, BarChart3, PieChart, Activity, Calendar, Clock, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { TrendingUp, BarChart3, PieChart, Activity, Calendar, Clock, Sparkles, ArrowRight, Zap } from 'lucide-react';
 
 export default function StatsPage() {
   const features = [
     {
       icon: BarChart3,
-      title: 'Gaming Analytics Dashboard',
-      description: 'Comprehensive visualizations of your gaming habits, trends, and patterns over time',
-      metrics: ['Daily/Weekly/Monthly activity', 'Genre preferences', 'Platform distribution'],
+      title: 'Gaming Analytics',
+      description: 'Comprehensive visualizations of your gaming habits and patterns',
+      metrics: ['Daily/Weekly activity', 'Genre preferences', 'Platform distribution'],
+      accent: 'cyan',
     },
     {
       icon: TrendingUp,
       title: 'Progress Tracking',
-      description: 'Monitor your completion rates, backlog velocity, and achievement hunting progress',
-      metrics: ['Completion trends', 'Time-to-beat analysis', 'Backlog burn rate'],
+      description: 'Monitor completion rates and backlog velocity',
+      metrics: ['Completion trends', 'Time-to-beat', 'Backlog burn rate'],
+      accent: 'emerald',
     },
     {
       icon: PieChart,
       title: 'Platform Insights',
-      description: 'See which platforms you play most and how your time is distributed',
-      metrics: ['Hours per platform', 'Games per platform', 'Purchase patterns'],
+      description: 'See which platforms you play most',
+      metrics: ['Hours per platform', 'Games owned', 'Purchase patterns'],
+      accent: 'violet',
     },
     {
       icon: Calendar,
       title: 'Gaming Calendar',
-      description: 'Visualize your gaming history with heatmaps and activity timelines',
-      metrics: ['Activity heatmap', 'Streaks & milestones', 'Seasonal patterns'],
+      description: 'Visualize history with heatmaps and timelines',
+      metrics: ['Activity heatmap', 'Streaks', 'Seasonal patterns'],
+      accent: 'amber',
     },
     {
       icon: Activity,
       title: 'Performance Metrics',
-      description: 'Track your skill progression and improvement across competitive games',
+      description: 'Track skill progression across competitive games',
       metrics: ['Win rates', 'Skill ratings', 'Performance trends'],
+      accent: 'rose',
     },
     {
       icon: Sparkles,
-      title: 'AI-Powered Insights',
-      description: 'Get personalized recommendations based on your gaming patterns and preferences',
-      metrics: ['What to play next', 'Hidden gems discovery', 'Playstyle analysis'],
+      title: 'AI Insights',
+      description: 'Personalized recommendations based on your patterns',
+      metrics: ['What to play next', 'Hidden gems', 'Playstyle analysis'],
+      accent: 'cyan',
     },
   ];
 
+  const timeline = [
+    { phase: 'Phase 3', quarter: 'Q3 2026', title: 'Core Analytics', description: 'Basic dashboard with essential metrics', color: 'cyan', progress: 45 },
+    { phase: 'Phase 4', quarter: 'Q4 2026', title: 'Advanced Analytics', description: 'AI-powered insights and predictions', color: 'violet', progress: 15 },
+    { phase: 'Phase 5', quarter: 'Q1 2027', title: 'Social Analytics', description: 'Compare stats with friends and community', color: 'emerald', progress: 0 },
+  ];
+
+  const accentColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
+    cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', text: 'text-cyan-400', glow: 'shadow-cyan-500/20' },
+    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400', glow: 'shadow-emerald-500/20' },
+    violet: { bg: 'bg-violet-500/10', border: 'border-violet-500/20', text: 'text-violet-400', glow: 'shadow-violet-500/20' },
+    amber: { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-400', glow: 'shadow-amber-500/20' },
+    rose: { bg: 'bg-rose-500/10', border: 'border-rose-500/20', text: 'text-rose-400', glow: 'shadow-rose-500/20' },
+  };
+
   return (
-    <>
-      {/* Animated grid background */}
-      <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,217,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,217,255,0.1)_1px,transparent_1px)] bg-[length:100px_100px]" />
-          </div>
-          <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/3 right-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
-        </div>
+    <div className="min-h-screen bg-void relative">
+      {/* Subtle ambient glow */}
+      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/[0.03] rounded-full blur-[120px] pointer-events-none animate-breathe" />
+      <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-violet-500/[0.02] rounded-full blur-[100px] pointer-events-none animate-breathe" style={{ animationDelay: '2s' }} />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-12">
-          {/* Header */}
-          <div className="mb-12">
-
-          {/* Hero Section with Chart Visualization */}
-          <div className="relative bg-gradient-to-br from-deep via-void to-abyss border-2 border-cyan-500/30 rounded-3xl p-12 overflow-hidden">
-            {/* Animated chart lines in background */}
-            <div className="absolute inset-0 opacity-5">
-              <svg className="w-full h-full" viewBox="0 0 1000 400">
-                <path
-                  d="M0,200 Q250,100 500,150 T1000,100"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeWidth="3"
-                  className="text-cyan-400"
-                  style={{ animation: 'dash 3s ease-in-out infinite' }}
-                />
-                <path
-                  d="M0,250 Q250,200 500,220 T1000,180"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeWidth="3"
-                  className="text-purple-400"
-                  style={{ animation: 'dash 3s ease-in-out infinite', animationDelay: '0.5s' }}
-                />
-              </svg>
+      <div className="relative max-w-6xl mx-auto px-6 py-12">
+        {/* Hero Section */}
+        <div className="mb-16">
+          <div className="relative bg-abyss border border-white/[0.06] rounded-2xl p-10 overflow-hidden">
+            {/* Subtle grid pattern */}
+            <div className="absolute inset-0 opacity-[0.02]">
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:60px_60px]" />
             </div>
 
-            <div className="relative">
-              <div className="flex items-start justify-between mb-6">
-                <div className="inline-flex items-center gap-3">
-                  <div className="relative">
-                    <TrendingUp className="w-16 h-16 text-cyan-400" />
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full animate-ping" />
-                  </div>
-                  <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
-                    IN DEVELOPMENT
-                  </Badge>
-                </div>
+            {/* Top accent line */}
+            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
 
-                {/* Mock stats badges */}
-                <div className="hidden md:flex flex-col gap-2">
-                  <div className="bg-deep/80 backdrop-blur-sm border border-steel rounded-lg px-4 py-2">
-                    <div className="text-xs text-gray-500">Phase</div>
-                    <div className="text-lg font-bold text-purple-400">3</div>
-                  </div>
-                  <div className="bg-deep/80 backdrop-blur-sm border border-steel rounded-lg px-4 py-2">
-                    <div className="text-xs text-gray-500">ETA</div>
-                    <div className="text-lg font-bold text-cyan-400">Q3</div>
-                  </div>
-                </div>
+            <div className="relative">
+              {/* Status badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] border border-white/[0.08] rounded-full mb-6">
+                <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
+                <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider">In Development</span>
               </div>
 
-              <h1 className="text-7xl font-bold mb-4 leading-none">
-                <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent animate-shimmer">
-                  STATISTICS
-                </span>
-              </h1>
+              <div className="flex items-start justify-between">
+                <div className="max-w-2xl">
+                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-2 block">// DATA_ANALYTICS</span>
+                  <h1 className="text-5xl font-bold text-white mb-4 tracking-tight font-[family-name:var(--font-family-display)]">
+                    STATISTICS
+                  </h1>
+                  <p className="text-lg text-white/40 leading-relaxed mb-8">
+                    Deep analytics and insights into your gaming journey. Visualize progress,
+                    track habits, and discover patterns in your play style.
+                  </p>
 
-              <p className="text-xl text-gray-300 max-w-2xl mb-8">
-                Deep analytics and insights into your gaming journey. Visualize your progress,
-                track your habits, and discover patterns in your play style.
-              </p>
+                  {/* Feature tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {['Analytics', 'Visualizations', 'AI Insights'].map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-xs font-medium text-white/40"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-              <div className="flex flex-wrap gap-3">
-                <Badge variant="outline" className="border-cyan-500/20 bg-cyan-500/5 text-cyan-400">
-                  Advanced Analytics
-                </Badge>
-                <Badge variant="outline" className="border-purple-500/20 bg-purple-500/5 text-purple-400">
-                  Data Visualization
-                </Badge>
-                <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/5 text-emerald-400">
-                  AI Insights
-                </Badge>
+                {/* Icon */}
+                <div className="hidden md:block">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-white/[0.08] flex items-center justify-center">
+                      <TrendingUp className="w-10 h-10 text-cyan-400" />
+                    </div>
+                    {/* HUD corners */}
+                    <div className="absolute -top-1 -left-1 w-3 h-3 border-l-2 border-t-2 border-cyan-400/50" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 border-r-2 border-t-2 border-cyan-400/50" />
+                    <div className="absolute -bottom-1 -left-1 w-3 h-3 border-l-2 border-b-2 border-cyan-400/50" />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 border-r-2 border-b-2 border-cyan-400/50" />
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full flex items-center justify-center">
+                      <Zap className="w-2.5 h-2.5 text-[#030304]" />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Features Grid */}
-        <div>
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-steel to-transparent" />
-            <h2 className="text-2xl font-bold text-cyan-400 uppercase tracking-wider">
-              Planned Features
-            </h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-steel via-steel to-transparent" />
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-8">
+            <BarChart3 className="w-4 h-4 text-white/20" />
+            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// PLANNED_FEATURES</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((feature, index) => {
               const Icon = feature.icon;
+              const colors = accentColors[feature.accent];
 
               return (
-                <Card
+                <div
                   key={index}
-                  className="relative group bg-gradient-to-br from-deep to-abyss border-steel hover:border-cyan-500/50 transition-all duration-300 hover:scale-105 overflow-hidden"
+                  className="group relative bg-abyss border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
                   style={{
-                    animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
+                    animation: `fadeIn 0.4s ease-out ${index * 0.05}s both`,
                   }}
                 >
-                  {/* Animated gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/5 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Hover HUD corners */}
+                  <div className={`absolute top-0 left-0 w-3 h-3 border-l border-t ${colors.border.replace('/20', '/50')} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className={`absolute top-0 right-0 w-3 h-3 border-r border-t ${colors.border.replace('/20', '/50')} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className={`absolute bottom-0 left-0 w-3 h-3 border-l border-b ${colors.border.replace('/20', '/50')} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className={`absolute bottom-0 right-0 w-3 h-3 border-r border-b ${colors.border.replace('/20', '/50')} opacity-0 group-hover:opacity-100 transition-opacity`} />
 
-                  <div className="relative p-6">
-                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <Icon className="w-6 h-6 text-cyan-400" />
+                  {/* Hover glow */}
+                  <div className={`absolute inset-0 rounded-xl ${colors.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl`} />
+
+                  <div className="relative">
+                    {/* Icon */}
+                    <div className={`w-10 h-10 rounded-lg ${colors.bg} ${colors.border} border flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}>
+                      <Icon className={`w-5 h-5 ${colors.text}`} />
                     </div>
 
-                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                    <h3 className="text-base font-semibold text-white mb-2 group-hover:text-white/90 transition-colors font-[family-name:var(--font-family-display)]">
                       {feature.title}
                     </h3>
 
-                    <p className="text-sm text-gray-400 mb-4">
+                    <p className="text-sm text-white/30 mb-4 leading-relaxed">
                       {feature.description}
                     </p>
 
+                    {/* Metrics */}
                     <div className="space-y-1.5">
                       {feature.metrics.map((metric, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-gray-500">
-                          <div className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <div key={i} className="flex items-center gap-2 text-xs text-white/20">
+                          <div className={`w-1 h-1 rounded-full ${colors.text.replace('text-', 'bg-')}`} />
                           {metric}
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  {/* Bottom gradient bar */}
-                  <div className="h-1 bg-gradient-to-r from-cyan-500/50 via-purple-500/50 to-cyan-500/50 opacity-50 group-hover:opacity-100 transition-opacity" />
-                </Card>
+                </div>
               );
             })}
           </div>
         </div>
 
         {/* Timeline Section */}
-        <div className="mt-16">
-          <div className="bg-gradient-to-r from-deep via-abyss to-deep border border-steel rounded-2xl p-8">
-            <div className="flex items-center gap-4 mb-6">
-              <Clock className="w-8 h-8 text-purple-400" />
-              <h3 className="text-2xl font-bold">Development Timeline</h3>
-            </div>
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-8">
+            <Clock className="w-4 h-4 text-white/20" />
+            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// DEV_TIMELINE</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+          </div>
 
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-3 h-3 rounded-full bg-cyan-400" />
-                  <div className="w-px flex-1 bg-steel" />
-                </div>
-                <div className="pb-8">
-                  <Badge className="mb-2 bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
-                    Phase 3 - Q3 2026
-                  </Badge>
-                  <h4 className="font-bold mb-1">Core Analytics</h4>
-                  <p className="text-sm text-gray-400">
-                    Basic statistics dashboard with essential metrics and visualizations
-                  </p>
-                </div>
-              </div>
+          <div className="relative bg-abyss border border-white/[0.06] rounded-xl overflow-hidden">
+            {/* HUD corners */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/30" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/30" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-400/30" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-400/30" />
 
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-3 h-3 rounded-full bg-purple-400" />
-                  <div className="w-px flex-1 bg-steel" />
-                </div>
-                <div className="pb-8">
-                  <Badge className="mb-2 bg-purple-500/10 text-purple-400 border-purple-500/30">
-                    Phase 4 - Q4 2026
-                  </Badge>
-                  <h4 className="font-bold mb-1">Advanced Analytics</h4>
-                  <p className="text-sm text-gray-400">
-                    AI-powered insights, predictions, and personalized recommendations
-                  </p>
-                </div>
-              </div>
+            {timeline.map((item, index) => {
+              const colors = accentColors[item.color];
+              const isLast = index === timeline.length - 1;
 
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-3 h-3 rounded-full bg-emerald-400" />
+              return (
+                <div
+                  key={index}
+                  className={`relative p-6 ${!isLast ? 'border-b border-white/[0.04]' : ''}`}
+                >
+                  <div className="flex items-start gap-6">
+                    {/* Timeline indicator */}
+                    <div className="flex flex-col items-center">
+                      <div className={`w-3 h-3 rounded-full ${colors.bg} ${colors.border} border-2`} />
+                      {!isLast && <div className="w-px flex-1 bg-white/[0.06] mt-2" />}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 -mt-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className={`text-[10px] font-mono font-medium ${colors.text} uppercase tracking-wider`}>
+                          {item.phase}
+                        </span>
+                        <span className="text-[10px] text-white/20">•</span>
+                        <span className="text-[10px] font-mono text-white/30">{item.quarter}</span>
+                      </div>
+                      <h4 className="font-semibold text-white mb-1 font-[family-name:var(--font-family-display)]">{item.title}</h4>
+                      <p className="text-sm text-white/30">{item.description}</p>
+
+                      {/* Progress bar */}
+                      {item.progress > 0 && (
+                        <div className="mt-3 flex items-center gap-3">
+                          <div className="flex-1 h-1 bg-white/[0.04] rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${colors.bg.replace('/10', '/40')} rounded-full transition-all duration-500`}
+                              style={{ width: `${item.progress}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-mono text-white/20 tabular-nums">{item.progress}%</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Badge className="mb-2 bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                    Phase 5 - Q1 2027
-                  </Badge>
-                  <h4 className="font-bold mb-1">Social Analytics</h4>
-                  <p className="text-sm text-gray-400">
-                    Compare your stats with friends and the community
-                  </p>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
 
         {/* CTA Section */}
-        <div className="mt-16 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-cyan-500/10 border border-cyan-500/30 rounded-2xl p-8 text-center">
-          <BarChart3 className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold mb-2">Coming Soon</h3>
-          <p className="text-gray-400 mb-6 max-w-md mx-auto">
-            Advanced statistics and analytics are in active development. Your gaming data will be ready when this launches!
+        <div className="relative bg-abyss border border-white/[0.06] rounded-xl p-8 text-center overflow-hidden">
+          {/* HUD corners */}
+          <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-cyan-400/30" />
+          <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-cyan-400/30" />
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-cyan-400/30" />
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-cyan-400/30" />
+
+          <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-4 block">// STATUS_UPDATE</span>
+          <div className="w-12 h-12 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center mx-auto mb-4">
+            <BarChart3 className="w-6 h-6 text-cyan-400" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2 font-[family-name:var(--font-family-display)]">COMING SOON</h3>
+          <p className="text-sm text-white/30 mb-6 max-w-md mx-auto">
+            Advanced statistics and analytics are in active development. Your gaming data will be ready when this launches.
           </p>
           <Link href="/dashboard">
-            <Button className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-void font-bold">
-              Back to Dashboard
-            </Button>
+            <button className="group relative inline-flex items-center gap-2 px-6 py-3 overflow-hidden rounded-xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+              <span className="relative font-semibold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">Back to Dashboard</span>
+              <ArrowRight className="relative w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </Link>
         </div>
-        </div>
+      </div>
 
-        <style jsx global>{`
-          @keyframes dash {
-            0%, 100% {
-              stroke-dasharray: 1000;
-              stroke-dashoffset: 0;
-            }
-            50% {
-              stroke-dashoffset: 500;
-            }
-          }
-        `}</style>
-    </>
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
   );
 }

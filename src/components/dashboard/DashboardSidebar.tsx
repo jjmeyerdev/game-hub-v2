@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Gamepad2,
   Library,
@@ -14,10 +15,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Radio,
+  Cpu,
 } from 'lucide-react';
-import { signOut } from '@/app/_actions/auth';
-import { NavItem } from './NavItem';
+import { signOut } from '@/app/(auth)/_actions/auth';
 
 interface DashboardSidebarProps {
   userName: string;
@@ -34,8 +34,8 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
-  // Handle click outside to close user menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -56,26 +56,31 @@ export function DashboardSidebar({
     await signOut();
   };
 
+  const navItems = [
+    { icon: Library, label: 'Dashboard', href: '/dashboard' },
+    { icon: Gamepad2, label: 'Library', href: '/library' },
+    { icon: Layers, label: 'Backlog', href: '/backlog' },
+  ];
+
+  const analyticsItems = [
+    { icon: Trophy, label: 'Achievements', href: '/achievements' },
+    { icon: TrendingUp, label: 'Stats', href: '/stats' },
+  ];
+
+  const socialItems = [
+    { icon: Users, label: 'Friends', href: '/friends' },
+  ];
+
   return (
     <aside
       className={`
-        relative bg-gradient-to-b from-abyss via-void to-abyss
-        border-r border-cyan-500/20 flex flex-col fixed h-screen
-        transition-all duration-500 ease-in-out overflow-hidden
-        ${collapsed ? 'w-20' : 'w-64'}
+        fixed h-screen bg-abyss/95 backdrop-blur-xl border-r border-white/[0.04]
+        flex flex-col transition-all duration-500 ease-out z-40
+        ${collapsed ? 'w-20' : 'w-72'}
       `}
     >
-      {/* Subtle grid background */}
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
-        backgroundImage: `
-          linear-gradient(rgba(0, 217, 255, 0.5) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0, 217, 255, 0.5) 1px, transparent 1px)
-        `,
-        backgroundSize: '30px 30px'
-      }} />
-
-      {/* Right edge glow line */}
-      <div className="absolute top-0 right-0 bottom-0 w-px bg-gradient-to-b from-cyan-500/40 via-purple-500/20 to-cyan-500/40" />
+      {/* Subtle gradient at top */}
+      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-cyan-500/[0.03] to-transparent pointer-events-none" />
 
       {/* Toggle Button */}
       <button
@@ -83,117 +88,136 @@ export function DashboardSidebar({
         className="absolute -right-3 top-8 z-50 group"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        <div className="relative">
-          <div className="w-6 h-6 rounded-full bg-void border border-cyan-500/50 group-hover:border-cyan-400 transition-all duration-300 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            {collapsed ? (
-              <ChevronRight className="w-3 h-3 text-cyan-400" />
-            ) : (
-              <ChevronLeft className="w-3 h-3 text-cyan-400" />
-            )}
-          </div>
-          <div className="absolute inset-0 rounded-full bg-cyan-500/30 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="w-6 h-6 rounded-full bg-abyss border border-white/[0.12] flex items-center justify-center transition-all hover:border-cyan-400/40 hover:bg-cyan-400/10">
+          {collapsed ? (
+            <ChevronRight className="w-3 h-3 text-white/50 group-hover:text-cyan-400" />
+          ) : (
+            <ChevronLeft className="w-3 h-3 text-white/50 group-hover:text-cyan-400" />
+          )}
         </div>
       </button>
 
       {/* Logo Section */}
-      <div className={`relative p-5 transition-all duration-500 ${collapsed ? 'px-3' : 'px-5'}`}>
-        {/* Corner accent */}
-        <div className="absolute top-0 left-0 w-6 h-6">
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 to-transparent" />
-          <div className="absolute top-0 left-0 h-full w-[2px] bg-gradient-to-b from-cyan-500 to-transparent" />
-        </div>
-
+      <div className={`relative px-6 py-6 transition-all duration-500 ${collapsed ? 'px-4' : 'px-6'}`}>
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
-              <Gamepad2 className="w-5 h-5 text-void" strokeWidth={2.5} />
+            <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-all duration-300">
+              <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2.5} />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
+            {/* Corner brackets */}
+            <div className="absolute -top-1 -left-1 w-2 h-2 border-l-2 border-t-2 border-cyan-400/50" />
+            <div className="absolute -top-1 -right-1 w-2 h-2 border-r-2 border-t-2 border-cyan-400/50" />
+            <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l-2 border-b-2 border-cyan-400/50" />
+            <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
           </div>
           <div
             className={`flex flex-col transition-all duration-500 ${
               collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
             }`}
           >
-            <span className="text-lg font-black tracking-tight text-white" style={{ fontFamily: 'var(--font-rajdhani)' }}>
-              GAME<span className="text-cyan-400">HUB</span>
+            <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+              GAMEHUB
             </span>
-            <span className="text-[9px] font-bold tracking-[0.2em] text-gray-600 -mt-1">
-              COMMAND CENTER
+            <span className="text-[9px] text-cyan-400/60 tracking-[0.2em] uppercase">
+              Command Center
             </span>
           </div>
         </Link>
       </div>
 
       {/* Divider */}
-      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-steel to-transparent" />
+      <div className="mx-6 h-px bg-gradient-to-r from-cyan-400/20 via-white/[0.06] to-transparent" />
 
       {/* Navigation */}
-      <nav className={`flex-1 py-4 transition-all duration-500 ${collapsed ? 'px-2' : 'px-3'}`}>
-        {/* Main Navigation Section */}
-        <div className="mb-6">
+      <nav className={`flex-1 py-6 overflow-y-auto transition-all duration-500 ${collapsed ? 'px-3' : 'px-4'}`}>
+        {/* Main Navigation */}
+        <div className="mb-8">
           {!collapsed && (
             <div className="flex items-center gap-2 px-3 mb-3">
-              <span className="text-[10px] font-bold tracking-[0.2em] text-gray-600 uppercase">Navigation</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-steel/50 to-transparent" />
+              <Cpu className="w-3 h-3 text-cyan-400/40" />
+              <span className="text-[9px] font-mono text-cyan-400/40 uppercase tracking-[0.2em]">// Main</span>
             </div>
           )}
           <div className="space-y-1">
-            <NavItem icon={Library} label="Dashboard" collapsed={collapsed} href="/dashboard" />
-            <NavItem icon={Gamepad2} label="Library" collapsed={collapsed} href="/library" />
-            <NavItem icon={Layers} label="Backlog" collapsed={collapsed} href="/backlog" />
+            {navItems.map((item) => (
+              <NavItem
+                key={item.href}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                collapsed={collapsed}
+                active={pathname === item.href}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Stats Section */}
-        <div className="mb-6">
+        {/* Analytics */}
+        <div className="mb-8">
           {!collapsed && (
             <div className="flex items-center gap-2 px-3 mb-3">
-              <span className="text-[10px] font-bold tracking-[0.2em] text-gray-600 uppercase">Analytics</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-steel/50 to-transparent" />
+              <TrendingUp className="w-3 h-3 text-violet-400/40" />
+              <span className="text-[9px] font-mono text-violet-400/40 uppercase tracking-[0.2em]">// Analytics</span>
             </div>
           )}
           <div className="space-y-1">
-            <NavItem icon={Trophy} label="Achievements" collapsed={collapsed} href="/achievements" />
-            <NavItem icon={TrendingUp} label="Stats" collapsed={collapsed} href="/stats" />
+            {analyticsItems.map((item) => (
+              <NavItem
+                key={item.href}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                collapsed={collapsed}
+                active={pathname === item.href}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Social Section */}
+        {/* Social */}
         <div>
           {!collapsed && (
             <div className="flex items-center gap-2 px-3 mb-3">
-              <span className="text-[10px] font-bold tracking-[0.2em] text-gray-600 uppercase">Social</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-steel/50 to-transparent" />
+              <Users className="w-3 h-3 text-emerald-400/40" />
+              <span className="text-[9px] font-mono text-emerald-400/40 uppercase tracking-[0.2em]">// Network</span>
             </div>
           )}
           <div className="space-y-1">
-            <NavItem icon={Users} label="Friends" collapsed={collapsed} href="/friends" />
+            {socialItems.map((item) => (
+              <NavItem
+                key={item.href}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                collapsed={collapsed}
+                active={pathname === item.href}
+              />
+            ))}
           </div>
         </div>
       </nav>
 
       {/* User Profile Section */}
-      <div className={`relative p-4 transition-all duration-500 ${collapsed ? 'px-2' : 'px-3'}`} ref={userMenuRef}>
-        {/* Top divider with glow */}
-        <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
+      <div className={`relative p-4 transition-all duration-500 ${collapsed ? 'px-3' : 'px-4'}`} ref={userMenuRef}>
+        {/* Top divider */}
+        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
           className={`
-            w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-300 group
-            hover:bg-cyan-500/5 border border-transparent hover:border-cyan-500/20
+            w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group
+            hover:bg-white/[0.03] border border-transparent hover:border-cyan-400/20
             ${collapsed ? 'justify-center' : ''}
           `}
         >
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-bold text-xs text-void border border-cyan-500/30">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-[family-name:var(--font-family-display)]">
               {userName.substring(0, 2).toUpperCase()}
             </div>
-            {/* Status indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-void flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
+            {/* Online indicator */}
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-abyss">
+              <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-50" />
             </div>
           </div>
 
@@ -205,16 +229,15 @@ export function DashboardSidebar({
           >
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-white truncate group-hover:text-cyan-400 transition-colors" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+                <div className="text-sm font-medium text-white/90 truncate font-[family-name:var(--font-family-display)]">
                   {userName}
                 </div>
-                <div className="flex items-center gap-1">
-                  <Radio className="w-2.5 h-2.5 text-emerald-400" />
-                  <span className="text-[10px] font-bold tracking-wider text-emerald-400/80">ONLINE</span>
+                <div className="text-[10px] text-emerald-400/80 font-mono uppercase tracking-wider">
+                  Online
                 </div>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-gray-600 group-hover:text-cyan-400 transition-all duration-300 flex-shrink-0 ${
+                className={`w-4 h-4 text-white/30 transition-all duration-300 flex-shrink-0 ${
                   userMenuOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -223,15 +246,11 @@ export function DashboardSidebar({
 
           {/* Tooltip for collapsed state */}
           {collapsed && (
-            <div className="absolute left-full ml-3 px-3 py-2 bg-abyss border border-cyan-500/30 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
-              <div className="text-xs font-bold text-white whitespace-nowrap" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+            <div className="absolute left-full ml-3 px-3 py-2 bg-abyss border border-white/[0.08] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
+              <div className="text-sm font-medium text-white whitespace-nowrap font-[family-name:var(--font-family-display)]">
                 {userName}
               </div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <Radio className="w-2 h-2 text-emerald-400" />
-                <span className="text-[9px] text-emerald-400">ONLINE</span>
-              </div>
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-abyss border-l border-b border-cyan-500/30 rotate-45" />
+              <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">ONLINE</div>
             </div>
           )}
         </button>
@@ -241,68 +260,105 @@ export function DashboardSidebar({
           <div
             className={`
               absolute z-50 overflow-hidden
-              ${collapsed ? 'left-full ml-2 bottom-4 w-48' : 'bottom-full mb-2 left-3 right-3'}
-              bg-abyss/95 backdrop-blur-xl border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/10
+              ${collapsed ? 'left-full ml-2 bottom-4 w-56' : 'bottom-full mb-2 left-4 right-4'}
+              bg-abyss border border-white/[0.08] rounded-xl shadow-2xl
             `}
-            style={{ animation: 'dropdownSlideIn 0.2s ease-out' }}
           >
             {/* Menu header */}
-            <div className="px-4 py-3 border-b border-steel/50">
+            <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.01]">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-bold text-[10px] text-void">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-[family-name:var(--font-family-display)]">
                   {userName.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-white truncate" style={{ fontFamily: 'var(--font-rajdhani)' }}>{userName}</div>
-                  <div className="text-[10px] text-gray-500 truncate">{userEmail}</div>
+                  <div className="text-sm font-medium text-white truncate font-[family-name:var(--font-family-display)]">{userName}</div>
+                  <div className="text-[10px] text-white/40 truncate font-mono">{userEmail}</div>
                 </div>
               </div>
             </div>
 
             {/* Menu items */}
             <div className="py-2">
-              {/* Settings */}
               <Link
                 href="/settings"
                 onClick={() => setUserMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-cyan-500/10 transition-all duration-200 group"
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.03] transition-all duration-200 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
-                  <Settings className="w-4 h-4 text-cyan-400" />
+                <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center group-hover:border-cyan-400/30 group-hover:bg-cyan-400/10 transition-all">
+                  <Settings className="w-4 h-4 text-white/50 group-hover:text-cyan-400" />
                 </div>
-                <span className="text-sm font-semibold text-gray-400 group-hover:text-white transition-colors">
+                <span className="text-sm text-white/60 group-hover:text-white/90 transition-colors">
                   Settings
                 </span>
               </Link>
 
-              {/* Divider */}
-              <div className="h-px bg-gradient-to-r from-transparent via-steel to-transparent my-2 mx-4" />
+              <div className="h-px bg-white/[0.04] my-2 mx-4" />
 
-              {/* Sign Out */}
               <button
                 onClick={() => {
                   setUserMenuOpen(false);
                   handleSignOut();
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-rose-500/10 transition-all duration-200 group"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 transition-all duration-200 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center group-hover:bg-rose-500/20 transition-all">
-                  <LogOut className="w-4 h-4 text-rose-400" />
+                <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center group-hover:bg-red-500/20 transition-all">
+                  <LogOut className="w-4 h-4 text-red-400" />
                 </div>
-                <span className="text-sm font-semibold text-rose-400 group-hover:text-rose-300 transition-colors">
-                  Sign Out
+                <span className="text-sm text-red-400 group-hover:text-red-300 transition-colors">
+                  Sign out
                 </span>
               </button>
             </div>
           </div>
         )}
       </div>
-
-      {/* Bottom corner accent */}
-      <div className="absolute bottom-0 left-0 w-6 h-6">
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 to-transparent" />
-        <div className="absolute bottom-0 left-0 h-full w-[2px] bg-gradient-to-t from-cyan-500 to-transparent" />
-      </div>
     </aside>
+  );
+}
+
+interface NavItemProps {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  collapsed: boolean;
+  active?: boolean;
+}
+
+function NavItem({ icon: Icon, label, href, collapsed, active }: NavItemProps) {
+  return (
+    <Link
+      href={href}
+      className={`
+        relative flex items-center gap-3 px-3 py-2.5 rounded-xl
+        transition-all duration-300 group
+        ${active
+          ? 'bg-cyan-400/10 text-white border border-cyan-400/20'
+          : 'text-white/40 hover:text-white/80 hover:bg-white/[0.03] border border-transparent hover:border-white/[0.06]'
+        }
+        ${collapsed ? 'justify-center' : ''}
+      `}
+    >
+      {/* Active indicator */}
+      {active && (
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-cyan-400 rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+      )}
+
+      <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${active ? 'text-cyan-400' : ''}`} />
+
+      <span
+        className={`text-sm font-medium transition-all duration-500 ${
+          collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+        }`}
+      >
+        {label}
+      </span>
+
+      {/* Tooltip for collapsed state */}
+      {collapsed && (
+        <div className="absolute left-full ml-3 px-3 py-1.5 bg-abyss border border-white/[0.08] rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
+          <span className="text-sm text-white whitespace-nowrap">{label}</span>
+        </div>
+      )}
+    </Link>
   );
 }

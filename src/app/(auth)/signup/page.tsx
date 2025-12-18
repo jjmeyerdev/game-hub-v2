@@ -1,162 +1,300 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { Gamepad2, X, Library, Clock, Loader2, AlertCircle } from 'lucide-react';
-import { signUp } from '@/app/_actions/auth';
+import { Gamepad2, ArrowLeft, Loader2, AlertCircle, Check, UserPlus, Cpu } from 'lucide-react';
+import { signUp } from '@/app/(auth)/_actions/auth';
+import {
+  SteamLogo,
+  PlayStationLogo,
+  XboxLogo,
+  EpicLogo,
+} from '@/components/icons/PlatformLogos';
 
 export default function SignUpPage() {
   const [state, formAction] = useActionState<{ error?: string } | undefined, FormData>(signUp, undefined);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-void flex flex-col relative overflow-hidden">
-      {/* Background Effects */}
+    <div className="min-h-screen bg-void text-white overflow-hidden">
+      {/* Noise texture */}
+      <div className="noise-overlay" />
+
+      {/* Scan line effect */}
+      <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent animate-scan-line" />
+      </div>
+
+      {/* Grid background */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }}></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,217,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,217,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(34, 211, 238, 0.5) 1px, transparent 1px),
+              linear-gradient(rgba(34, 211, 238, 0.5) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
+        {/* Hex pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%2322d3ee' stroke-width='0.5'/%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+      </div>
+
+      {/* Background gradient orbs */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-cyan-500/[0.04] blur-[150px] animate-breathe" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-violet-500/[0.05] blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
+      </div>
+
+      {/* Floating platform logos */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {mounted && (
+          <>
+            <FloatingLogo Logo={SteamLogo} x={8} y={20} delay={0} />
+            <FloatingLogo Logo={PlayStationLogo} x={88} y={15} delay={1} />
+            <FloatingLogo Logo={XboxLogo} x={92} y={70} delay={2} />
+            <FloatingLogo Logo={EpicLogo} x={5} y={75} delay={3} />
+          </>
+        )}
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-6 py-6">
-        <Link href="/" className="flex items-center space-x-2 group w-fit">
-          <div className="relative">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
-              <Gamepad2 className="w-6 h-6 text-void" strokeWidth={2.5} />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
+      <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/[0.04]">
+        <div className="max-w-[1400px] mx-auto px-8">
+          <div className="flex items-center justify-between h-20">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative">
+                <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-all duration-300">
+                  <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2.5} />
+                </div>
+                {/* Corner brackets */}
+                <div className="absolute -top-1 -left-1 w-2 h-2 border-l-2 border-t-2 border-cyan-400/50" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 border-r-2 border-t-2 border-cyan-400/50" />
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l-2 border-b-2 border-cyan-400/50" />
+                <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+                  GAMEHUB
+                </span>
+                <span className="text-[9px] font-mono text-white/30 tracking-wider uppercase">
+                  // REGISTRATION
+                </span>
+              </div>
+            </Link>
+
+            <Link
+              href="/"
+              className="group relative flex items-center gap-2 px-5 py-2.5 text-sm text-white/70 hover:text-cyan-400 transition-all uppercase tracking-wide border border-white/20 hover:border-cyan-400/50 rounded-lg bg-white/[0.03] hover:bg-cyan-400/10"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:inline font-[family-name:var(--font-family-display)] font-medium">Return</span>
+            </Link>
           </div>
-          <span className="text-2xl font-bold tracking-tight">
-            Game<span className="text-cyan-400">hub</span>
-          </span>
-        </Link>
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6 py-12 relative z-10">
-        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Marketing Copy */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-                <span className="text-white">Join Thousands</span>
-                <br />
-                <span className="text-white">of </span>
-                <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                  Gamers
-                </span>
-              </h1>
-              <p className="text-xl text-gray-400 leading-relaxed">
-                Track your entire gaming library in one unified dashboard
-              </p>
+      <main className="relative z-10 min-h-screen flex items-center justify-center px-8 py-32">
+        <div className="w-full max-w-md">
+          {/* Card */}
+          <div
+            className={`relative transition-all duration-1000 ${
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            {/* HUD Frame */}
+            <div className="absolute -inset-4">
+              <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-cyan-400/30" />
+              <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-cyan-400/30" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-cyan-400/30" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-cyan-400/30" />
             </div>
 
-            {/* Feature Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-8">
-              <FeatureStat icon={Library} value="100k+" label="Games tracked" />
-              <FeatureStat icon={Gamepad2} value="10+" label="Platform connections" />
-              <FeatureStat icon={Clock} value="1M+" label="Hours of gameplay" />
-            </div>
-          </div>
+            {/* Glow effect behind card */}
+            <div className="absolute -inset-px bg-gradient-to-b from-cyan-400/10 to-violet-400/5 rounded-2xl blur-sm" />
 
-          {/* Right Side - Sign Up Form */}
-          <div className="relative">
-            {/* Modal Card */}
-            <div className="relative bg-deep/80 backdrop-blur-xl border border-steel rounded-2xl p-8 shadow-2xl">
-              {/* Close Button */}
-              <Link
-                href="/"
-                className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </Link>
-
-              {/* Form Header */}
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold mb-2">Sign Up for Free</h2>
-                <p className="text-gray-400 text-sm">and enhance your gaming experience</p>
+            <div className="relative bg-abyss/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
+              {/* Card header */}
+              <div className="px-8 py-4 border-b border-white/[0.06] bg-white/[0.01]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Cpu className="w-4 h-4 text-cyan-400" />
+                    <span className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-wider">
+                      New Operator Registration
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] font-mono text-emerald-400">OPEN</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Form */}
-              <form action={formAction} className="space-y-6">
-                {/* Error Message */}
-                {state?.error && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-start space-x-3">
-                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm text-red-400 font-semibold">Sign Up Error</p>
-                      <p className="text-xs text-red-300 mt-1">{state.error}</p>
+              <div className="p-8">
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-[0.3em] mb-3">
+                    // CREATE ACCOUNT
+                  </span>
+                  <h1 className="text-3xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-2">
+                    JOIN THE NETWORK
+                  </h1>
+                  <p className="text-white/40 text-sm">
+                    Initialize your gaming command center
+                  </p>
+                </div>
+
+                {/* Form */}
+                <form action={formAction} className="space-y-5">
+                  {/* Error Message */}
+                  {state?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-red-400 font-medium">{state.error}</p>
+                      </div>
                     </div>
+                  )}
+
+                  {/* Email Field */}
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="flex items-center gap-2 text-[10px] font-mono text-white/50 uppercase tracking-wider">
+                      <span className="text-cyan-400/60">&gt;</span>
+                      Email Address
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="operator@example.com"
+                      required
+                      autoComplete="email"
+                      className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-400/30 focus:bg-white/[0.04] focus:ring-1 focus:ring-cyan-400/20 transition-all font-mono text-sm"
+                    />
                   </div>
-                )}
 
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-300">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    className="w-full bg-slate/50 border border-steel rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
+                  {/* Password Field */}
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="flex items-center gap-2 text-[10px] font-mono text-white/50 uppercase tracking-wider">
+                      <span className="text-cyan-400/60">&gt;</span>
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Create secure password"
+                      required
+                      minLength={6}
+                      autoComplete="new-password"
+                      className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-400/30 focus:bg-white/[0.04] focus:ring-1 focus:ring-cyan-400/20 transition-all font-mono text-sm"
+                    />
+                    <p className="text-[10px] font-mono text-white/30 flex items-center gap-2">
+                      <span className="text-cyan-400/60">!</span>
+                      Minimum 6 characters required
+                    </p>
+                  </div>
+
+                  {/* Submit Button */}
+                  <SubmitButton />
+                </form>
+
+                {/* Divider */}
+                <div className="relative my-8">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/[0.06]" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-abyss px-4 text-[10px] font-mono text-white/30">OR</span>
+                  </div>
                 </div>
 
-                {/* Password Field */}
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-semibold text-gray-300">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Create a strong password"
-                    required
-                    minLength={6}
-                    className="w-full bg-slate/50 border border-steel rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                  <p className="text-xs text-gray-500">Password must be at least 6 characters</p>
-                </div>
-
-                {/* Submit Button */}
-                <SubmitButton />
-              </form>
-
-              {/* Log In Link */}
-              <p className="mt-6 text-center text-sm text-gray-400">
-                Already have an account?{' '}
-                <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
-                  Log In
-                </Link>{' '}
-                here
-              </p>
-
-              {/* Terms */}
-              <p className="mt-6 text-center text-xs text-gray-600">
-                By signing up, you agree to the{' '}
-                <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                  Terms and Conditions
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                  Privacy Policy
-                </a>
-                , including{' '}
-                <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                  Cookie Use
-                </a>
-                .
-              </p>
+                {/* Sign In Link */}
+                <p className="text-center text-sm text-white/40">
+                  Already registered?{' '}
+                  <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+                    Sign In
+                  </Link>
+                </p>
+              </div>
             </div>
-
-            {/* Card Glow Effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl -z-10"></div>
           </div>
+
+          {/* Features */}
+          <div
+            className={`mt-10 transition-all duration-1000 delay-200 ${
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/[0.06]" />
+              <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider">System Benefits</span>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/[0.06]" />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <FeatureChip icon={<Check className="w-3 h-3" />} text="Free Forever" />
+              <FeatureChip icon={<Check className="w-3 h-3" />} text="Live Sync" />
+              <FeatureChip icon={<Check className="w-3 h-3" />} text="All Platforms" />
+            </div>
+          </div>
+
+          {/* Platform icons */}
+          <div
+            className={`mt-8 flex items-center justify-center gap-6 transition-all duration-1000 delay-300 ${
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <span className="text-[9px] font-mono text-white/20 uppercase tracking-wider">Connect</span>
+            <div className="flex items-center gap-3">
+              {[
+                { Logo: SteamLogo, name: 'Steam' },
+                { Logo: PlayStationLogo, name: 'PlayStation' },
+                { Logo: XboxLogo, name: 'Xbox' },
+                { Logo: EpicLogo, name: 'Epic' },
+              ].map(({ Logo, name }) => (
+                <div
+                  key={name}
+                  className="group relative w-9 h-9 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center justify-center hover:border-cyan-400/30 hover:bg-white/[0.04] transition-all overflow-hidden"
+                >
+                  {/* Hover HUD corners */}
+                  <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Logo size="sm" className="relative text-white/30 group-hover:text-cyan-400/60 transition-colors" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Terms */}
+          <p
+            className={`mt-8 text-center text-[10px] font-mono text-white/20 leading-relaxed transition-all duration-1000 delay-400 ${
+              mounted ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            BY REGISTERING, YOU ACCEPT OUR{' '}
+            <a href="#" className="text-white/40 hover:text-cyan-400 transition-colors">
+              TERMS
+            </a>{' '}
+            AND{' '}
+            <a href="#" className="text-white/40 hover:text-cyan-400 transition-colors">
+              PRIVACY PROTOCOL
+            </a>
+          </p>
         </div>
       </main>
     </div>
@@ -170,37 +308,63 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-void font-bold py-3 rounded-lg transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-2"
+      className="group relative w-full overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {pending ? (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Creating Account...</span>
-        </>
-      ) : (
-        <span>Sign Up</span>
-      )}
+      {/* Glow effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+      <div className="relative flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl">
+        {pending ? (
+          <>
+            <Loader2 className="w-5 h-5 text-white animate-spin" />
+            <span className="font-semibold text-white tracking-wide uppercase font-[family-name:var(--font-family-display)]">
+              Initializing...
+            </span>
+          </>
+        ) : (
+          <>
+            <UserPlus className="w-5 h-5 text-white" />
+            <span className="font-semibold text-white tracking-wide uppercase font-[family-name:var(--font-family-display)]">
+              Create Account
+            </span>
+          </>
+        )}
+      </div>
     </button>
   );
 }
 
-interface FeatureStatProps {
-  icon: React.ElementType;
-  value: string;
-  label: string;
+function FeatureChip({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <div className="group relative flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] hover:border-emerald-400/30 transition-all overflow-hidden">
+      {/* Hover HUD corners */}
+      <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <span className="relative text-emerald-400">{icon}</span>
+      <span className="relative text-[10px] font-mono text-white/50 uppercase tracking-wide">{text}</span>
+    </div>
+  );
 }
 
-function FeatureStat({ icon: Icon, value, label }: FeatureStatProps) {
+interface FloatingLogoProps {
+  Logo: React.ComponentType<{ size: 'sm' | 'md' | 'lg' | 'xl'; className?: string }>;
+  x: number;
+  y: number;
+  delay: number;
+}
+
+function FloatingLogo({ Logo, x, y, delay }: FloatingLogoProps) {
   return (
-    <div className="relative group">
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      <div className="relative p-4 rounded-xl border border-steel/50 group-hover:border-cyan-500/50 transition-all duration-300">
-        <Icon className="w-6 h-6 text-cyan-400 mb-2" />
-        <div className="text-2xl font-bold text-cyan-400 mb-1">{value}</div>
-        <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider leading-tight">
-          {label}
-        </div>
-      </div>
+    <div
+      className="absolute animate-float"
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        animationDelay: `${delay}s`,
+      }}
+    >
+      <Logo size="lg" className="w-12 h-12 text-white/[0.03]" />
     </div>
   );
 }

@@ -89,17 +89,20 @@ src/
 The application uses a **cyber-gaming aesthetic** with a custom color palette defined in `globals.css`:
 
 **Color Tokens:**
+
 - `void`, `abyss`, `deep`, `slate`, `steel` - Dark background shades (#060a0f to #252b35)
 - `cyan-400/500/600/700` - Primary accent colors (#00d9ff range)
 - `purple-400/500/600` - Secondary accent colors (#b845ff range)
 - `emerald-400/500` - Success/completion colors (#00ff9f range)
 
 **Typography:**
+
 - Display font: Rajdhani (bold, geometric, uppercase headings)
 - Body font: Inter (clean, readable text)
 - Custom utilities: `.glow-cyan`, `.glow-purple` for text glow effects
 
 **Visual Effects:**
+
 - Grain texture overlay on body
 - Gradient orbs and grid patterns for depth
 - Border glows and card shadows with cyan/purple accents
@@ -112,6 +115,7 @@ The application uses a **cyber-gaming aesthetic** with a custom color palette de
 ### Image Configuration
 
 Next.js is configured to allow images from:
+
 - `images.igdb.com` (for future game cover art from IGDB API)
 
 ## Key Implementation Notes
@@ -119,6 +123,7 @@ Next.js is configured to allow images from:
 ### Fonts
 
 The app uses Google Fonts via Next.js Font optimization:
+
 - `Inter` for body text with CSS variable `--font-inter`
 - `Rajdhani` (weights 300-700) for display text with CSS variable `--font-rajdhani`
 
@@ -127,6 +132,7 @@ Both fonts are loaded in `layout.tsx` and applied via CSS variables to maintain 
 ### Tailwind CSS 4.0
 
 This project uses Tailwind CSS 4.0, which has a different configuration approach:
+
 - Theme is defined using `@theme` directive in `globals.css`
 - Uses `@import "tailwindcss"` instead of traditional directives
 - PostCSS config uses `@tailwindcss/postcss` plugin
@@ -135,6 +141,7 @@ This project uses Tailwind CSS 4.0, which has a different configuration approach
 ### Component Patterns
 
 Currently, the landing page demonstrates:
+
 - Fixed header with backdrop blur and transparent background
 - Centered hero layout with large typography
 - Gradient text using `bg-gradient-to-r` with `bg-clip-text`
@@ -171,6 +178,7 @@ The following features are planned but not yet implemented:
 ### Type Safety
 
 TypeScript strict mode is enabled. Avoid using:
+
 - `any` types
 - Non-null assertion operator (`!`)
 - Type assertions (`as Type`) unless absolutely necessary

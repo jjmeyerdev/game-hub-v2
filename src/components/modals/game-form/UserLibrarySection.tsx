@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Gamepad2,
   Package,
   Heart,
   X,
@@ -16,30 +15,26 @@ import {
   Tag,
 } from 'lucide-react';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
+import { getPlatformBrandStyle } from '@/lib/constants/platforms';
 import { PRIORITY_CONFIG, STATUS_CONFIG, type PriorityKey, type StatusKey } from './config';
 
 interface UserLibrarySectionProps {
-  // Platform
   selectedPlatform: string;
   setSelectedPlatform: (value: string) => void;
   selectedConsole: string;
   setSelectedConsole: (value: string) => void;
-  // Status & Priority
   selectedStatus: StatusKey;
   setSelectedStatus: (value: StatusKey) => void;
   selectedPriority: PriorityKey;
   setSelectedPriority: (value: PriorityKey) => void;
-  // Ownership
   ownershipStatus: 'owned' | 'wishlist' | 'unowned';
   setOwnershipStatus: (value: 'owned' | 'wishlist' | 'unowned') => void;
   isPhysical: boolean;
   setIsPhysical: (value: boolean) => void;
-  // Visibility
   isAdult: boolean;
   setIsAdult: (value: boolean) => void;
   isHidden: boolean;
   setIsHidden: (value: boolean) => void;
-  // Edit mode fields
   isEditMode: boolean;
   playtimeHours?: string;
   setPlaytimeHours?: (value: string) => void;
@@ -55,6 +50,55 @@ interface UserLibrarySectionProps {
   setTagInput?: (value: string) => void;
   addTag?: (tag: string) => void;
   removeTag?: (tag: string) => void;
+}
+
+function Toggle({
+  checked,
+  onChange,
+  label,
+  description,
+  icon: Icon,
+  color = 'cyan',
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+  description?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color?: 'cyan' | 'amber' | 'rose' | 'violet';
+}) {
+  const colorClasses = {
+    cyan: { bg: 'bg-cyan-500', border: 'border-cyan-500/30', text: 'text-cyan-400', bgActive: 'bg-cyan-500/10' },
+    amber: { bg: 'bg-amber-500', border: 'border-amber-500/30', text: 'text-amber-400', bgActive: 'bg-amber-500/10' },
+    rose: { bg: 'bg-rose-500', border: 'border-rose-500/30', text: 'text-rose-400', bgActive: 'bg-rose-500/10' },
+    violet: { bg: 'bg-violet-500', border: 'border-violet-500/30', text: 'text-violet-400', bgActive: 'bg-violet-500/10' },
+  };
+  const c = colorClasses[color];
+
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
+        checked
+          ? `${c.bgActive} border ${c.border}`
+          : 'bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08]'
+      }`}
+    >
+      <div className="flex items-center gap-2.5">
+        <Icon className={`w-4 h-4 ${checked ? c.text : 'text-white/30'}`} />
+        <div className="text-left">
+          <span className={`text-sm font-medium ${checked ? c.text : 'text-white/50'}`}>{label}</span>
+          {description && (
+            <p className="text-[10px] text-white/30 mt-0.5">{description}</p>
+          )}
+        </div>
+      </div>
+      <div className={`w-9 h-5 rounded-full transition-all ${checked ? c.bg : 'bg-white/10'}`}>
+        <div className={`w-4 h-4 rounded-full bg-white shadow-sm transform transition-all ${checked ? 'translate-x-4' : 'translate-x-0.5'} mt-0.5`} />
+      </div>
+    </button>
+  );
 }
 
 export function UserLibrarySection({
@@ -97,72 +141,73 @@ export function UserLibrarySection({
   return (
     <div className="space-y-4">
       {/* Section Header */}
-      <div className="flex items-center gap-2 pb-2 border-b border-steel/30">
-        <Gamepad2 className="w-4 h-4 text-purple-400" />
-        <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Your Library</span>
+      <div className="pb-3 border-b border-white/[0.04]">
+        <span className="text-xs font-medium text-white/50">Your Library</span>
       </div>
 
       {/* Platform Selection */}
       <div>
-        <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+        <label className="flex items-center justify-between text-[11px] font-medium text-white/40 uppercase tracking-wider mb-2">
           <span>Platform</span>
           {selectedPlatform && (
             <button
               type="button"
               onClick={() => { setSelectedPlatform(''); setSelectedConsole(''); }}
-              className="text-gray-600 hover:text-red-400 transition-colors"
+              className="text-[10px] text-white/20 hover:text-red-400/70 transition-colors normal-case"
             >
               Clear
             </button>
           )}
         </label>
         <div className="grid grid-cols-3 gap-1.5">
-          {PLATFORMS.filter(p => ['PC', 'Steam', 'PlayStation', 'Xbox', 'Epic Games', 'EA App', 'Nintendo', 'Battle.net'].includes(p.id)).sort((a, b) => a.label.localeCompare(b.label)).map((platform) => (
-            <button
-              key={platform.id}
-              type="button"
-              onClick={() => {
-                if (selectedPlatform === platform.id) {
-                  setSelectedPlatform('');
-                  setSelectedConsole('');
-                } else {
-                  setSelectedPlatform(platform.id);
-                  setSelectedConsole('');
-                }
-              }}
-              className={`px-2 py-2 rounded-lg text-[11px] font-semibold transition-all ${
-                selectedPlatform === platform.id
-                  ? `bg-gradient-to-r ${platform.color} text-white shadow-lg`
-                  : 'bg-abyss border border-steel/50 text-gray-400 hover:border-steel hover:text-white'
-              }`}
-            >
-              {platform.label}
-            </button>
-          ))}
+          {PLATFORMS.filter(p => ['PC', 'Steam', 'PlayStation', 'Xbox', 'Epic Games', 'EA App', 'Nintendo', 'Battle.net', 'GOG', 'Ubisoft Connect'].includes(p.id)).sort((a, b) => a.label.localeCompare(b.label)).map((platform) => {
+            const brandStyle = getPlatformBrandStyle(platform.id);
+            const isSelected = selectedPlatform === platform.id;
+            return (
+              <button
+                key={platform.id}
+                type="button"
+                onClick={() => {
+                  if (isSelected) {
+                    setSelectedPlatform('');
+                    setSelectedConsole('');
+                  } else {
+                    setSelectedPlatform(platform.id);
+                    setSelectedConsole('');
+                  }
+                }}
+                className={`px-2 py-2 rounded-lg text-[11px] font-medium transition-all border ${
+                  isSelected
+                    ? `${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`
+                    : 'bg-white/[0.03] border-white/[0.04] text-white/50 hover:text-white hover:border-white/[0.08]'
+                }`}
+              >
+                {platform.label}
+              </button>
+            );
+          })}
         </div>
         {/* Console selector */}
         {hasConsoles && consoleOptions.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {[...consoleOptions].sort((a, b) => a.localeCompare(b)).map((consoleName) => (
-              <button
-                key={consoleName}
-                type="button"
-                onClick={() => {
-                  if (selectedConsole === consoleName) {
-                    setSelectedConsole('');
-                  } else {
-                    setSelectedConsole(consoleName);
-                  }
-                }}
-                className={`px-2 py-1.5 rounded text-[10px] font-medium transition-all ${
-                  selectedConsole === consoleName
-                    ? 'bg-purple-500/30 border border-purple-500/50 text-purple-300'
-                    : 'bg-abyss/50 border border-steel/30 text-gray-500 hover:text-white'
-                }`}
-              >
-                {consoleName}
-              </button>
-            ))}
+            {[...consoleOptions].sort((a, b) => a.localeCompare(b)).map((consoleName) => {
+              const brandStyle = getPlatformBrandStyle(selectedPlatform);
+              const isSelected = selectedConsole === consoleName;
+              return (
+                <button
+                  key={consoleName}
+                  type="button"
+                  onClick={() => setSelectedConsole(isSelected ? '' : consoleName)}
+                  className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-all border ${
+                    isSelected
+                      ? `${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`
+                      : 'bg-white/[0.02] border-white/[0.04] text-white/40 hover:text-white/60'
+                  }`}
+                >
+                  {consoleName}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -171,19 +216,20 @@ export function UserLibrarySection({
       <div className="grid grid-cols-2 gap-3">
         {/* Status */}
         <div>
-          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Status</label>
-          <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-white/40 uppercase tracking-wider mb-2">Status</label>
+          <div className="space-y-1">
             {(Object.entries(STATUS_CONFIG) as [StatusKey, typeof STATUS_CONFIG[StatusKey]][]).map(([key, config]) => {
               const Icon = config.Icon;
+              const isSelected = selectedStatus === key;
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setSelectedStatus(key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold transition-all ${
-                    selectedStatus === key
-                      ? `${config.bg} ${config.color} border ${config.border}`
-                      : 'bg-abyss border border-steel/50 text-gray-500 hover:text-white'
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                    isSelected
+                      ? 'bg-white text-[#030304]'
+                      : 'bg-white/[0.02] border border-white/[0.04] text-white/40 hover:text-white/60 hover:border-white/[0.08]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -196,19 +242,20 @@ export function UserLibrarySection({
 
         {/* Priority */}
         <div>
-          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Priority</label>
-          <div className="space-y-1.5">
+          <label className="block text-[11px] font-medium text-white/40 uppercase tracking-wider mb-2">Priority</label>
+          <div className="space-y-1">
             {(Object.entries(PRIORITY_CONFIG) as [PriorityKey, typeof PRIORITY_CONFIG[PriorityKey]][]).map(([key, config]) => {
               const Icon = config.Icon;
+              const isSelected = selectedPriority === key;
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setSelectedPriority(key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold transition-all ${
-                    selectedPriority === key
-                      ? `${config.bg} ${config.color} border ${config.border}`
-                      : 'bg-abyss border border-steel/50 text-gray-500 hover:text-white'
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                    isSelected
+                      ? 'bg-white text-[#030304]'
+                      : 'bg-white/[0.02] border border-white/[0.04] text-white/40 hover:text-white/60 hover:border-white/[0.08]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -221,108 +268,76 @@ export function UserLibrarySection({
       </div>
 
       {/* Ownership Status */}
-      <div className="space-y-1.5">
-        <label className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+      <div>
+        <label className="flex items-center gap-1.5 text-[11px] font-medium text-white/40 uppercase tracking-wider mb-2">
           <Package className="w-3 h-3" /> Ownership
         </label>
-        <div className="relative flex bg-abyss border border-steel/50 rounded-xl p-1 overflow-hidden">
-          {/* Sliding background indicator */}
+        <div className="relative flex bg-white/[0.02] border border-white/[0.04] rounded-xl p-1 overflow-hidden">
+          {/* Sliding indicator */}
           <div
-            className={`absolute top-1 bottom-1 w-[calc(33.333%-3px)] rounded-lg transition-all duration-300 ease-out ${
-              ownershipStatus === 'owned'
-                ? 'left-1 bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30'
-                : ownershipStatus === 'wishlist'
-                ? 'left-[calc(33.333%+1px)] bg-gradient-to-r from-rose-500 to-pink-500 shadow-lg shadow-rose-500/30'
-                : 'left-[calc(66.666%+1px)] bg-gradient-to-r from-gray-500 to-gray-600 shadow-lg shadow-gray-500/20'
+            className={`absolute top-1 bottom-1 w-[calc(33.333%-3px)] rounded-lg transition-all duration-200 ease-out bg-white ${
+              ownershipStatus === 'owned' ? 'left-1' : ownershipStatus === 'wishlist' ? 'left-[calc(33.333%+1px)]' : 'left-[calc(66.666%+1px)]'
             }`}
           />
           <button
             type="button"
             onClick={() => setOwnershipStatus('owned')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'owned' ? 'text-void font-bold' : 'text-gray-500 hover:text-gray-300'
+              ownershipStatus === 'owned' ? 'text-[#030304] font-semibold' : 'text-white/40 hover:text-white/60'
             }`}
           >
-            <Package className={`w-3.5 h-3.5 transition-transform ${ownershipStatus === 'owned' ? 'scale-110' : ''}`} />
+            <Package className="w-3.5 h-3.5" />
             <span className="text-xs">Owned</span>
           </button>
           <button
             type="button"
             onClick={() => setOwnershipStatus('wishlist')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'wishlist' ? 'text-void font-bold' : 'text-gray-500 hover:text-gray-300'
+              ownershipStatus === 'wishlist' ? 'text-[#030304] font-semibold' : 'text-white/40 hover:text-white/60'
             }`}
           >
-            <Heart className={`w-3.5 h-3.5 transition-transform ${ownershipStatus === 'wishlist' ? 'scale-110 fill-current' : ''}`} />
+            <Heart className={`w-3.5 h-3.5 ${ownershipStatus === 'wishlist' ? 'fill-current' : ''}`} />
             <span className="text-xs">Wishlist</span>
           </button>
           <button
             type="button"
             onClick={() => setOwnershipStatus('unowned')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'unowned' ? 'text-white font-bold' : 'text-gray-500 hover:text-gray-300'
+              ownershipStatus === 'unowned' ? 'text-[#030304] font-semibold' : 'text-white/40 hover:text-white/60'
             }`}
           >
-            <X className={`w-3.5 h-3.5 transition-transform ${ownershipStatus === 'unowned' ? 'scale-110' : ''}`} />
+            <X className="w-3.5 h-3.5" />
             <span className="text-xs">Unowned</span>
           </button>
         </div>
       </div>
 
-      {/* Physical Copy Toggle */}
-      <button
-        type="button"
-        onClick={() => setIsPhysical(!isPhysical)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
-          isPhysical
-            ? 'bg-amber-500/20 border border-amber-500/50'
-            : 'bg-abyss border border-steel/50 hover:border-steel'
-        }`}
-      >
-        <div className="flex items-center gap-2">
-          <Disc className={`w-4 h-4 ${isPhysical ? 'text-amber-400' : 'text-gray-500'}`} />
-          <span className={`text-sm font-medium ${isPhysical ? 'text-amber-300' : 'text-gray-400'}`}>
-            Physical Copy
-          </span>
-        </div>
-        <div className={`w-10 h-5 rounded-full transition-all ${isPhysical ? 'bg-amber-500' : 'bg-steel'}`}>
-          <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-all ${isPhysical ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
-        </div>
-      </button>
-
-      {/* Adult Content Toggle */}
-      <button
-        type="button"
-        onClick={() => setIsAdult(!isAdult)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
-          isAdult
-            ? 'bg-rose-500/20 border border-rose-500/50'
-            : 'bg-abyss border border-steel/50 hover:border-steel'
-        }`}
-      >
-        <div className="flex items-center gap-2">
-          <ShieldAlert className={`w-4 h-4 ${isAdult ? 'text-rose-400' : 'text-gray-500'}`} />
-          <div className="flex flex-col items-start">
-            <span className={`text-sm font-medium ${isAdult ? 'text-rose-300' : 'text-gray-400'}`}>
-              Adult Content
-            </span>
-            <span className="text-[10px] text-gray-600">
-              Hides game and blurs cover
-            </span>
-          </div>
-        </div>
-        <div className={`w-10 h-5 rounded-full transition-all ${isAdult ? 'bg-rose-500' : 'bg-steel'}`}>
-          <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-all ${isAdult ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
-        </div>
-      </button>
+      {/* Toggles */}
+      <div className="space-y-2">
+        <Toggle
+          checked={isPhysical}
+          onChange={setIsPhysical}
+          label="Physical Copy"
+          icon={Disc}
+          color="amber"
+        />
+        <Toggle
+          checked={isAdult}
+          onChange={setIsAdult}
+          label="Adult Content"
+          description="Hides game and blurs cover"
+          icon={ShieldAlert}
+          color="rose"
+        />
+      </div>
 
       {/* Edit Mode: Additional Fields */}
       {isEditMode && (
         <>
           {/* Playtime + Completion + Rating */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+              <label className="flex items-center gap-1 text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5">
                 <Timer className="w-3 h-3" /> Hours
               </label>
               <div className="relative">
@@ -333,21 +348,12 @@ export function UserLibrarySection({
                   min="0"
                   step="0.1"
                   placeholder="0"
-                  className="w-full px-3 py-2.5 pr-7 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                  className="w-full px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-white text-sm focus:outline-none focus:border-white/[0.15] font-mono"
                 />
-                {playtimeHours && (
-                  <button
-                    type="button"
-                    onClick={() => setPlaytimeHours?.('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
               </div>
             </div>
             <div>
-              <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+              <label className="flex items-center gap-1 text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5">
                 <Trophy className="w-3 h-3" /> Complete
               </label>
               <div className="relative">
@@ -358,22 +364,13 @@ export function UserLibrarySection({
                   min="0"
                   max="100"
                   placeholder="0"
-                  className="w-full px-3 py-2.5 pr-12 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                  className="w-full px-3 py-2.5 pr-8 bg-white/[0.03] border border-white/[0.06] rounded-lg text-white text-sm focus:outline-none focus:border-white/[0.15] font-mono"
                 />
-                <span className="absolute right-7 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
-                {completionPercentage && (
-                  <button
-                    type="button"
-                    onClick={() => setCompletionPercentage?.('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 text-xs">%</span>
               </div>
             </div>
             <div>
-              <label className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+              <label className="flex items-center gap-1 text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5">
                 <Star className="w-3 h-3" /> Rating
               </label>
               <div className="relative">
@@ -384,52 +381,31 @@ export function UserLibrarySection({
                   min="1"
                   max="10"
                   placeholder="—"
-                  className="w-full px-3 py-2.5 pr-12 bg-abyss border border-steel/50 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 font-mono"
+                  className="w-full px-3 py-2.5 pr-10 bg-white/[0.03] border border-white/[0.06] rounded-lg text-white text-sm focus:outline-none focus:border-white/[0.15] font-mono"
                 />
-                <span className="absolute right-7 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]">/10</span>
-                {personalRating && (
-                  <button
-                    type="button"
-                    onClick={() => setPersonalRating?.('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 text-[10px]">/10</span>
               </div>
             </div>
           </div>
 
           {/* Hidden Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsHidden(!isHidden)}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
-              isHidden
-                ? 'bg-purple-500/20 border border-purple-500/50'
-                : 'bg-abyss border border-steel/50 hover:border-steel'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {isHidden ? <EyeOff className="w-4 h-4 text-purple-400" /> : <Eye className="w-4 h-4 text-gray-500" />}
-              <span className={`text-sm font-medium ${isHidden ? 'text-purple-300' : 'text-gray-400'}`}>
-                {isHidden ? 'Hidden from library' : 'Visible in library'}
-              </span>
-            </div>
-            <div className={`w-10 h-5 rounded-full transition-all ${isHidden ? 'bg-purple-500' : 'bg-steel'}`}>
-              <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-all ${isHidden ? 'translate-x-5' : 'translate-x-0.5'} mt-0.5`} />
-            </div>
-          </button>
+          <Toggle
+            checked={isHidden}
+            onChange={setIsHidden}
+            label={isHidden ? 'Hidden from library' : 'Visible in library'}
+            icon={isHidden ? EyeOff : Eye}
+            color="violet"
+          />
 
           {/* Notes */}
           <div>
-            <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            <label className="flex items-center justify-between text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5">
               <span className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Notes</span>
               {notes && (
                 <button
                   type="button"
                   onClick={() => setNotes?.('')}
-                  className="text-gray-600 hover:text-red-400 transition-colors"
+                  className="text-white/20 hover:text-red-400/70 transition-colors"
                 >
                   Clear
                 </button>
@@ -440,36 +416,36 @@ export function UserLibrarySection({
               onChange={(e) => setNotes?.(e.target.value)}
               placeholder="Your thoughts..."
               rows={2}
-              className="w-full px-3 py-2.5 bg-abyss border border-steel/50 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 text-sm resize-none"
+              className="w-full px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/[0.15] resize-none"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            <label className="flex items-center justify-between text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5">
               <span className="flex items-center gap-1.5"><Tag className="w-3 h-3" /> Tags</span>
               <span className="flex items-center gap-2">
                 {tags && tags.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setTags?.([])}
-                    className="text-gray-600 hover:text-red-400 transition-colors"
+                    className="text-white/20 hover:text-red-400/70 transition-colors"
                   >
                     Clear all
                   </button>
                 )}
-                <span className="text-gray-600">{tags?.length ?? 0}/10</span>
+                <span className="text-white/20">{tags?.length ?? 0}/10</span>
               </span>
             </label>
-            <div className="flex flex-wrap gap-1.5 p-2.5 bg-abyss border border-steel/50 rounded-lg min-h-[42px]">
+            <div className="flex flex-wrap gap-1.5 p-2.5 bg-white/[0.03] border border-white/[0.06] rounded-lg min-h-[42px]">
               {tags?.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/20 border border-cyan-500/40 rounded text-xs text-cyan-300"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded text-xs text-cyan-400/80"
                 >
                   <Tag className="w-2.5 h-2.5" />
                   {tag}
-                  <button type="button" onClick={() => removeTag?.(tag)} className="hover:text-white">
+                  <button type="button" onClick={() => removeTag?.(tag)} className="hover:text-white transition-colors">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -484,7 +460,7 @@ export function UserLibrarySection({
                 }}
                 placeholder={!tags || tags.length === 0 ? "Add tags..." : ""}
                 disabled={tags && tags.length >= 10}
-                className="flex-1 min-w-[80px] bg-transparent text-sm text-white placeholder:text-gray-600 outline-none disabled:cursor-not-allowed"
+                className="flex-1 min-w-[80px] bg-transparent text-sm text-white placeholder:text-white/20 outline-none disabled:cursor-not-allowed"
               />
             </div>
           </div>

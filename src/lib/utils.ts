@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { UserGame } from "@/app/_actions/games"
+import type { UserGame } from "@/app/(dashboard)/_actions/games"
 import { type SortOption, type SyncSourceId, PRIORITY_ORDER } from "@/lib/constants/platforms"
 
 export function cn(...inputs: ClassValue[]) {

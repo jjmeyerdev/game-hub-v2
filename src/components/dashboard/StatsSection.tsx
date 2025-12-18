@@ -17,22 +17,19 @@ export function StatsSection({ stats }: StatsSectionProps) {
     <section className="relative">
       {/* Section header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse" />
-          <h2 className="text-xs font-bold tracking-[0.25em] uppercase text-cyan-500/70">
-            System Status
-          </h2>
+        <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+          <Target className="w-3.5 h-3.5 text-cyan-400" />
         </div>
-        <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/30 to-transparent" />
-        <span className="text-[10px] font-mono text-gray-600 tracking-wider">
-          REAL-TIME DATA
+        <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+          // STATS_OVERVIEW
         </span>
+        <div className="flex-1 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />
       </div>
 
-      {/* Stats grid with staggered reveal */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Arsenal"
+          label="Total Games"
           value={stats.totalGames.toString()}
           icon={Library}
           change=""
@@ -40,7 +37,7 @@ export function StatsSection({ stats }: StatsSectionProps) {
           delay={0}
         />
         <StatCard
-          label="Time Logged"
+          label="Hours Played"
           value={stats.hoursPlayed.toLocaleString()}
           icon={Clock}
           change=""
@@ -48,7 +45,7 @@ export function StatsSection({ stats }: StatsSectionProps) {
           delay={100}
         />
         <StatCard
-          label="Trophies"
+          label="Achievements"
           value={stats.achievements.toString()}
           icon={Trophy}
           change=""
@@ -56,7 +53,7 @@ export function StatsSection({ stats }: StatsSectionProps) {
           delay={200}
         />
         <StatCard
-          label="Mastery"
+          label="Completion"
           value={`${stats.completionRate}%`}
           icon={Target}
           change=""

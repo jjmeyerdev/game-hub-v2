@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import SettingsTabs from '@/components/settings/SettingsTabs';
-import { Settings, User, Shield } from 'lucide-react';
+import { Settings, User, Shield, Terminal } from 'lucide-react';
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -22,116 +22,72 @@ export default async function SettingsPage() {
     .single();
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background Effects - matching dashboard */}
+    <div className="relative min-h-screen bg-void">
+      {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-[0.015]" style={{
-          backgroundImage: `
-            linear-gradient(rgba(0, 217, 255, 0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 217, 255, 0.5) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px'
-        }} />
-
-        {/* Radial gradient overlays */}
-        <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-cyan-500/3 to-transparent rounded-full" />
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-violet-500/[0.03] rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-cyan-500/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* Header - Command Center Style */}
-      <header className="relative bg-gradient-to-r from-void via-abyss to-void border-b border-cyan-500/20 overflow-hidden">
-        {/* Tactical grid background */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `
-            linear-gradient(rgba(0, 217, 255, 0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 217, 255, 0.5) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px'
-        }} />
+      {/* Header */}
+      <header className="relative border-b border-white/[0.06]">
+        {/* Top accent line */}
+        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
 
-        {/* Horizontal scan line */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-purple-400/40 to-transparent animate-command-scan" />
-        </div>
-
-        {/* Corner accents */}
-        <div className="absolute top-0 left-0 w-24 h-24">
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-purple-500 to-transparent" />
-          <div className="absolute top-0 left-0 h-full w-[2px] bg-gradient-to-b from-purple-500 to-transparent" />
-        </div>
-        <div className="absolute top-0 right-0 w-24 h-24">
-          <div className="absolute top-0 right-0 w-full h-[2px] bg-gradient-to-l from-purple-500 to-transparent" />
-          <div className="absolute top-0 right-0 h-full w-[2px] bg-gradient-to-b from-purple-500 to-transparent" />
-        </div>
-
-        <div className="relative px-6 lg:px-8 py-6">
+        <div className="px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            {/* Left: Page designation */}
-            <div className="flex items-center gap-6">
-              {/* Status indicator cluster */}
-              <div className="flex flex-col items-center gap-1">
-                <div className="relative">
-                  <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse" />
-                  <div className="absolute inset-0 w-3 h-3 bg-purple-400 rounded-full animate-ping opacity-75" />
+            {/* Left: Page title */}
+            <div className="flex items-center gap-4">
+              {/* Icon with HUD corners */}
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+                  <Settings className="w-6 h-6 text-violet-400" />
                 </div>
-                <span className="text-[10px] font-bold tracking-[0.15em] text-purple-400/80">CONFIG</span>
+                {/* HUD corners */}
+                <div className="absolute -top-1 -left-1 w-2 h-2 border-l-2 border-t-2 border-violet-400/50" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 border-r-2 border-t-2 border-violet-400/50" />
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l-2 border-b-2 border-violet-400/50" />
+                <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-violet-400/50" />
               </div>
-
-              {/* Divider */}
-              <div className="h-12 w-px bg-gradient-to-b from-transparent via-steel to-transparent" />
-
-              {/* Title block */}
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-bold tracking-[0.2em] text-purple-500/60">SYSTEM</span>
-                  <div className="h-px flex-1 bg-gradient-to-r from-purple-500/40 to-transparent w-16" />
+                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// SYSTEM_CONFIG</span>
                 </div>
-                <div className="flex items-baseline gap-3">
-                  <Settings className="w-5 h-5 text-purple-400" />
-                  <h1 className="text-2xl font-black tracking-wide text-white" style={{ fontFamily: 'var(--font-rajdhani)' }}>
-                    CONFIGURATION
-                  </h1>
-                </div>
+                <h1 className="text-2xl font-bold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                  SETTINGS
+                </h1>
               </div>
             </div>
 
             {/* Right: User info */}
-            <div className="flex items-center gap-4">
-              {/* Security status */}
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded">
-                <Shield className="w-3 h-3 text-emerald-400" />
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Secure</span>
+            <div className="flex items-center gap-3">
+              {/* Security badge */}
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                <span className="text-[10px] font-mono font-medium text-emerald-400 uppercase tracking-wider">Encrypted</span>
               </div>
 
               {/* User card */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative flex items-center gap-3 px-4 py-2 bg-deep/80 border border-steel/50 rounded-xl">
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt={profile.full_name || 'User'}
-                      className="w-8 h-8 rounded-lg border border-steel object-cover"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-purple-500/30 border border-steel flex items-center justify-center">
-                      <User className="w-4 h-4 text-gray-400" />
-                    </div>
-                  )}
-                  <div className="hidden sm:block">
-                    <p className="text-sm font-semibold text-white">{profile?.full_name || 'Gamer'}</p>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">Operator</p>
+              <div className="relative flex items-center gap-3 px-4 py-2 bg-abyss border border-white/[0.06] rounded-xl hover:border-white/[0.12] transition-colors">
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.full_name || 'User'}
+                    className="w-8 h-8 rounded-lg border border-white/[0.08] object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-white/[0.08] flex items-center justify-center">
+                    <User className="w-4 h-4 text-white/40" />
                   </div>
+                )}
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-white">{profile?.full_name || 'Operator'}</p>
+                  <p className="text-[11px] font-mono text-white/30">{user.email}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Bottom edge highlight */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
       </header>
 
       {/* Main Content */}
@@ -143,15 +99,27 @@ export default async function SettingsPage() {
         />
 
         {/* Footer */}
-        <footer className="mt-12 pt-6 border-t border-steel/20">
+        <footer className="relative mt-12 pt-6 border-t border-white/[0.06]">
+          {/* HUD corners */}
+          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-white/[0.06]" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-white/[0.06]" />
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <p className="text-xs text-gray-600 font-mono tracking-wider">GAME HUB v1.0 // ALL SYSTEMS NOMINAL</p>
+              <Terminal className="w-3.5 h-3.5 text-white/20" />
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <p className="text-[11px] font-mono text-white/30 uppercase tracking-wider">
+                  Game Hub v1.0 <span className="text-white/20">•</span> All systems operational
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-gray-600">
-              Data secured with end-to-end encryption
-            </p>
+            <div className="flex items-center gap-2">
+              <Shield className="w-3 h-3 text-white/20" />
+              <p className="text-[10px] font-mono text-white/20 uppercase tracking-wider">
+                End-to-end encrypted
+              </p>
+            </div>
           </div>
         </footer>
       </div>

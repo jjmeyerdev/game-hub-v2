@@ -8,13 +8,7 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "db:deploy": "node deploy-schema.mjs",
-    "db:verify": "node verify-schema.mjs",
-    "db:migrate": "node apply-migration.mjs",
-    "import-games": "tsx scripts/import-games.ts",
-    "import-to-library": "tsx scripts/import-to-user-library.ts",
-    "verify-import": "tsx scripts/verify-import.ts",
-    "update-games": "tsx scripts/update-games-from-igdb.ts",
-    "import-with-igdb": "tsx scripts/import-games-with-igdb.ts"
+    "db:migrate": "node apply-migration.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

@@ -15,21 +15,40 @@ import {
   Smartphone,
   Globe,
   Shield,
-  Sparkles,
-  ChevronDown,
-  Play
+  Radio,
+  Hand,
+  Target,
+  Cpu,
+  Database,
+  Wifi,
+  Lock,
+  Activity,
+  Server,
 } from 'lucide-react';
+import {
+  SteamLogo,
+  PlayStationLogo,
+  XboxLogo,
+  EpicLogo,
+  NintendoLogo,
+  GOGLogo,
+  EALogo,
+  BattleNetLogo,
+  UbisoftLogo,
+} from '@/components/icons/PlatformLogos';
 
 export default function FeaturesPage() {
+  const [mounted, setMounted] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
+
     const handleScroll = () => {
       setScrollY(window.scrollY);
-
-      // Determine active section based on scroll position
       const sections = document.querySelectorAll('[data-section]');
       sections.forEach((section, index) => {
         const rect = section.getBoundingClientRect();
@@ -39,34 +58,87 @@ export default function FeaturesPage() {
       });
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   return (
-    <div className="min-h-screen bg-void text-white overflow-x-hidden">
+    <div className="min-h-screen bg-void text-white overflow-x-hidden selection:bg-cyan-500/30">
+      {/* Noise texture overlay */}
+      <div className="noise-overlay" />
+
+      {/* Scan line effect */}
+      <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent animate-scan-line" />
+      </div>
+
+      {/* Grid background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(34, 211, 238, 0.5) 1px, transparent 1px),
+              linear-gradient(rgba(34, 211, 238, 0.5) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px',
+          }}
+        />
+        {/* Hex pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%2322d3ee' stroke-width='0.5'/%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+      </div>
+
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-void/80 backdrop-blur-xl border-b border-steel/50">
-        <div className="container mx-auto px-6 lg:px-8">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-void/90 backdrop-blur-2xl border-b border-white/[0.04]">
+        <div className="max-w-[1400px] mx-auto px-8">
           <div className="flex items-center justify-between h-20">
-            <Link href="/" className="flex items-center space-x-2 group">
+            <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
-                  <Gamepad2 className="w-6 h-6 text-void" strokeWidth={2.5} />
+                <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-all duration-300">
+                  <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2.5} />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg blur-lg opacity-40 group-hover:opacity-60 transition-opacity" />
+                {/* Corner brackets */}
+                <div className="absolute -top-1 -left-1 w-2 h-2 border-l-2 border-t-2 border-cyan-400/50" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 border-r-2 border-t-2 border-cyan-400/50" />
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l-2 border-b-2 border-cyan-400/50" />
+                <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
               </div>
-              <span className="text-2xl font-bold tracking-tight">
-                Game<span className="text-cyan-400">hub</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+                  GAMEHUB
+                </span>
+                <span className="text-[9px] font-mono text-white/30 tracking-wider uppercase">
+                  // SYSTEM_SPECS
+                </span>
+              </div>
             </Link>
 
-            <div className="flex items-center space-x-4">
-              <Link href="/login" className="px-6 py-2.5 text-white hover:text-cyan-400 font-semibold transition-colors">
-                Login
+            <div className="flex items-center gap-4">
+              <Link href="/login" className="px-5 py-2.5 text-white/50 hover:text-cyan-400 text-sm font-medium transition-colors uppercase tracking-wide">
+                Sign in
               </Link>
-              <Link href="/signup" className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-void font-bold rounded-full transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30">
-                Sign Up Free
+              <Link
+                href="/signup"
+                className="group relative px-6 py-2.5 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-lg opacity-90 group-hover:opacity-100 transition-opacity" />
+                <span className="relative text-sm font-semibold text-white tracking-wide uppercase">
+                  Get Started
+                </span>
               </Link>
             </div>
           </div>
@@ -77,108 +149,113 @@ export default function FeaturesPage() {
       <section
         ref={heroRef}
         data-section
-        className="relative min-h-screen flex items-center justify-center pt-20"
-        style={{
-          background: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 217, 255, 0.15) 0%, transparent 50%)`
-        }}
+        className="relative min-h-[100vh] flex items-center pt-20"
       >
-        {/* Animated Grid Background */}
+        {/* Dynamic gradient background */}
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 transition-opacity duration-1000"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px)
+            background: `
+              radial-gradient(800px circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(34, 211, 238, 0.06), transparent 40%),
+              radial-gradient(600px circle at ${(1 - mousePosition.x) * 100}% ${(1 - mousePosition.y) * 100}%, rgba(168, 85, 247, 0.05), transparent 40%)
             `,
-            backgroundSize: '60px 60px',
-            transform: `translateY(${scrollY * 0.1}px)`,
+            opacity: mounted ? 1 : 0,
           }}
         />
 
-        {/* Floating Orbs */}
+        {/* Ambient glows */}
         <div
-          className="absolute top-1/4 left-1/5 w-64 h-64 bg-cyan-500/20 rounded-full blur-[100px]"
-          style={{ transform: `translate(${scrollY * 0.05}px, ${scrollY * -0.03}px)` }}
+          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full opacity-30 animate-breathe"
+          style={{
+            background: 'radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%)',
+            transform: `translate(${scrollY * 0.02}px, ${scrollY * 0.01}px)`,
+          }}
         />
         <div
-          className="absolute bottom-1/4 right-1/5 w-80 h-80 bg-purple-500/20 rounded-full blur-[120px]"
-          style={{ transform: `translate(${scrollY * -0.05}px, ${scrollY * 0.02}px)` }}
+          className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full opacity-20 animate-breathe"
+          style={{
+            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%)',
+            transform: `translate(${scrollY * -0.015}px, ${scrollY * 0.02}px)`,
+            animationDelay: '2s',
+          }}
         />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          {/* Eyebrow */}
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5 mb-8"
-            style={{
-              animation: 'fadeInUp 0.8s ease-out',
-            }}
-          >
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm font-medium text-cyan-400 tracking-wide">DISCOVER THE FUTURE OF GAME TRACKING</span>
-          </div>
+        <div className="relative z-10 max-w-[1400px] mx-auto px-8 py-32">
+          <div className="grid lg:grid-cols-[1fr,500px] gap-16 items-center">
+            <div>
+              {/* Eyebrow */}
+              <div
+                className={`inline-flex items-center gap-3 px-4 py-2 rounded-full border border-cyan-400/20 bg-cyan-400/[0.05] mb-8 transition-all duration-1000 ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                }`}
+              >
+                <div className="relative">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                </div>
+                <span className="text-[10px] font-medium text-cyan-400 uppercase tracking-[0.25em] font-[family-name:var(--font-family-display)]">
+                  Full System Documentation
+                </span>
+              </div>
 
-          {/* Main Headline */}
-          <h1
-            className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] mb-8 tracking-tight"
-            style={{
-              animation: 'fadeInUp 0.8s ease-out 0.1s both',
-            }}
-          >
-            <span className="block text-white">ONE DASHBOARD.</span>
-            <span className="block bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
-              EVERY GAME.
-            </span>
-            <span className="block text-white/60 text-4xl md:text-5xl lg:text-6xl mt-4">ALL PLATFORMS.</span>
-          </h1>
+              {/* Main Headline */}
+              <h1
+                className={`font-[family-name:var(--font-family-display)] text-[clamp(2.5rem,7vw,5.5rem)] font-bold leading-[0.95] tracking-tight mb-6 transition-all duration-1000 delay-100 ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <span className="block text-white">SYSTEM</span>
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-300 to-violet-400 glow-cyan">
+                  CAPABILITIES
+                </span>
+              </h1>
 
-          {/* Subtitle */}
-          <p
-            className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12"
-            style={{
-              animation: 'fadeInUp 0.8s ease-out 0.2s both',
-            }}
-          >
-            Stop juggling between Steam, PlayStation, Xbox, and Epic.
-            Gamehub brings your entire collection together with real-time sync,
-            detailed analytics, and beautiful organization.
-          </p>
+              {/* Subtitle */}
+              <p
+                className={`text-base md:text-lg text-white/40 max-w-lg mb-10 leading-relaxed transition-all duration-1000 delay-200 ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <span className="text-cyan-400/60 font-mono text-sm">&gt;</span> Complete technical breakdown of platform integrations,
+                tracking systems, and command center features.
+              </p>
 
-          {/* CTA */}
-          <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            style={{
-              animation: 'fadeInUp 0.8s ease-out 0.3s both',
-            }}
-          >
-            <Link
-              href="/signup"
-              className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-cyan-400 text-void font-bold rounded-full text-lg overflow-hidden transition-all transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/40"
+              {/* CTA */}
+              <div
+                className={`flex flex-wrap items-center gap-4 transition-all duration-1000 delay-300 ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <Link
+                  href="/signup"
+                  className="group relative overflow-hidden"
+                >
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+                  <div className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl">
+                    <Zap className="w-5 h-5 text-white" />
+                    <span className="font-semibold text-white tracking-wide uppercase font-[family-name:var(--font-family-display)]">
+                      Get Started
+                    </span>
+                    <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+                <a
+                  href="#platforms"
+                  className="group flex items-center gap-3 px-6 py-4 text-white/50 hover:text-white font-medium transition-all border border-white/[0.06] hover:border-white/[0.15] rounded-xl hover:bg-white/[0.02]"
+                >
+                  <span className="tracking-wide">View Integrations</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* System Status Panel */}
+            <div
+              className={`hidden lg:block transition-all duration-1000 delay-400 ${
+                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Get Started Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </Link>
-            <a
-              href="#platforms"
-              className="px-8 py-4 border-2 border-white/20 hover:border-cyan-400 text-white hover:text-cyan-400 font-bold rounded-full text-lg transition-all flex items-center gap-2"
-            >
-              <Play className="w-5 h-5" />
-              See How It Works
-            </a>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
-            style={{
-              animation: 'fadeInUp 0.8s ease-out 0.5s both',
-            }}
-          >
-            <div className="flex flex-col items-center gap-2 text-gray-500">
-              <span className="text-xs uppercase tracking-widest">Scroll to explore</span>
-              <ChevronDown className="w-5 h-5 animate-bounce" />
+              <SystemStatusPanel />
             </div>
           </div>
         </div>
@@ -188,227 +265,261 @@ export default function FeaturesPage() {
       <section
         id="platforms"
         data-section
-        className="relative py-32 overflow-hidden"
+        className="relative py-32"
       >
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="text-white">Connect </span>
-              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Everything</span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Link your gaming accounts once. We handle the rest with automatic syncing.
+        <div className="max-w-[1400px] mx-auto px-8">
+          {/* Connected Services */}
+          <div className="mb-32">
+            {/* Section header */}
+            <div className="flex items-center gap-4 mb-12">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-cyan-400/10 border border-cyan-400/20">
+                <Radio className="w-4 h-4 text-cyan-400" />
+                <span className="text-[10px] font-semibold text-cyan-400 uppercase tracking-[0.2em] font-[family-name:var(--font-family-display)]">
+                  Live Sync Protocol
+                </span>
+              </div>
+              <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/30 to-transparent" />
+              <span className="text-[10px] font-mono text-white/20">// 01</span>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8 mb-12">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4">
+                  <span className="text-white">CONNECTED </span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
+                    PLATFORMS
+                  </span>
+                </h2>
+                <p className="text-white/40 text-lg leading-relaxed max-w-md">
+                  <span className="text-cyan-400/60 font-mono text-sm">&gt;</span> Establish link once. Automatic synchronization forever.
+                  Real-time data stream for games, achievements, and playtime.
+                </p>
+              </div>
+            </div>
+
+            {/* Connected Platform Cards */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <ConnectedPlatformCard
+                name="Steam"
+                description="Full library sync with playtime & achievement tracking"
+                icon={<SteamLogo size="lg" />}
+                color="#66c0f4"
+                stats={{ games: '50K+', sync: 'Real-time' }}
+                status="online"
+              />
+              <ConnectedPlatformCard
+                name="PlayStation"
+                description="PSN trophy sync & cross-gen game library"
+                icon={<PlayStationLogo size="lg" />}
+                color="#0070cc"
+                stats={{ games: '4K+', sync: '15 min' }}
+                status="online"
+              />
+              <ConnectedPlatformCard
+                name="Xbox"
+                description="Gamerscore & achievements across all generations"
+                icon={<XboxLogo size="lg" />}
+                color="#107c10"
+                stats={{ games: '3K+', sync: 'Real-time' }}
+                status="online"
+              />
+              <ConnectedPlatformCard
+                name="Epic Games"
+                description="Library sync including weekly free game claims"
+                icon={<EpicLogo size="lg" />}
+                color="#ffffff"
+                stats={{ games: '500+', sync: '30 min' }}
+                status="online"
+              />
+            </div>
+          </div>
+
+          {/* Manual Platforms */}
+          <div>
+            <div className="flex items-center gap-4 mb-12">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+                <Hand className="w-4 h-4 text-white/40" />
+                <span className="text-[10px] font-semibold text-white/40 uppercase tracking-[0.2em] font-[family-name:var(--font-family-display)]">
+                  Manual Entry Protocol
+                </span>
+              </div>
+              <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+              <span className="text-[10px] font-mono text-white/20">// 02</span>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8 mb-8">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4 text-white/80">
+                  EXTENDED PLATFORM SUPPORT
+                </h2>
+                <p className="text-white/30 leading-relaxed max-w-md">
+                  No public API access? Manual tracking enables full feature support
+                  for any gaming platform in the ecosystem.
+                </p>
+              </div>
+            </div>
+
+            {/* Manual Platform Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <ManualPlatformCard name="Nintendo" icon={<NintendoLogo size="md" />} />
+              <ManualPlatformCard name="GOG Galaxy" icon={<GOGLogo size="md" />} />
+              <ManualPlatformCard name="EA App" icon={<EALogo size="md" />} />
+              <ManualPlatformCard name="Battle.net" icon={<BattleNetLogo size="md" />} />
+              <ManualPlatformCard name="Ubisoft" icon={<UbisoftLogo size="md" />} />
+            </div>
+
+            <p className="text-white/20 text-xs mt-6 font-mono">
+              + ADDITIONAL: Physical media, retro consoles, indie platforms, and custom entries supported
             </p>
           </div>
-
-          {/* Platform Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <PlatformCard
-              name="Steam"
-              color="#1b2838"
-              accent="#66c0f4"
-              games="50,000+"
-              icon={
-                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0z"/>
-                </svg>
-              }
-            />
-            <PlatformCard
-              name="PlayStation"
-              color="#003791"
-              accent="#0070cc"
-              games="Trophies"
-              icon={
-                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.181.76.814.76 1.505v5.876c2.441 1.193 4.362-.002 4.362-3.153 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.391-1.502h-.002zm4.656 16.242l6.296-2.275c.715-.258.826-.625.246-.818-.586-.192-1.637-.139-2.357.123l-4.205 1.5v-2.385l.24-.085s1.201-.42 2.913-.615c1.696-.18 3.792.03 5.437.661 1.848.596 2.063 1.473 1.597 2.085-.466.611-1.635 1.04-1.635 1.04l-8.532 3.047v-2.278zM1.004 18.241c-1.513-.453-1.775-1.396-1.08-1.985.654-.556 1.77-.96 1.77-.96l5.572-1.99v2.316l-4.049 1.446c-.715.257-.826.625-.247.817.587.193 1.637.14 2.358-.12l1.938-.707v2.068c-.127.026-.262.047-.39.07-1.765.286-3.655.078-5.872-.955z"/>
-                </svg>
-              }
-            />
-            <PlatformCard
-              name="Xbox"
-              color="#107c10"
-              accent="#52b043"
-              games="Achievements"
-              icon={
-                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M4.102 21.033C6.211 22.881 8.977 24 12 24c3.026 0 5.789-1.119 7.902-2.967 1.877-1.912-4.316-8.709-7.902-11.417-3.582 2.708-9.779 9.505-7.898 11.417zm11.16-14.406c2.5 2.961 7.484 10.313 6.076 12.912C23.056 17.036 24 14.62 24 12c0-5.238-3.354-9.691-8.024-11.33.039.071.076.142.108.219.492 1.161.825 2.426.978 3.738zm-6.532 0c.154-1.312.487-2.577.978-3.738.033-.077.07-.148.108-.219C5.354 2.309 2 6.762 2 12c0 2.62.944 5.036 2.662 6.539-1.408-2.599 3.576-9.951 6.068-12.912z"/>
-                </svg>
-              }
-            />
-            <PlatformCard
-              name="Epic Games"
-              color="#2a2a2a"
-              accent="#ffffff"
-              games="Free Games"
-              icon={
-                <span className="text-3xl font-black">E</span>
-              }
-            />
-          </div>
-
-          {/* Additional platforms hint */}
-          <p className="text-center text-gray-500 mt-8 text-sm">
-            + Nintendo, GOG, EA Play, and more coming soon
-          </p>
         </div>
       </section>
 
-      {/* Features Grid Section */}
-      <section
-        data-section
-        className="relative py-32 bg-gradient-to-b from-void via-deep to-void"
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="text-white">Powerful </span>
-              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Features</span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Everything you need to organize, track, and conquer your gaming backlog.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              icon={Layers}
-              title="Unified Library"
-              description="All your games from every platform in one searchable, filterable collection. No more switching between apps."
-              gradient="from-cyan-500 to-blue-500"
-            />
-            <FeatureCard
-              icon={BarChart3}
-              title="Playtime Analytics"
-              description="Track your gaming habits with detailed stats. See your most played games, daily patterns, and yearly reviews."
-              gradient="from-purple-500 to-pink-500"
-            />
-            <FeatureCard
-              icon={Trophy}
-              title="Achievement Tracking"
-              description="View all your trophies and achievements across platforms. Track completion rates and rare unlocks."
-              gradient="from-amber-500 to-orange-500"
-            />
-            <FeatureCard
-              icon={Clock}
-              title="Session Tracking"
-              description="Automatic detection of what you're playing. See real-time sessions and build your gaming history."
-              gradient="from-emerald-500 to-teal-500"
-            />
-            <FeatureCard
-              icon={Users}
-              title="Backlog Management"
-              description="Organize your pile of shame with priority levels, custom lists, and smart recommendations."
-              gradient="from-rose-500 to-red-500"
-            />
-            <FeatureCard
-              icon={Zap}
-              title="Real-time Sync"
-              description="Changes sync automatically. Add a game on Steam? It appears in Gamehub within minutes."
-              gradient="from-yellow-500 to-amber-500"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section
-        data-section
-        className="relative py-32 overflow-hidden"
-      >
-        {/* Background Effect */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-emerald-500/10" />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)`,
-              backgroundSize: '32px 32px',
-            }}
-          />
-        </div>
-
-        <div className="relative max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-            <StatItem value="10+" label="Platforms" />
-            <StatItem value="100K+" label="Games Tracked" />
-            <StatItem value="1M+" label="Hours Logged" />
-            <StatItem value="99.9%" label="Uptime" />
-          </div>
-        </div>
-      </section>
-
-      {/* Device Compatibility Section */}
+      {/* Core Systems Section */}
       <section
         data-section
         className="relative py-32"
       >
-        <div className="max-w-7xl mx-auto px-6">
+        {/* Background effect */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] bg-gradient-to-r from-cyan-500/[0.02] via-violet-500/[0.03] to-cyan-500/[0.02] blur-3xl" />
+        </div>
+
+        <div className="relative max-w-[1400px] mx-auto px-8">
+          {/* Section header */}
+          <div className="text-center mb-20">
+            <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider mb-4">
+              // CORE_SYSTEMS_ARRAY
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4">
+              <span className="text-white">MISSION </span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
+                CRITICAL
+              </span>
+              <span className="text-white"> MODULES</span>
+            </h2>
+            <p className="text-white/40 text-lg max-w-xl mx-auto">
+              Six integrated subsystems engineered for total gaming dominance.
+            </p>
+          </div>
+
+          {/* Feature grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <FeatureCard
+              number="01"
+              icon={Layers}
+              title="UNIFIED LIBRARY"
+              description="Cross-platform aggregation engine. All games indexed, searchable, and filterable in one command interface."
+              color="cyan"
+            />
+            <FeatureCard
+              number="02"
+              icon={BarChart3}
+              title="ANALYTICS CORE"
+              description="Deep telemetry processing. Playtime patterns, completion metrics, and behavioral insights visualized."
+              color="violet"
+            />
+            <FeatureCard
+              number="03"
+              icon={Trophy}
+              title="ACHIEVEMENT HUB"
+              description="Trophy and achievement consolidation from all platforms. Track progress toward 100% completion."
+              color="amber"
+            />
+            <FeatureCard
+              number="04"
+              icon={Clock}
+              title="SESSION TRACKER"
+              description="Automatic play session detection. Detailed history with timestamps and duration logging."
+              color="emerald"
+            />
+            <FeatureCard
+              number="05"
+              icon={Users}
+              title="BACKLOG COMMAND"
+              description="Priority queue management. Smart organization algorithms to conquer the pile systematically."
+              color="rose"
+            />
+            <FeatureCard
+              number="06"
+              icon={Zap}
+              title="SYNC ENGINE"
+              description="Real-time data synchronization across all connected platforms. Always current, always accurate."
+              color="blue"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Tech Specs Section */}
+      <section
+        data-section
+        className="relative py-24"
+      >
+        <div className="max-w-[1400px] mx-auto px-8">
+          <div className="relative rounded-2xl border border-white/[0.06] bg-abyss/50 overflow-hidden">
+            {/* HUD corners */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-cyan-400/30" />
+            <div className="absolute top-0 right-0 w-12 h-12 border-r-2 border-t-2 border-cyan-400/30" />
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-l-2 border-b-2 border-cyan-400/30" />
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-cyan-400/30" />
+
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-violet-500/5" />
+
+            <div className="relative p-8 md:p-12">
+              <div className="flex items-center gap-4 mb-8">
+                <Cpu className="w-5 h-5 text-cyan-400" />
+                <span className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider">
+                  // TECH_SPECIFICATIONS
+                </span>
+                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/30 to-transparent" />
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <TechSpec value="10+" label="Platforms" icon={Target} />
+                <TechSpec value="100K+" label="Games Indexed" icon={Database} />
+                <TechSpec value="1M+" label="Hours Tracked" icon={Clock} />
+                <TechSpec value="99.9%" label="System Uptime" icon={Activity} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Access Section */}
+      <section
+        data-section
+        className="relative py-32"
+      >
+        <div className="max-w-[1400px] mx-auto px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                <span className="text-white">Access </span>
-                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Anywhere</span>
+              <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider mb-4">
+                // DEPLOYMENT_OPTIONS
+              </span>
+              <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-6">
+                <span className="text-white">UNIVERSAL </span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
+                  ACCESS
+                </span>
               </h2>
-              <p className="text-xl text-gray-400 mb-8">
-                Whether you're at your PC, on the couch, or on the go. Your gaming library is always with you.
+              <p className="text-white/40 text-lg leading-relaxed mb-10 max-w-md">
+                Command center synchronized across all endpoints. Check your backlog
+                from the couch, plan sessions on the move.
               </p>
 
-              <div className="space-y-4">
-                <DeviceFeature icon={Monitor} title="Desktop" description="Full-featured web dashboard" />
-                <DeviceFeature icon={Smartphone} title="Mobile" description="Responsive design for any screen" />
-                <DeviceFeature icon={Globe} title="Cloud Sync" description="Data synced across all devices" />
-                <DeviceFeature icon={Shield} title="Secure" description="Your data is encrypted and private" />
+              <div className="grid grid-cols-2 gap-4">
+                <DeviceCard icon={Monitor} title="Desktop" status="Primary" />
+                <DeviceCard icon={Smartphone} title="Mobile" status="Companion" />
+                <DeviceCard icon={Globe} title="Cloud Sync" status="Active" />
+                <DeviceCard icon={Lock} title="Encrypted" status="256-bit" />
               </div>
             </div>
 
-            {/* Device Mockup */}
+            {/* Terminal Mockup */}
             <div className="relative">
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-steel bg-gradient-to-br from-deep to-abyss shadow-2xl shadow-cyan-500/10">
-                {/* Browser Chrome */}
-                <div className="absolute top-0 left-0 right-0 h-10 bg-slate/50 border-b border-steel flex items-center px-4 gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                  <div className="flex-1 mx-4">
-                    <div className="bg-abyss rounded-md px-3 py-1 text-xs text-gray-500 w-48">
-                      gamehub.app/dashboard
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dashboard Preview */}
-                <div className="absolute top-10 inset-x-0 bottom-0 p-4">
-                  <div className="h-full rounded-lg bg-void/50 border border-steel/50 p-4 space-y-3">
-                    {/* Mini stat cards */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-deep rounded-lg p-3 border border-steel/30">
-                        <div className="text-2xl font-bold text-cyan-400">247</div>
-                        <div className="text-[10px] text-gray-500">Games</div>
-                      </div>
-                      <div className="bg-deep rounded-lg p-3 border border-steel/30">
-                        <div className="text-2xl font-bold text-purple-400">12</div>
-                        <div className="text-[10px] text-gray-500">Playing</div>
-                      </div>
-                      <div className="bg-deep rounded-lg p-3 border border-steel/30">
-                        <div className="text-2xl font-bold text-emerald-400">892h</div>
-                        <div className="text-[10px] text-gray-500">Total</div>
-                      </div>
-                    </div>
-
-                    {/* Mini game cards */}
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="flex-1 aspect-[2/3] bg-gradient-to-br from-slate to-deep rounded-lg border border-steel/30" />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Glow effect */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-emerald-500/20 blur-3xl -z-10" />
-              </div>
+              <TerminalMockup />
             </div>
           </div>
         </div>
@@ -419,184 +530,492 @@ export default function FeaturesPage() {
         data-section
         className="relative py-32"
       >
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          {/* Decorative elements */}
+        <div className="max-w-4xl mx-auto px-8 text-center">
+          {/* Background glow */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[600px] h-[600px] bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-emerald-500/10 rounded-full blur-3xl" />
+            <div className="w-[600px] h-[400px] rounded-full bg-gradient-to-r from-cyan-500/[0.04] to-violet-500/[0.04] blur-[100px]" />
           </div>
 
+          {/* HUD corners */}
           <div className="relative">
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8">
+            <div className="absolute -top-8 -left-8 w-16 h-16 border-l-2 border-t-2 border-cyan-400/30" />
+            <div className="absolute -top-8 -right-8 w-16 h-16 border-r-2 border-t-2 border-cyan-400/30" />
+            <div className="absolute -bottom-8 -left-8 w-16 h-16 border-l-2 border-b-2 border-cyan-400/30" />
+            <div className="absolute -bottom-8 -right-8 w-16 h-16 border-r-2 border-b-2 border-cyan-400/30" />
+
+            <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider mb-6">
+              // INITIATE_DEPLOYMENT
+            </span>
+
+            <h2 className="relative text-4xl md:text-6xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-6">
               <span className="text-white">Ready to </span>
-              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">Level Up</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 glow-cyan">
+                Get Started
+              </span>
               <span className="text-white">?</span>
             </h2>
-            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-              Join thousands of gamers who've already unified their libraries.
-              Free forever for personal use.
+
+            <p className="relative text-white/40 text-lg mb-12 max-w-md mx-auto">
+              Initialize your command center. Free forever for personal operations.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/signup"
-                className="group relative px-10 py-5 bg-gradient-to-r from-cyan-500 to-cyan-400 text-void font-bold rounded-full text-xl overflow-hidden transition-all transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/40"
-              >
-                <span className="relative z-10 flex items-center gap-3">
+            <Link
+              href="/signup"
+              className="group relative inline-flex items-center gap-3 overflow-hidden"
+            >
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl blur opacity-40 group-hover:opacity-70 transition-opacity duration-500" />
+              <div className="relative flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl">
+                <span className="font-semibold text-white text-lg tracking-wide uppercase font-[family-name:var(--font-family-display)]">
                   Create Free Account
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            </div>
+                <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
 
-            <p className="mt-6 text-sm text-gray-500">
-              No credit card required. Takes less than 30 seconds.
+            <p className="relative mt-8 text-xs text-white/20 font-mono">
+              NO CREDIT CARD REQUIRED • INSTANT ACCESS • UNLIMITED GAMES
             </p>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 border-t border-steel/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <Gamepad2 className="w-5 h-5 text-void" strokeWidth={2.5} />
+      <footer className="relative py-12 border-t border-white/[0.04]">
+        <div className="max-w-[1400px] mx-auto px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-9 h-9 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center">
+                <Gamepad2 className="w-4 h-4 text-white" strokeWidth={2.5} />
               </div>
-              <span className="text-lg font-bold">
-                Game<span className="text-cyan-400">hub</span>
-              </span>
+              <div>
+                <span className="text-sm font-semibold text-white/60 font-[family-name:var(--font-family-display)] tracking-wide">
+                  GAMEHUB
+                </span>
+                <span className="hidden sm:inline text-[10px] text-white/30 ml-3 font-mono">
+                  v2.0.0-beta
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">
-              Your gaming library, unified.
-            </p>
+            <div className="flex items-center gap-8">
+              <Link href="/" className="text-xs text-white/30 hover:text-cyan-400 transition-colors uppercase tracking-wider">
+                Home
+              </Link>
+              <Link href="/login" className="text-xs text-white/30 hover:text-cyan-400 transition-colors uppercase tracking-wider">
+                Sign in
+              </Link>
+            </div>
+            <div className="text-[10px] text-white/20 font-mono">
+              &copy; {new Date().getFullYear()} GAMEHUB • ALL SYSTEMS OPERATIONAL
+            </div>
           </div>
         </div>
       </footer>
 
       {/* Progress indicator */}
-      <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col gap-2">
+      <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3">
+        <div className="text-[8px] font-mono text-white/20 uppercase tracking-wider -rotate-90 origin-center mb-4">
+          Section
+        </div>
         {[0, 1, 2, 3, 4, 5].map((index) => (
           <div
             key={index}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+            className={`relative w-2 h-2 rounded-full transition-all duration-500 ${
               activeSection === index
-                ? 'bg-cyan-400 scale-125'
-                : 'bg-steel hover:bg-gray-500'
+                ? 'bg-cyan-400 scale-150'
+                : 'bg-white/20 hover:bg-white/40'
             }`}
-          />
+          >
+            {activeSection === index && (
+              <div className="absolute inset-0 rounded-full bg-cyan-400 animate-ping opacity-50" />
+            )}
+          </div>
         ))}
       </div>
     </div>
   );
 }
 
-// Component: Platform Card
-interface PlatformCardProps {
-  name: string;
-  color: string;
-  accent: string;
-  games: string;
-  icon: React.ReactNode;
+// System Status Panel Component
+function SystemStatusPanel() {
+  const [currentTime, setCurrentTime] = useState('--:--:--');
+
+  useEffect(() => {
+    const updateTime = () => {
+      setCurrentTime(new Date().toLocaleTimeString('en-US', { hour12: false }));
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative">
+      {/* HUD Frame */}
+      <div className="absolute -inset-4">
+        <div className="absolute top-0 left-0 w-10 h-10 border-l-2 border-t-2 border-cyan-400/40" />
+        <div className="absolute top-0 right-0 w-10 h-10 border-r-2 border-t-2 border-cyan-400/40" />
+        <div className="absolute bottom-0 left-0 w-10 h-10 border-l-2 border-b-2 border-cyan-400/40" />
+        <div className="absolute bottom-0 right-0 w-10 h-10 border-r-2 border-b-2 border-cyan-400/40" />
+      </div>
+
+      <div className="bg-abyss/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-white/[0.01]">
+          <div className="flex items-center gap-3">
+            <Server className="w-4 h-4 text-cyan-400" />
+            <span className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-wider">
+              // SYSTEM_OVERVIEW
+            </span>
+          </div>
+          <span className="text-[10px] font-mono text-emerald-400 tabular-nums">{currentTime}</span>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          {/* Status indicators */}
+          <div className="grid grid-cols-2 gap-3">
+            <StatusIndicator label="API Gateway" status="online" />
+            <StatusIndicator label="Sync Engine" status="online" />
+            <StatusIndicator label="Data Pipeline" status="online" />
+            <StatusIndicator label="Auth Service" status="online" />
+          </div>
+
+          {/* Metrics */}
+          <div className="pt-4 border-t border-white/[0.06]">
+            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-3">
+              Platform Connections
+            </div>
+            <div className="space-y-2">
+              <MetricBar label="Steam" value={98} color="cyan" />
+              <MetricBar label="PlayStation" value={94} color="violet" />
+              <MetricBar label="Xbox" value={96} color="emerald" />
+              <MetricBar label="Epic" value={92} color="amber" />
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="pt-4 border-t border-white/[0.06]">
+            <div className="flex items-center justify-between text-[9px] font-mono text-white/30">
+              <span>Latency: 12ms</span>
+              <span>Build: 2.0.0-b47</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-function PlatformCard({ name, color, accent, games, icon }: PlatformCardProps) {
+function StatusIndicator({ label, status }: { label: string; status: 'online' | 'offline' | 'syncing' }) {
+  const statusColors = {
+    online: 'bg-emerald-400',
+    offline: 'bg-red-400',
+    syncing: 'bg-amber-400 animate-pulse',
+  };
+
   return (
-    <div
-      className="group relative p-6 rounded-2xl border border-steel/50 overflow-hidden transition-all duration-500 hover:border-transparent hover:scale-105"
-      style={{
-        background: `linear-gradient(135deg, ${color}20 0%, transparent 50%)`,
-      }}
-    >
+    <div className="group relative flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-colors overflow-hidden">
+      {/* Hover HUD corners */}
+      <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className={`relative w-1.5 h-1.5 rounded-full ${statusColors[status]}`} />
+      <span className="relative text-[10px] text-white/50 font-mono">{label}</span>
+    </div>
+  );
+}
+
+function MetricBar({ label, value, color }: { label: string; value: number; color: string }) {
+  const colorClasses: Record<string, string> = {
+    cyan: 'bg-cyan-400',
+    violet: 'bg-violet-400',
+    emerald: 'bg-emerald-400',
+    amber: 'bg-amber-400',
+  };
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-[10px]">
+        <span className="text-white/40 font-mono">{label}</span>
+        <span className="font-mono text-white/60 tabular-nums">{value}%</span>
+      </div>
+      <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full ${colorClasses[color]} transition-all duration-1000`}
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Connected Platform Card
+interface ConnectedPlatformCardProps {
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  stats: { games: string; sync: string };
+  status: 'online' | 'offline' | 'syncing';
+}
+
+function ConnectedPlatformCard({ name, description, icon, color, stats, status }: ConnectedPlatformCardProps) {
+  return (
+    <div className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.01] overflow-hidden transition-all duration-500 hover:border-cyan-400/30 hover:bg-white/[0.02]">
+      {/* Hover HUD corners */}
+      <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+      <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+
+      {/* Status indicator */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <div className="relative">
+          <div className={`w-2 h-2 rounded-full ${status === 'online' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+          {status === 'online' && (
+            <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-50" />
+          )}
+        </div>
+        <span className="text-[8px] text-emerald-400/80 uppercase tracking-wider font-mono">
+          {status}
+        </span>
+      </div>
+
       {/* Hover glow */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
-          background: `radial-gradient(circle at 50% 50%, ${accent}20 0%, transparent 70%)`,
+          background: `radial-gradient(circle at 50% 100%, ${color}10 0%, transparent 70%)`,
         }}
       />
 
-      <div className="relative z-10">
+      <div className="relative p-6">
         <div
           className="mb-4 transition-transform duration-300 group-hover:scale-110"
-          style={{ color: accent }}
+          style={{ color }}
         >
           {icon}
         </div>
-        <h3 className="text-lg font-bold text-white mb-1">{name}</h3>
-        <p className="text-sm text-gray-500">{games}</p>
-      </div>
+        <h3 className="text-lg font-bold font-[family-name:var(--font-family-display)] text-white mb-2 tracking-wide">
+          {name}
+        </h3>
+        <p className="text-xs text-white/30 mb-4 leading-relaxed">{description}</p>
 
-      {/* Corner accent */}
-      <div
-        className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full opacity-20 group-hover:opacity-40 transition-opacity"
-        style={{ background: accent }}
-      />
-    </div>
-  );
-}
-
-// Component: Feature Card
-interface FeatureCardProps {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  gradient: string;
-}
-
-function FeatureCard({ icon: Icon, title, description, gradient }: FeatureCardProps) {
-  return (
-    <div className="group relative p-6 rounded-2xl bg-deep/50 border border-steel/50 overflow-hidden transition-all duration-300 hover:border-cyan-500/30 hover:bg-deep">
-      {/* Icon */}
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} p-0.5 mb-4`}>
-        <div className="w-full h-full rounded-[10px] bg-deep flex items-center justify-center">
-          <Icon className="w-6 h-6 text-white" />
+        {/* Stats */}
+        <div className="flex items-center gap-4 pt-4 border-t border-white/[0.06]">
+          <div>
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">Games</div>
+            <div className="text-sm font-bold text-white font-mono">{stats.games}</div>
+          </div>
+          <div>
+            <div className="text-[9px] text-white/30 uppercase tracking-wider">Sync</div>
+            <div className="text-sm font-bold text-cyan-400 font-mono">{stats.sync}</div>
+          </div>
         </div>
       </div>
-
-      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
-
-      {/* Hover gradient line */}
-      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`} />
     </div>
   );
 }
 
-// Component: Stat Item
-interface StatItemProps {
-  value: string;
-  label: string;
+// Manual Platform Card
+interface ManualPlatformCardProps {
+  name: string;
+  icon: React.ReactNode;
 }
 
-function StatItem({ value, label }: StatItemProps) {
+function ManualPlatformCard({ name, icon }: ManualPlatformCardProps) {
   return (
-    <div className="text-center">
-      <div className="text-4xl md:text-6xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent mb-2">
-        {value}
+    <div className="group relative p-4 rounded-xl border border-white/[0.04] bg-white/[0.01] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.02] overflow-hidden">
+      {/* Hover HUD corners */}
+      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative flex items-center gap-3">
+        <div className="text-white/30 group-hover:text-white/60 transition-colors">
+          {icon}
+        </div>
+        <span className="text-sm font-medium text-white/50 group-hover:text-white/80 transition-colors font-[family-name:var(--font-family-display)] tracking-wide">
+          {name}
+        </span>
       </div>
-      <div className="text-sm text-gray-500 uppercase tracking-widest font-medium">{label}</div>
     </div>
   );
 }
 
-// Component: Device Feature
-interface DeviceFeatureProps {
+// Feature Card
+interface FeatureCardProps {
+  number: string;
   icon: React.ElementType;
   title: string;
   description: string;
+  color: 'cyan' | 'violet' | 'amber' | 'emerald' | 'rose' | 'blue';
 }
 
-function DeviceFeature({ icon: Icon, title, description }: DeviceFeatureProps) {
+const featureColors = {
+  cyan: {
+    border: 'border-cyan-400/20 group-hover:border-cyan-400/40',
+    icon: 'text-cyan-400 bg-cyan-400/10',
+    glow: 'group-hover:shadow-cyan-400/10',
+    hud: 'border-cyan-400/50',
+  },
+  violet: {
+    border: 'border-violet-400/20 group-hover:border-violet-400/40',
+    icon: 'text-violet-400 bg-violet-400/10',
+    glow: 'group-hover:shadow-violet-400/10',
+    hud: 'border-violet-400/50',
+  },
+  amber: {
+    border: 'border-amber-400/20 group-hover:border-amber-400/40',
+    icon: 'text-amber-400 bg-amber-400/10',
+    glow: 'group-hover:shadow-amber-400/10',
+    hud: 'border-amber-400/50',
+  },
+  emerald: {
+    border: 'border-emerald-400/20 group-hover:border-emerald-400/40',
+    icon: 'text-emerald-400 bg-emerald-400/10',
+    glow: 'group-hover:shadow-emerald-400/10',
+    hud: 'border-emerald-400/50',
+  },
+  rose: {
+    border: 'border-rose-400/20 group-hover:border-rose-400/40',
+    icon: 'text-rose-400 bg-rose-400/10',
+    glow: 'group-hover:shadow-rose-400/10',
+    hud: 'border-rose-400/50',
+  },
+  blue: {
+    border: 'border-blue-400/20 group-hover:border-blue-400/40',
+    icon: 'text-blue-400 bg-blue-400/10',
+    glow: 'group-hover:shadow-blue-400/10',
+    hud: 'border-blue-400/50',
+  },
+};
+
+function FeatureCard({ number, icon: Icon, title, description, color }: FeatureCardProps) {
+  const colors = featureColors[color];
+
   return (
-    <div className="flex items-start gap-4 group">
-      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0 group-hover:border-purple-400/50 transition-colors">
-        <Icon className="w-5 h-5 text-purple-400" />
+    <div className={`group relative p-6 rounded-2xl border bg-white/[0.01] transition-all duration-500 hover:bg-white/[0.02] hover:shadow-2xl overflow-hidden ${colors.border} ${colors.glow}`}>
+      {/* Hover HUD corners */}
+      <div className={`absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
+      <div className={`absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
+      <div className={`absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
+      <div className={`absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
+
+      {/* Number */}
+      <div className="relative text-[10px] text-white/20 font-mono mb-4 tracking-wider">// {number}</div>
+
+      {/* Icon */}
+      <div className={`relative inline-flex p-3 rounded-xl mb-4 ${colors.icon}`}>
+        <Icon className="w-5 h-5" />
       </div>
-      <div>
-        <h4 className="font-semibold text-white mb-0.5">{title}</h4>
-        <p className="text-sm text-gray-500">{description}</p>
+
+      {/* Content */}
+      <h3 className="relative text-lg font-bold font-[family-name:var(--font-family-display)] text-white mb-2 tracking-wide">
+        {title}
+      </h3>
+      <p className="relative text-sm text-white/40 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+// Tech Spec Component
+function TechSpec({ value, label, icon: Icon }: { value: string; label: string; icon: React.ElementType }) {
+  return (
+    <div className="text-center group relative">
+      {/* Hover HUD corners */}
+      <div className="absolute top-0 left-0 w-3 h-3 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-3 h-3 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-3 h-3 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-3 h-3 border-r border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative inline-flex p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] mb-4 group-hover:border-cyan-400/30 transition-colors">
+        <Icon className="w-5 h-5 text-cyan-400/60 group-hover:text-cyan-400 transition-colors" />
+      </div>
+      <div className="relative text-3xl md:text-4xl font-bold font-[family-name:var(--font-family-display)] text-white mb-1 group-hover:text-cyan-400 transition-colors tabular-nums">
+        {value}
+      </div>
+      <div className="relative text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono">{label}</div>
+    </div>
+  );
+}
+
+// Device Card
+function DeviceCard({ icon: Icon, title, status }: { icon: React.ElementType; title: string; status: string }) {
+  return (
+    <div className="group relative flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-cyan-400/20 transition-all overflow-hidden">
+      {/* Hover HUD corners */}
+      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative p-2 rounded-lg bg-cyan-400/10">
+        <Icon className="w-5 h-5 text-cyan-400" />
+      </div>
+      <div className="relative">
+        <div className="text-sm font-medium text-white">{title}</div>
+        <div className="text-[10px] text-white/40 font-mono uppercase">{status}</div>
+      </div>
+    </div>
+  );
+}
+
+// Terminal Mockup
+function TerminalMockup() {
+  return (
+    <div className="relative">
+      {/* HUD Frame */}
+      <div className="absolute -inset-4">
+        <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-cyan-400/30" />
+        <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-cyan-400/30" />
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-cyan-400/30" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-cyan-400/30" />
+      </div>
+
+      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/[0.06] bg-abyss">
+        {/* Terminal header */}
+        <div className="absolute top-0 left-0 right-0 h-10 bg-white/[0.02] border-b border-white/[0.04] flex items-center px-4 gap-2">
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-400/60" />
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/60" />
+          </div>
+          <div className="flex-1 text-center">
+            <span className="text-[10px] font-mono text-white/30">gamehub — bash</span>
+          </div>
+        </div>
+
+        {/* Terminal content */}
+        <div className="absolute top-10 inset-x-0 bottom-0 p-4 font-mono text-xs">
+          <div className="space-y-2">
+            <div>
+              <span className="text-emerald-400">➜</span>
+              <span className="text-cyan-400"> ~/gamehub</span>
+              <span className="text-white/60"> gamehub status</span>
+            </div>
+            <div className="text-white/40 pl-2">
+              <div className="text-emerald-400">✓ Steam connected (247 games)</div>
+              <div className="text-emerald-400">✓ PlayStation connected (89 games)</div>
+              <div className="text-emerald-400">✓ Xbox connected (156 games)</div>
+              <div className="text-emerald-400">✓ Epic connected (67 games)</div>
+            </div>
+            <div className="pt-2">
+              <span className="text-emerald-400">➜</span>
+              <span className="text-cyan-400"> ~/gamehub</span>
+              <span className="text-white/60"> gamehub sync --all</span>
+            </div>
+            <div className="text-cyan-400/80 pl-2 animate-pulse">
+              Syncing all platforms...
+            </div>
+          </div>
+        </div>
+
+        {/* Glow */}
+        <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-cyan-500/10 via-transparent to-violet-500/10 -z-10 blur-xl" />
       </div>
     </div>
   );
