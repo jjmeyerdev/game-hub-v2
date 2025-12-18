@@ -354,6 +354,11 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
   if (!isVisible || !mounted) return null;
 
+  // Safety check for phases array and config
+  if (!phases || phases.length === 0 || displayPhaseIndex >= phases.length || !config) {
+    return null;
+  }
+
   const currentPhase = phases[displayPhaseIndex];
   const PhaseIcon = currentPhase.icon;
   const StatIcon = config.statIcon;

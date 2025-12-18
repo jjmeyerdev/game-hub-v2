@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Gamepad2, Clock, Trophy, Layers, Sparkles, RotateCw, RefreshCcw, ChevronRight, Star, Shield, CircleCheck, Merge, ArrowLeft } from 'lucide-react';
+import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Gamepad2, Clock, Trophy, Layers, Sparkles, RotateCw, RefreshCcw, ChevronRight, Star, Shield, Merge, ArrowLeft, Check, Square, CheckSquare } from 'lucide-react';
 import { findDuplicateGames, mergeDuplicateGames, deleteUserGame, dismissDuplicateGroup, clearAllDismissedDuplicates } from '@/app/(dashboard)/_actions/games';
 import type { DuplicateGroup, UserGame, Game } from '@/app/(dashboard)/_actions/games';
 
@@ -12,7 +12,7 @@ interface DuplicateFinderModalProps {
 }
 
 type ScanPhase = 'idle' | 'scanning' | 'complete';
-type ViewMode = 'choose' | 'merge';
+type ViewMode = 'choose' | 'merge-select';
 
 export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFinderModalProps) {
   const [phase, setPhase] = useState<ScanPhase>('idle');
@@ -24,7 +24,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
   const [isClearing, setIsClearing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('choose');
-  const [selectedPrimaryId, setSelectedPrimaryId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [mergePrimaryId, setMergePrimaryId] = useState<string | null>(null);
 
   const resetState = useCallback(() => {
     setPhase('idle');
@@ -34,7 +35,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     setScanProgress(0);
     setResolvedCount(0);
     setViewMode('choose');
-    setSelectedPrimaryId(null);
+    setSelectedIds(new Set());
+    setMergePrimaryId(null);
   }, []);
 
   useEffect(() => {
@@ -98,7 +100,33 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     }
   };
 
-  // Keep selected copy and delete the rest
+  // Toggle selection of a game
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  // Select all in current group
+  const selectAll = () => {
+    const group = duplicates[currentIndex];
+    if (!group) return;
+    setSelectedIds(new Set(group.games.map(g => g.id)));
+  };
+
+  // Clear selection
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setMergePrimaryId(null);
+  };
+
+  // Keep selected copy and delete the rest (quick action)
   const handleKeepOne = async (keepId: string) => {
     const group = duplicates[currentIndex];
     if (!group) return;
@@ -156,21 +184,89 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     }
   };
 
-  // Merge all copies into the selected primary
-  const handleMerge = async () => {
-    const group = duplicates[currentIndex];
-    if (!group || !selectedPrimaryId) return;
+  // Delete selected items
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
 
     setIsProcessing(true);
-    const toMerge = group.games.filter(g => g.id !== selectedPrimaryId).map(g => g.id);
+    try {
+      for (const id of selectedIds) {
+        await deleteUserGame(id);
+      }
+
+      // Check if we deleted all items in the group
+      const group = duplicates[currentIndex];
+      if (group && selectedIds.size >= group.games.length) {
+        setResolvedCount(prev => prev + 1);
+        goToNext();
+      } else {
+        // Update duplicates to remove deleted items
+        setDuplicates(prev => prev.map((g, idx) =>
+          idx === currentIndex
+            ? { ...g, games: g.games.filter(game => !selectedIds.has(game.id)) }
+            : g
+        ));
+        clearSelection();
+      }
+      onSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Keep selected items (dismiss from duplicate group)
+  const handleKeepSelected = async () => {
+    if (selectedIds.size === 0) return;
+
+    const group = duplicates[currentIndex];
+    if (!group) return;
+
+    // If all items are selected, just dismiss the whole group
+    if (selectedIds.size >= group.games.length) {
+      await dismissDuplicateGroup(group.normalizedTitle, Array.from(selectedIds));
+      setResolvedCount(prev => prev + 1);
+      goToNext();
+      return;
+    }
+
+    // Otherwise, update the group to remove kept items
+    setDuplicates(prev => prev.map((g, idx) =>
+      idx === currentIndex
+        ? { ...g, games: g.games.filter(game => !selectedIds.has(game.id)) }
+        : g
+    ));
+    clearSelection();
+  };
+
+  // Merge selected copies into the primary
+  const handleMergeSelected = async () => {
+    if (selectedIds.size < 2 || !mergePrimaryId) return;
+
+    setIsProcessing(true);
+    const toMerge = Array.from(selectedIds).filter(id => id !== mergePrimaryId);
 
     try {
-      const result = await mergeDuplicateGames(selectedPrimaryId, toMerge);
+      const result = await mergeDuplicateGames(mergePrimaryId, toMerge);
       if (result.error) {
         setError(result.error);
       } else {
-        setResolvedCount(prev => prev + 1);
-        goToNext();
+        // Check if we merged all items
+        const group = duplicates[currentIndex];
+        if (group && selectedIds.size >= group.games.length) {
+          setResolvedCount(prev => prev + 1);
+          goToNext();
+        } else {
+          // Update group to remove merged items (keep primary)
+          setDuplicates(prev => prev.map((g, idx) =>
+            idx === currentIndex
+              ? { ...g, games: g.games.filter(game => !toMerge.includes(game.id)) }
+              : g
+          ));
+          clearSelection();
+          setViewMode('choose');
+        }
         onSuccess();
       }
     } catch (err) {
@@ -182,7 +278,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
 
   const goToNext = () => {
     setViewMode('choose');
-    setSelectedPrimaryId(null);
+    clearSelection();
     if (currentIndex < duplicates.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
@@ -190,7 +286,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
 
   const goToPrev = () => {
     setViewMode('choose');
-    setSelectedPrimaryId(null);
+    clearSelection();
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
     }
@@ -437,7 +533,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
           {phase === 'complete' && !isComplete && currentGroup && viewMode === 'choose' && (
             <div className="p-6">
               {/* Game Title */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-4">
                 <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1 font-mono">
                   {currentGroup.matchType === 'exact' ? '// EXACT MATCH' : '// SIMILAR TITLES'}
                 </p>
@@ -449,43 +545,72 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                 </p>
               </div>
 
-              {/* Question */}
-              <div className="text-center mb-6">
-                <p className="text-lg text-white/70">Which copy do you want to keep?</p>
-                <p className="text-xs text-white/30 mt-1">Select one to keep, others will be removed</p>
+              {/* Selection Toolbar */}
+              <div className="flex items-center justify-between mb-4 py-2 px-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={selectedIds.size === currentGroup.games.length ? clearSelection : selectAll}
+                    className="flex items-center gap-2 text-xs text-white/50 hover:text-white transition-colors"
+                  >
+                    {selectedIds.size === currentGroup.games.length ? (
+                      <CheckSquare className="w-4 h-4 text-violet-400" />
+                    ) : selectedIds.size > 0 ? (
+                      <CheckSquare className="w-4 h-4 text-violet-400/50" />
+                    ) : (
+                      <Square className="w-4 h-4" />
+                    )}
+                    {selectedIds.size === 0 ? 'Select items' : `${selectedIds.size} selected`}
+                  </button>
+                </div>
+                {selectedIds.size > 0 && (
+                  <button
+                    onClick={clearSelection}
+                    className="text-xs text-white/30 hover:text-white transition-colors"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
 
-              {/* Copies Grid */}
-              <div className="grid gap-3 mb-6">
+              {/* Copies Grid with Checkboxes */}
+              <div className="grid gap-3 mb-4">
                 {currentGroup.games.map((userGame, idx) => {
                   const game = userGame.game as Game;
                   const platform = (() => {
                     const match = userGame.platform.match(/^(.+?)\s*\((.+)\)$/);
                     return match ? match[2] : userGame.platform;
                   })();
+                  const isSelected = selectedIds.has(userGame.id);
 
                   return (
-                    <button
+                    <div
                       key={userGame.id}
-                      onClick={() => handleKeepOne(userGame.id)}
-                      disabled={isProcessing}
-                      className="group relative p-4 rounded-xl text-left transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`group relative p-4 rounded-xl transition-all ${isSelected ? 'ring-2 ring-violet-400' : ''}`}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.02)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        background: isSelected ? 'rgba(168, 85, 247, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+                        border: `1px solid ${isSelected ? 'rgba(168, 85, 247, 0.3)' : 'rgba(255, 255, 255, 0.06)'}`,
                       }}
                     >
-                      {/* Hover effect */}
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="absolute inset-0 rounded-xl border border-emerald-500/0 group-hover:border-emerald-500/30 transition-colors" />
+                      <div className="flex items-center gap-4">
+                        {/* Checkbox */}
+                        <button
+                          onClick={() => toggleSelection(userGame.id)}
+                          disabled={isProcessing}
+                          className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
+                            isSelected
+                              ? 'bg-violet-500 border-violet-500'
+                              : 'bg-white/[0.03] border border-white/[0.15] hover:border-violet-400/50'
+                          }`}
+                        >
+                          {isSelected && <Check className="w-4 h-4 text-white" />}
+                        </button>
 
-                      <div className="relative flex items-center gap-4">
                         {/* Cover */}
                         {game?.cover_url ? (
-                          <img src={game.cover_url} alt={game.title} className="w-16 h-20 object-cover rounded-lg" />
+                          <img src={game.cover_url} alt={game.title} className="w-14 h-18 object-cover rounded-lg" />
                         ) : (
-                          <div className="w-16 h-20 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
-                            <Gamepad2 className="w-6 h-6 text-white/20" />
+                          <div className="w-14 h-18 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                            <Gamepad2 className="w-5 h-5 text-white/20" />
                           </div>
                         )}
 
@@ -530,10 +655,14 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                           )}
                         </div>
 
-                        {/* Keep indicator */}
-                        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <CircleCheck className="w-6 h-6 text-emerald-400" />
-                        </div>
+                        {/* Quick Keep Button */}
+                        <button
+                          onClick={() => handleKeepOne(userGame.id)}
+                          disabled={isProcessing}
+                          className="flex-shrink-0 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all hover:bg-emerald-500/20"
+                        >
+                          Keep Only
+                        </button>
                       </div>
 
                       {/* Best choice indicator */}
@@ -542,120 +671,130 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                           Most Played
                         </div>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
 
-              {/* Alternative Actions */}
-              <div className="border-t border-white/[0.04] pt-5">
-                <p className="text-[10px] text-white/30 uppercase tracking-wider mb-3 text-center">Or choose an action</p>
+              {/* Selection Actions */}
+              {selectedIds.size > 0 && (
+                <div
+                  className="mb-4 p-4 rounded-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(34, 211, 238, 0.05) 100%)',
+                    border: '1px solid rgba(168, 85, 247, 0.2)',
+                  }}
+                >
+                  <p className="text-[10px] text-white/40 uppercase tracking-wider mb-3 font-mono">
+                    // Actions for {selectedIds.size} selected
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    {/* Merge Selected */}
+                    {selectedIds.size >= 2 && (
+                      <button
+                        onClick={() => setViewMode('merge-select')}
+                        disabled={isProcessing}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-400 text-sm font-medium hover:bg-violet-500/25 transition-all disabled:opacity-50"
+                      >
+                        <Merge className="w-4 h-4" />
+                        Merge Selected
+                      </button>
+                    )}
+                    {/* Keep Selected */}
+                    <button
+                      onClick={handleKeepSelected}
+                      disabled={isProcessing}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium hover:bg-cyan-500/20 transition-all disabled:opacity-50"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Keep Selected
+                    </button>
+                    {/* Delete Selected */}
+                    <button
+                      onClick={handleDeleteSelected}
+                      disabled={isProcessing}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete Selected
+                    </button>
+                  </div>
+                </div>
+              )}
 
-                <div className="grid grid-cols-3 gap-3">
-                  {/* Merge All */}
+              {/* Quick Actions (when nothing selected) */}
+              {selectedIds.size === 0 && (
+                <div className="border-t border-white/[0.04] pt-4">
+                  <p className="text-[10px] text-white/30 uppercase tracking-wider mb-3 text-center">Quick actions for all</p>
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      onClick={() => { selectAll(); setViewMode('merge-select'); }}
+                      disabled={isProcessing}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium hover:bg-violet-500/20 transition-all"
+                    >
+                      <Merge className="w-3.5 h-3.5" />
+                      Merge All
+                    </button>
+                    <button
+                      onClick={() => handleKeepAll(true)}
+                      disabled={isProcessing}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium hover:bg-cyan-500/20 transition-all"
+                    >
+                      <Shield className="w-3.5 h-3.5" />
+                      Keep All
+                    </button>
+                    <button
+                      onClick={handleDeleteAll}
+                      disabled={isProcessing}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium hover:bg-red-500/20 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Delete All
+                    </button>
+                  </div>
                   <button
-                    onClick={() => setViewMode('merge')}
+                    onClick={() => { setResolvedCount(prev => prev + 1); goToNext(); }}
                     disabled={isProcessing}
-                    className="group p-4 rounded-xl text-left transition-all disabled:opacity-50"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(34, 211, 238, 0.08) 100%)',
-                      border: '1px solid rgba(168, 85, 247, 0.25)',
-                    }}
+                    className="w-full mt-3 py-2 text-xs text-white/30 hover:text-white/60 transition-colors flex items-center justify-center gap-1"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500/15 to-cyan-500/15 flex items-center justify-center border border-violet-500/20">
-                        <Merge className="w-5 h-5 text-violet-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-violet-400">Merge</p>
-                        <p className="text-[11px] text-white/40">Combine stats</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Keep All */}
-                  <button
-                    onClick={() => handleKeepAll(true)}
-                    disabled={isProcessing}
-                    className="group p-4 rounded-xl text-left transition-all disabled:opacity-50"
-                    style={{
-                      background: 'rgba(34, 211, 238, 0.05)',
-                      border: '1px solid rgba(34, 211, 238, 0.15)',
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-cyan-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-cyan-400">Keep All</p>
-                        <p className="text-[11px] text-white/40">Not duplicates</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Delete All */}
-                  <button
-                    onClick={handleDeleteAll}
-                    disabled={isProcessing}
-                    className="group p-4 rounded-xl text-left transition-all disabled:opacity-50"
-                    style={{
-                      background: 'rgba(239, 68, 68, 0.05)',
-                      border: '1px solid rgba(239, 68, 68, 0.15)',
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                        <Trash2 className="w-5 h-5 text-red-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-red-400">Delete All</p>
-                        <p className="text-[11px] text-white/40">Remove all</p>
-                      </div>
-                    </div>
+                    Skip for now
+                    <ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
-
-                {/* Skip */}
-                <button
-                  onClick={() => { setResolvedCount(prev => prev + 1); goToNext(); }}
-                  disabled={isProcessing}
-                  className="w-full mt-3 py-3 text-sm text-white/30 hover:text-white/60 transition-colors flex items-center justify-center gap-2"
-                >
-                  Skip for now
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              )}
             </div>
           )}
 
-          {/* Results - Current Group - Merge View */}
-          {phase === 'complete' && !isComplete && currentGroup && viewMode === 'merge' && (() => {
-            const mergedStats = getMergedStats(currentGroup.games);
+          {/* Results - Current Group - Merge Select View */}
+          {phase === 'complete' && !isComplete && currentGroup && viewMode === 'merge-select' && (() => {
+            const selectedGames = currentGroup.games.filter(g => selectedIds.has(g.id));
+            const mergedStats = getMergedStats(selectedGames);
             const game = currentGroup.games[0]?.game as Game;
 
             return (
               <div className="p-6">
                 {/* Back button */}
                 <button
-                  onClick={() => { setViewMode('choose'); setSelectedPrimaryId(null); }}
+                  onClick={() => { setViewMode('choose'); setMergePrimaryId(null); }}
                   className="flex items-center gap-2 text-sm text-white/40 hover:text-white mb-4 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Back to options
+                  Back to selection
                 </button>
 
                 {/* Header */}
                 <div className="text-center mb-6">
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-3">
                     <Merge className="w-4 h-4 text-violet-400" />
-                    <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">Merge Mode</span>
+                    <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">
+                      Merge {selectedIds.size} Items
+                    </span>
                   </div>
                   <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-family-display)' }}>
                     {game?.title || 'Unknown Game'}
                   </h3>
                   <p className="text-sm text-white/40 mt-1">
-                    Combine all copies into one
+                    Combine selected copies into one
                   </p>
                 </div>
 
@@ -667,7 +806,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                     border: '1px solid rgba(168, 85, 247, 0.15)',
                   }}
                 >
-                  <p className="text-[10px] text-white/40 uppercase tracking-wider mb-3 font-mono">// Combined Stats</p>
+                  <p className="text-[10px] text-white/40 uppercase tracking-wider mb-3 font-mono">// Combined Stats from {selectedIds.size} items</p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-cyan-400" />
@@ -718,21 +857,21 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                   )}
                 </div>
 
-                {/* Select Platform to Keep */}
+                {/* Select Platform to Keep as Primary */}
                 <div className="mb-6">
-                  <p className="text-sm text-white/70 mb-3">Which platform version should be kept?</p>
+                  <p className="text-sm text-white/70 mb-3">Which platform version should be the primary?</p>
                   <div className="grid gap-2">
-                    {currentGroup.games.map((userGame) => {
+                    {selectedGames.map((userGame) => {
                       const platform = (() => {
                         const match = userGame.platform.match(/^(.+?)\s*\((.+)\)$/);
                         return match ? match[2] : userGame.platform;
                       })();
-                      const isSelected = selectedPrimaryId === userGame.id;
+                      const isSelected = mergePrimaryId === userGame.id;
 
                       return (
                         <button
                           key={userGame.id}
-                          onClick={() => setSelectedPrimaryId(userGame.id)}
+                          onClick={() => setMergePrimaryId(userGame.id)}
                           disabled={isProcessing}
                           className={`relative p-3 rounded-xl text-left transition-all ${
                             isSelected ? 'ring-2 ring-violet-400' : ''
@@ -772,14 +911,14 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
 
                 {/* Merge Button */}
                 <button
-                  onClick={handleMerge}
-                  disabled={isProcessing || !selectedPrimaryId}
+                  onClick={handleMergeSelected}
+                  disabled={isProcessing || !mergePrimaryId}
                   className="w-full py-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{
-                    background: selectedPrimaryId
+                    background: mergePrimaryId
                       ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)'
                       : 'rgba(255, 255, 255, 0.02)',
-                    border: `1px solid ${selectedPrimaryId ? 'rgba(168, 85, 247, 0.4)' : 'rgba(255, 255, 255, 0.06)'}`,
+                    border: `1px solid ${mergePrimaryId ? 'rgba(168, 85, 247, 0.4)' : 'rgba(255, 255, 255, 0.06)'}`,
                   }}
                 >
                   {isProcessing ? (
@@ -787,8 +926,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                   ) : (
                     <>
                       <Merge className="w-5 h-5 text-violet-400" />
-                      <span className={selectedPrimaryId ? 'text-white' : 'text-white/40'}>
-                        {selectedPrimaryId ? 'Merge & Keep Selected' : 'Select a platform first'}
+                      <span className={mergePrimaryId ? 'text-white' : 'text-white/40'}>
+                        {mergePrimaryId ? `Merge ${selectedIds.size} into One` : 'Select a primary platform'}
                       </span>
                     </>
                   )}
