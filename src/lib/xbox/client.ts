@@ -326,6 +326,9 @@ export async function getAchievementsByXuid(
 
 /**
  * Get achievements for a specific game for a player
+ *
+ * Note: OpenXBL API provides detailed achievements for Xbox One/Series games,
+ * but Xbox 360 games only have summary counts available (no individual achievement details).
  */
 export async function getGameAchievements(
   xuid: string,
@@ -333,12 +336,38 @@ export async function getGameAchievements(
   apiKey: string
 ): Promise<XboxAchievement[]> {
   const validXuid = validateXuid(xuid);
-  const data = await xboxApiRequest<XboxAchievementsResponse>(
-    `/achievements/player/${validXuid}/${titleId}`,
-    apiKey
-  );
 
-  return data.achievements || [];
+  // Try the title-specific endpoint (works for Xbox One/Series games)
+  try {
+    const data = await xboxApiRequest<XboxAchievementsResponse>(
+      `/achievements/player/${validXuid}/${titleId}`,
+      apiKey
+    );
+
+    if (data.achievements && data.achievements.length > 0) {
+      return data.achievements;
+    }
+  } catch {
+    // Endpoint may not exist for this title, continue to fallbacks
+  }
+
+  // Try the title achievements endpoint
+  try {
+    const titleData = await xboxApiRequest<{ achievements?: XboxAchievement[] }>(
+      `/achievements/title/${titleId}`,
+      apiKey
+    );
+
+    if (titleData.achievements && titleData.achievements.length > 0) {
+      return titleData.achievements;
+    }
+  } catch {
+    // Endpoint may not work for Xbox 360 titles
+  }
+
+  // Xbox 360 games: OpenXBL only provides summary counts, not individual achievements
+  // The user_games table has the counts from sync - UI will show "counts only" view
+  return [];
 }
 
 /**

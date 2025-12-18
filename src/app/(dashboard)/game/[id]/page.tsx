@@ -46,6 +46,7 @@ import {
   WindowsLogo,
 } from '@/components/icons/PlatformLogos';
 import type { UserGame } from '@/lib/actions/games';
+import { getGameAchievements, type NormalizedAchievement } from '@/lib/actions/games';
 
 // Helper to get platform logo component
 function getPlatformLogo(platform: string, className?: string) {
@@ -67,25 +68,10 @@ function getPlatformLogo(platform: string, className?: string) {
   return <Gamepad2 className={logoClass} />;
 }
 
-// Achievement/Trophy types
-interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon_url?: string;
-  unlocked: boolean;
-  unlock_date?: string;
-  rarity: 'common' | 'uncommon' | 'rare' | 'very_rare' | 'ultra_rare';
-  rarity_percentage?: number;
-  // PlayStation specific
-  trophy_type?: 'platinum' | 'gold' | 'silver' | 'bronze';
-  // Xbox specific
-  gamerscore?: number;
-  // Steam specific
-  global_percentage?: number;
-  // Icon variant for visual variety
+// Re-export Achievement type for component use
+type Achievement = NormalizedAchievement & {
   icon_variant?: number;
-}
+};
 
 // Steam-style achievement icon component
 function SteamAchievementIcon({
@@ -227,54 +213,6 @@ function SteamAchievementIcon({
   );
 }
 
-// Generate mock achievements based on game data
-function generateMockAchievements(total: number, earned: number, platform: string): Achievement[] {
-  const isPlayStation = platform.toLowerCase().includes('playstation') || platform.toLowerCase().startsWith('ps');
-  const isXbox = platform.toLowerCase().includes('xbox');
-
-  const achievementNames = [
-    { name: 'First Steps', desc: 'Complete the tutorial' },
-    { name: 'Veteran', desc: 'Reach level 50' },
-    { name: 'Completionist', desc: 'Collect all collectibles' },
-    { name: 'Speed Demon', desc: 'Complete a mission in under 5 minutes' },
-    { name: 'Untouchable', desc: 'Complete a level without taking damage' },
-    { name: 'Explorer', desc: 'Discover all locations' },
-    { name: 'Master Tactician', desc: 'Win 100 battles' },
-    { name: 'Legendary', desc: 'Defeat the final boss on hardest difficulty' },
-    { name: 'Social Butterfly', desc: 'Make 10 friends in multiplayer' },
-    { name: 'Treasure Hunter', desc: 'Find all hidden treasures' },
-    { name: 'Perfectionist', desc: 'Get a perfect score on any level' },
-    { name: 'Night Owl', desc: 'Play for 10 hours total' },
-    { name: 'Champion', desc: 'Win a tournament' },
-    { name: 'Survivor', desc: 'Survive for 30 minutes' },
-    { name: 'Collector', desc: 'Collect 500 items' },
-  ];
-
-  const rarities: Achievement['rarity'][] = ['common', 'uncommon', 'rare', 'very_rare', 'ultra_rare'];
-  const trophyTypes: Achievement['trophy_type'][] = ['bronze', 'bronze', 'silver', 'gold', 'platinum'];
-  const gamerscores = [10, 15, 25, 50, 100];
-
-  return Array.from({ length: total }, (_, i) => {
-    const template = achievementNames[i % achievementNames.length];
-    const rarityIndex = Math.min(Math.floor(i / (total / 5)), 4);
-    const unlocked = i < earned;
-    const rarityPercentage = [45, 25, 12, 5, 1.5][rarityIndex];
-
-    return {
-      id: `achievement-${i}`,
-      name: i === 0 && isPlayStation ? 'Platinum Trophy' : `${template.name}${i >= achievementNames.length ? ` ${Math.floor(i / achievementNames.length) + 1}` : ''}`,
-      description: i === 0 && isPlayStation ? 'Unlock all other trophies' : template.desc,
-      unlocked,
-      unlock_date: unlocked ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() : undefined,
-      rarity: rarities[rarityIndex],
-      rarity_percentage: rarityPercentage + Math.random() * 5,
-      trophy_type: isPlayStation ? (i === 0 ? 'platinum' : trophyTypes[rarityIndex]) : undefined,
-      gamerscore: isXbox ? gamerscores[rarityIndex] : undefined,
-      global_percentage: rarityPercentage + Math.random() * 5,
-      icon_variant: i % 8, // Cycle through 8 different icon designs
-    };
-  });
-}
 
 export default function GameDetailPage() {
   const params = useParams();
@@ -285,6 +223,9 @@ export default function GameDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [achievementFilter, setAchievementFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [showHiddenAchievements, setShowHiddenAchievements] = useState(false);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [achievementsLoading, setAchievementsLoading] = useState(false);
+  const [achievementsPlatform, setAchievementsPlatform] = useState<'steam' | 'psn' | 'xbox' | 'unknown'>('unknown');
 
   useEffect(() => {
     async function loadGame() {
@@ -309,6 +250,36 @@ export default function GameDetailPage() {
     }
   }, [params.id, router]);
 
+  // Fetch achievements when game is loaded
+  useEffect(() => {
+    async function loadAchievements() {
+      if (!game) return;
+      // Load if either total or earned > 0 (some APIs don't return total)
+      if ((game.achievements_total || 0) === 0 && (game.achievements_earned || 0) === 0) return;
+
+      setAchievementsLoading(true);
+      try {
+        const result = await getGameAchievements(game.id);
+        if (result.success) {
+          if (result.achievements.length > 0) {
+            const achievementsWithVariants = result.achievements.map((a, i) => ({
+              ...a,
+              icon_variant: i % 8,
+            }));
+            setAchievements(achievementsWithVariants);
+          }
+          setAchievementsPlatform(result.platform);
+        }
+      } catch {
+        // Achievement fetching failed, UI will show counts-only view
+      } finally {
+        setAchievementsLoading(false);
+      }
+    }
+
+    loadAchievements();
+  }, [game?.id, game?.achievements_total, game?.achievements_earned]);
+
   const handleSuccess = () => {
     window.location.reload();
   };
@@ -332,6 +303,17 @@ export default function GameDetailPage() {
   if (!game) {
     return null;
   }
+
+  // Calculate achievement counts - use fetched data when available (more accurate)
+  const displayAchievementsTotal = achievements.length > 0
+    ? achievements.length
+    : (game.achievements_total || 0);
+  const displayAchievementsEarned = achievements.length > 0
+    ? achievements.filter(a => a.unlocked).length
+    : (game.achievements_earned || 0);
+  const achievementPercent = displayAchievementsTotal > 0
+    ? (displayAchievementsEarned / displayAchievementsTotal) * 100
+    : 0;
 
   const canHaveActiveSession = isPcPlatform(game.platform);
 
@@ -488,7 +470,7 @@ export default function GameDetailPage() {
                   <StatCard
                     icon={<Trophy className="w-4 h-4" />}
                     label={game.platform.includes('PlayStation') || game.platform.startsWith('PS') ? 'Trophies' : 'Achievements'}
-                    value={`${game.achievements_earned || 0}/${game.achievements_total || 0}`}
+                    value={`${displayAchievementsEarned}/${displayAchievementsTotal}`}
                     color="amber"
                   />
                   <StatCard
@@ -500,7 +482,7 @@ export default function GameDetailPage() {
                 </div>
 
                 {/* Progress Bars */}
-                {(game.completion_percentage > 0 || (game.achievements_total > 0 && game.achievements_earned > 0)) && (
+                {(game.completion_percentage > 0 || displayAchievementsTotal > 0) && (
                   <div className="relative p-5 bg-abyss border border-white/[0.08] rounded-xl space-y-4 overflow-hidden">
                     {/* HUD corners */}
                     <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-white/[0.12]" />
@@ -529,20 +511,20 @@ export default function GameDetailPage() {
                       </div>
                     )}
 
-                    {game.achievements_total > 0 && (
+                    {displayAchievementsTotal > 0 && (
                       <div>
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
                             {game.platform.includes('PlayStation') || game.platform.startsWith('PS') ? 'Trophies' : 'Achievements'}
                           </span>
                           <span className="text-xs font-mono font-medium text-amber-400">
-                            {game.achievements_earned} / {game.achievements_total}
+                            {displayAchievementsEarned} / {displayAchievementsTotal}
                           </span>
                         </div>
                         <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
-                            style={{ width: `${(game.achievements_earned / game.achievements_total) * 100}%` }}
+                            style={{ width: `${achievementPercent}%` }}
                           />
                         </div>
                       </div>
@@ -723,10 +705,14 @@ export default function GameDetailPage() {
             </div>
           )}
 
-          {/* Achievements/Trophies Section */}
-          {game.achievements_total > 0 && (
+          {/* Achievements/Trophies Section - Hide for Xbox 360 (no detailed API) */}
+          {(game.achievements_total > 0 || game.achievements_earned > 0) &&
+           !game.platform.toLowerCase().includes('360') && (
             <AchievementsSection
               game={game}
+              achievements={achievements}
+              achievementsLoading={achievementsLoading}
+              achievementsPlatform={achievementsPlatform}
               filter={achievementFilter}
               setFilter={setAchievementFilter}
               showHidden={showHiddenAchievements}
@@ -825,23 +811,39 @@ function InfoRow({
 // Achievements/Trophies Section Component
 function AchievementsSection({
   game,
+  achievements,
+  achievementsLoading,
+  achievementsPlatform,
   filter,
   setFilter,
   showHidden,
   setShowHidden,
 }: {
   game: UserGame;
+  achievements: Achievement[];
+  achievementsLoading: boolean;
+  achievementsPlatform: 'steam' | 'psn' | 'xbox' | 'unknown';
   filter: 'all' | 'unlocked' | 'locked';
   setFilter: (filter: 'all' | 'unlocked' | 'locked') => void;
   showHidden: boolean;
   setShowHidden: (show: boolean) => void;
 }) {
-  const isPlayStation = game.platform.toLowerCase().includes('playstation') || game.platform.toLowerCase().startsWith('ps');
-  const isXbox = game.platform.toLowerCase().includes('xbox');
+  // Determine platform from props or fallback to game.platform
+  const isPlayStation = achievementsPlatform === 'psn' ||
+    game.platform.toLowerCase().includes('playstation') ||
+    game.platform.toLowerCase().startsWith('ps');
+  const isXbox = achievementsPlatform === 'xbox' || game.platform.toLowerCase().includes('xbox');
+  const isSteam = achievementsPlatform === 'steam' || game.platform.toLowerCase().includes('steam');
   const termLabel = isPlayStation ? 'TROPHIES' : 'ACHIEVEMENTS';
 
-  // Generate mock achievements for demo
-  const achievements = generateMockAchievements(game.achievements_total, game.achievements_earned, game.platform);
+  // Use real achievements if available, otherwise show counts only
+  const hasRealData = achievements.length > 0;
+
+  // Calculate totals from real data when available (more accurate than sync data)
+  const totalAchievements = hasRealData ? achievements.length : (game.achievements_total || 0);
+  const earnedAchievements = hasRealData
+    ? achievements.filter(a => a.unlocked).length
+    : (game.achievements_earned || 0);
 
   // Filter achievements
   const filteredAchievements = achievements.filter(a => {
@@ -850,7 +852,9 @@ function AchievementsSection({
     return true;
   });
 
-  const progressPercent = (game.achievements_earned / game.achievements_total) * 100;
+  const progressPercent = totalAchievements > 0
+    ? (earnedAchievements / totalAchievements) * 100
+    : 0;
 
   // Get rarity color and icon
   const getRarityConfig = (rarity: Achievement['rarity']) => {
@@ -869,7 +873,7 @@ function AchievementsSection({
   };
 
   // Get trophy type config for PlayStation
-  const getTrophyConfig = (trophyType: Achievement['trophy_type']) => {
+  const getTrophyConfig = (trophyType: Achievement['trophyType']) => {
     switch (trophyType) {
       case 'platinum':
         return { color: 'text-sky-300', bg: 'bg-sky-500/20', border: 'border-sky-400/40', glow: 'shadow-[0_0_20px_rgba(125,211,252,0.4)]' };
@@ -882,17 +886,17 @@ function AchievementsSection({
     }
   };
 
-  // Count by trophy type for PlayStation
-  const trophyCounts = isPlayStation ? {
-    platinum: achievements.filter(a => a.trophy_type === 'platinum' && a.unlocked).length,
-    gold: achievements.filter(a => a.trophy_type === 'gold' && a.unlocked).length,
-    silver: achievements.filter(a => a.trophy_type === 'silver' && a.unlocked).length,
-    bronze: achievements.filter(a => a.trophy_type === 'bronze' && a.unlocked).length,
+  // Count by trophy type for PlayStation (from real data if available)
+  const trophyCounts = isPlayStation && hasRealData ? {
+    platinum: achievements.filter(a => a.trophyType === 'platinum' && a.unlocked).length,
+    gold: achievements.filter(a => a.trophyType === 'gold' && a.unlocked).length,
+    silver: achievements.filter(a => a.trophyType === 'silver' && a.unlocked).length,
+    bronze: achievements.filter(a => a.trophyType === 'bronze' && a.unlocked).length,
   } : null;
 
-  // Total gamerscore for Xbox
-  const totalGamerscore = isXbox ? achievements.filter(a => a.unlocked).reduce((sum, a) => sum + (a.gamerscore || 0), 0) : null;
-  const maxGamerscore = isXbox ? achievements.reduce((sum, a) => sum + (a.gamerscore || 0), 0) : null;
+  // Total gamerscore for Xbox (from real data if available)
+  const totalGamerscore = isXbox && hasRealData ? achievements.filter(a => a.unlocked).reduce((sum, a) => sum + (a.gamerscore || 0), 0) : null;
+  const maxGamerscore = isXbox && hasRealData ? achievements.reduce((sum, a) => sum + (a.gamerscore || 0), 0) : null;
 
   return (
     <div className="relative mt-8 p-6 bg-abyss border border-amber-500/20 rounded-2xl overflow-hidden">
@@ -924,7 +928,7 @@ function AchievementsSection({
               <span className="text-[10px] font-mono text-white/30 font-normal">// {isPlayStation ? 'PSN_TROPHIES' : isXbox ? 'XBOX_ACHIEVEMENTS' : 'PROGRESS_TRACKING'}</span>
             </h3>
             <p className="text-[11px] font-mono text-white/40">
-              {game.achievements_earned} of {game.achievements_total} unlocked
+              {earnedAchievements} of {totalAchievements} unlocked
             </p>
           </div>
         </div>
@@ -1053,11 +1057,41 @@ function AchievementsSection({
         })}
       </div>
 
+      {/* Loading state */}
+      {achievementsLoading && (
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative mb-4">
+            <Loader2 className="w-8 h-8 text-amber-400/60 animate-spin" />
+            <div className="absolute inset-0 w-8 h-8 border-2 border-amber-400/20 rounded-full" />
+          </div>
+          <p className="text-[11px] font-mono text-white/30 uppercase tracking-wider">// Fetching {termLabel.toLowerCase()}...</p>
+        </div>
+      )}
+
+      {/* No real data - show counts only view */}
+      {!achievementsLoading && !hasRealData && (
+        <div className="text-center py-12 border border-white/[0.06] rounded-xl bg-white/[0.01]">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Trophy className="w-10 h-10 text-amber-400/60" />
+          </div>
+          <p className="text-sm font-mono text-white/40 mb-2">
+            {earnedAchievements} of {totalAchievements} {termLabel.toLowerCase()} unlocked
+          </p>
+          <p className="text-[11px] font-mono text-white/20">
+            {isXbox
+              ? '// Xbox 360 games only provide summary counts via API'
+              : `// Individual ${termLabel.toLowerCase()} data not available`
+            }
+          </p>
+        </div>
+      )}
+
       {/* Achievements grid */}
+      {!achievementsLoading && hasRealData && (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {filteredAchievements.map((achievement, index) => {
           const rarityConfig = getRarityConfig(achievement.rarity);
-          const trophyConfig = isPlayStation && achievement.trophy_type ? getTrophyConfig(achievement.trophy_type) : null;
+          const trophyConfig = isPlayStation && achievement.trophyType ? getTrophyConfig(achievement.trophyType) : null;
           const RarityIcon = rarityConfig.icon;
 
           return (
@@ -1078,59 +1112,92 @@ function AchievementsSection({
 
               <div className="flex items-start gap-4">
                 {/* Achievement icon */}
-                {isPlayStation && achievement.trophy_type ? (
-                  // PlayStation Trophy Icon
-                  <div className={`relative flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
+                {isPlayStation && achievement.trophyType ? (
+                  // PlayStation Trophy Icon - use real icons when available
+                  <div className={`relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
                     achievement.unlocked
-                      ? `${trophyConfig?.bg} border ${trophyConfig?.border}`
-                      : 'bg-white/[0.03] border border-white/[0.08]'
+                      ? `${trophyConfig?.glow} ring-1 ${trophyConfig?.border}`
+                      : 'ring-1 ring-white/10 grayscale opacity-60'
                   }`}>
-                    {achievement.unlocked ? (
-                      <div className={`w-9 h-9 rounded-full ${
-                        achievement.trophy_type === 'platinum' ? 'bg-gradient-to-br from-sky-200 via-sky-400 to-sky-600 shadow-[0_0_15px_rgba(125,211,252,0.5)]' :
-                        achievement.trophy_type === 'gold' ? 'bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 shadow-[0_0_12px_rgba(251,191,36,0.4)]' :
-                        achievement.trophy_type === 'silver' ? 'bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500' :
+                    {achievement.iconUrl ? (
+                      <img
+                        src={achievement.iconUrl}
+                        alt={achievement.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : achievement.unlocked ? (
+                      <div className={`w-full h-full flex items-center justify-center ${
+                        achievement.trophyType === 'platinum' ? 'bg-gradient-to-br from-sky-200 via-sky-400 to-sky-600' :
+                        achievement.trophyType === 'gold' ? 'bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600' :
+                        achievement.trophyType === 'silver' ? 'bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500' :
                         'bg-gradient-to-br from-orange-300 via-orange-500 to-orange-700'
-                      } flex items-center justify-center`}>
-                        <Trophy className="w-4 h-4 text-white" />
+                      }`}>
+                        <Trophy className="w-6 h-6 text-white" />
                       </div>
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-white/[0.05] flex items-center justify-center">
-                        <Lock className="w-4 h-4 text-white/20" />
+                      <div className="w-full h-full bg-white/[0.05] flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-white/20" />
+                      </div>
+                    )}
+                    {!achievement.unlocked && achievement.iconUrl && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <Lock className="w-4 h-4 text-white/40" />
                       </div>
                     )}
                   </div>
                 ) : isXbox ? (
-                  // Xbox Achievement Icon
-                  <div className={`relative flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
+                  // Xbox Achievement Icon - use real icons when available
+                  <div className={`relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
                     achievement.unlocked
-                      ? `${rarityConfig.bg} border ${rarityConfig.border}`
-                      : 'bg-white/[0.03] border border-white/[0.08]'
+                      ? `${rarityConfig.glow} ring-1 ${rarityConfig.border}`
+                      : 'ring-1 ring-white/10 grayscale opacity-60'
                   }`}>
-                    {achievement.unlocked ? (
-                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-[0_0_10px_rgba(52,211,153,0.3)]">
-                        <RarityIcon className="w-5 h-5 text-white" />
+                    {achievement.iconUrl ? (
+                      <img
+                        src={achievement.iconUrl}
+                        alt={achievement.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : achievement.unlocked ? (
+                      <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+                        <RarityIcon className="w-6 h-6 text-white" />
                       </div>
                     ) : (
-                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center">
-                        <Lock className="w-4 h-4 text-white/20" />
+                      <div className="w-full h-full bg-white/[0.05] flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-white/20" />
                       </div>
                     )}
-                    {/* Xbox gamerscore badge */}
-                    {achievement.gamerscore && achievement.unlocked && (
-                      <div className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-emerald-500 rounded text-[8px] font-bold text-white shadow-lg">
-                        +{achievement.gamerscore}G
+                    {!achievement.unlocked && achievement.iconUrl && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <Lock className="w-4 h-4 text-white/40" />
                       </div>
                     )}
                   </div>
                 ) : (
-                  // Steam/PC Style Achievement Icon
-                  <div className="relative flex-shrink-0">
-                    <SteamAchievementIcon
-                      variant={achievement.icon_variant || 0}
-                      unlocked={achievement.unlocked}
-                      rarity={achievement.rarity}
-                    />
+                  // Steam/PC Style Achievement Icon - use real icons if available
+                  <div className={`relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden ${
+                    achievement.unlocked
+                      ? `${rarityConfig.glow} ring-1 ${rarityConfig.border}`
+                      : 'ring-1 ring-white/10 grayscale opacity-60'
+                  }`}>
+                    {(achievement.unlocked ? achievement.iconUrl : achievement.iconGrayUrl) || achievement.iconUrl ? (
+                      <img
+                        src={achievement.unlocked ? achievement.iconUrl : (achievement.iconGrayUrl || achievement.iconUrl)}
+                        alt={achievement.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <SteamAchievementIcon
+                        variant={achievement.icon_variant || 0}
+                        unlocked={achievement.unlocked}
+                        rarity={achievement.rarity}
+                      />
+                    )}
+                    {!achievement.unlocked && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <Lock className="w-4 h-4 text-white/40" />
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1147,7 +1214,7 @@ function AchievementsSection({
                     <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider ${
                       achievement.unlocked ? `${rarityConfig.bg} ${rarityConfig.color}` : 'bg-white/[0.02] text-white/30'
                     }`}>
-                      {achievement.rarity_percentage?.toFixed(1)}%
+                      {achievement.rarityPercentage?.toFixed(1)}%
                     </div>
                   </div>
 
@@ -1166,8 +1233,8 @@ function AchievementsSection({
                       <div className="flex items-center gap-1.5 text-emerald-400">
                         <Unlock className="w-3 h-3" />
                         <span className="text-[10px] font-mono">
-                          {achievement.unlock_date
-                            ? new Date(achievement.unlock_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          {achievement.unlockDate
+                            ? new Date(achievement.unlockDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                             : 'Unlocked'
                           }
                         </span>
@@ -1185,28 +1252,40 @@ function AchievementsSection({
                     }`}>
                       {rarityConfig.label}
                     </div>
+
+                    {/* Xbox gamerscore */}
+                    {isXbox && achievement.gamerscore && (
+                      <div className={`flex items-center gap-1 px-2 py-0.5 rounded ${
+                        achievement.unlocked
+                          ? 'bg-emerald-500/20 text-emerald-400'
+                          : 'bg-white/[0.02] text-white/20'
+                      }`}>
+                        <span className="text-[10px] font-mono font-bold">{achievement.gamerscore}G</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           );
         })}
-      </div>
 
-      {/* Empty state */}
-      {filteredAchievements.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
-            {filter === 'unlocked' ? (
-              <Lock className="w-8 h-8 text-white/10" />
-            ) : (
-              <Unlock className="w-8 h-8 text-white/10" />
-            )}
+        {/* Empty state for filtered results */}
+        {filteredAchievements.length === 0 && (
+          <div className="col-span-full text-center py-12">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+              {filter === 'unlocked' ? (
+                <Lock className="w-8 h-8 text-white/10" />
+              ) : (
+                <Unlock className="w-8 h-8 text-white/10" />
+              )}
+            </div>
+            <p className="text-sm font-mono text-white/30">
+              // No {filter === 'unlocked' ? 'unlocked' : 'locked'} {termLabel.toLowerCase()} found
+            </p>
           </div>
-          <p className="text-sm font-mono text-white/30">
-            // No {filter === 'unlocked' ? 'unlocked' : 'locked'} {termLabel.toLowerCase()} found
-          </p>
-        </div>
+        )}
+      </div>
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import {
   getUserTitles,
   getUserTrophyProfileSummary,
   getUserTrophiesEarnedForTitle,
+  getTitleTrophies,
   getProfileFromAccountId,
   getUserPlayedGames,
   type AuthorizationPayload,
@@ -287,7 +288,8 @@ export async function getGameLibrary(
 }
 
 /**
- * Get trophies earned for a specific title
+ * Get trophies for a specific title with full details (names, descriptions, icons)
+ * Fetches both trophy definitions and user's earned status, then merges them
  */
 export async function getTrophiesForTitle(
   accessToken: string,
@@ -295,35 +297,45 @@ export async function getTrophiesForTitle(
   npServiceName: 'trophy' | 'trophy2' = 'trophy',
   accountId: string = 'me'
 ): Promise<PsnTrophy[]> {
-  checkRateLimit();
+  const auth: AuthorizationPayload = { accessToken };
 
   try {
+    // Fetch trophy definitions (names, descriptions, icons) and user progress in parallel
+    checkRateLimit();
     rateLimiter.recordRequest();
 
-    const auth: AuthorizationPayload = { accessToken };
-    const response = await getUserTrophiesEarnedForTitle(
-      auth,
-      accountId,
-      npCommunicationId,
-      'all',
-      { npServiceName }
+    const [definitionsResponse, earnedResponse] = await Promise.all([
+      getTitleTrophies(auth, npCommunicationId, 'all', { npServiceName }),
+      getUserTrophiesEarnedForTitle(auth, accountId, npCommunicationId, 'all', { npServiceName }),
+    ]);
+
+    rateLimiter.recordRequest(); // Count both requests
+
+    // Create a map of earned trophies for quick lookup
+    const earnedMap = new Map(
+      (earnedResponse.trophies || []).map((t) => [t.trophyId, t])
     );
 
-    return (response.trophies || []).map((trophy) => ({
-      trophyId: trophy.trophyId,
-      trophyHidden: trophy.trophyHidden,
-      trophyType: trophy.trophyType as 'bronze' | 'silver' | 'gold' | 'platinum',
-      trophyName: '', // UserThinTrophy doesn't include name
-      trophyDetail: '', // UserThinTrophy doesn't include detail
-      trophyIconUrl: '', // UserThinTrophy doesn't include icon
-      trophyGroupId: 'default',
-      earned: trophy.earned,
-      earnedDateTime: trophy.earnedDateTime,
-      trophyEarnedRate: trophy.trophyEarnedRate,
-      trophyRare: trophy.trophyRare,
-    }));
+    // Merge definitions with earned status
+    return (definitionsResponse.trophies || []).map((trophy) => {
+      const earned = earnedMap.get(trophy.trophyId);
+
+      return {
+        trophyId: trophy.trophyId,
+        trophyHidden: trophy.trophyHidden,
+        trophyType: trophy.trophyType as 'bronze' | 'silver' | 'gold' | 'platinum',
+        trophyName: trophy.trophyName || 'Hidden Trophy',
+        trophyDetail: trophy.trophyDetail || '',
+        trophyIconUrl: trophy.trophyIconUrl || '',
+        trophyGroupId: trophy.trophyGroupId || 'default',
+        earned: earned?.earned || false,
+        earnedDateTime: earned?.earnedDateTime,
+        trophyEarnedRate: earned?.trophyEarnedRate,
+        trophyRare: earned?.trophyRare,
+      };
+    });
   } catch (error) {
-    // Silently fail for trophy fetching - not all games have accessible trophy data
+    // Silently fail - not all games have accessible trophy data
     console.error('Failed to fetch trophies for title:', npCommunicationId, error);
     return [];
   }

@@ -62,3 +62,10 @@ export {
   removeSyncedGames,
   getSyncedGameCounts,
 } from './platforms';
+
+// Achievements
+export {
+  getGameAchievements,
+  type NormalizedAchievement,
+  type GameAchievementsResult,
+} from './achievements';
