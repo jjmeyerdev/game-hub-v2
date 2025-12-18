@@ -4,7 +4,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { Gamepad2, ArrowLeft, Loader2, AlertCircle, Shield, Zap } from 'lucide-react';
-import { signIn } from '@/app/(auth)/_actions/auth';
+import { signIn } from '@/lib/actions/auth/auth';
 import {
   SteamLogo,
   PlayStationLogo,

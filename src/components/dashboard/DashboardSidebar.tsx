@@ -17,7 +17,7 @@ import {
   ChevronDown,
   Cpu,
 } from 'lucide-react';
-import { signOut } from '@/app/(auth)/_actions/auth';
+import { signOut } from '@/lib/actions/auth/auth';
 
 interface DashboardSidebarProps {
   userName: string;
