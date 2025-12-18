@@ -111,6 +111,7 @@ export function SyncServiceDropdown() {
   const [syncingService, setSyncingService] = useState<ServiceKey | null>(null);
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState<ServiceKey>('steam');
   const [cooldowns, setCooldowns] = useState<Record<ServiceKey, number>>({
     steam: 0,
     psn: 0,
@@ -205,6 +206,7 @@ export function SyncServiceDropdown() {
           break;
       }
       setSyncResult(result);
+      setToastType(service);
       setShowToast(true);
       triggerLibraryRefresh();
       await loadProfiles(true);
@@ -217,6 +219,7 @@ export function SyncServiceDropdown() {
         totalGames: 0,
         errors: [error instanceof Error ? error.message : 'Sync failed'],
       });
+      setToastType(service);
       setShowToast(true);
     } finally {
       setSyncingService(null);
@@ -226,8 +229,10 @@ export function SyncServiceDropdown() {
   async function handleSyncAll() {
     setIsOpen(false);
 
+    let lastService: ServiceKey = 'steam';
     for (const [service] of connectedServices) {
       setSyncingService(service);
+      lastService = service;
       try {
         switch (service) {
           case 'steam':
@@ -258,6 +263,7 @@ export function SyncServiceDropdown() {
       totalGames: 0,
       errors: [],
     });
+    setToastType(lastService);
     setShowToast(true);
   }
 
@@ -623,7 +629,7 @@ export function SyncServiceDropdown() {
       <SyncToast
         isVisible={showToast}
         onClose={() => setShowToast(false)}
-        type={syncingService || 'steam'}
+        type={toastType}
         result={syncResult}
       />
     </div>
