@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Gamepad2, Clock, Trophy, Layers, Sparkles, RotateCw, RefreshCcw, Zap, ChevronRight, Star, Shield, CircleCheck, CircleX } from 'lucide-react';
+import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Gamepad2, Clock, Trophy, Layers, Sparkles, RotateCw, RefreshCcw, ChevronRight, Star, Shield, CircleCheck, Merge, ArrowLeft } from 'lucide-react';
 import { findDuplicateGames, mergeDuplicateGames, deleteUserGame, dismissDuplicateGroup, clearAllDismissedDuplicates } from '@/app/(dashboard)/_actions/games';
 import type { DuplicateGroup, UserGame, Game } from '@/app/(dashboard)/_actions/games';
 
@@ -12,6 +12,7 @@ interface DuplicateFinderModalProps {
 }
 
 type ScanPhase = 'idle' | 'scanning' | 'complete';
+type ViewMode = 'choose' | 'merge';
 
 export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFinderModalProps) {
   const [phase, setPhase] = useState<ScanPhase>('idle');
@@ -22,6 +23,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
   const [resolvedCount, setResolvedCount] = useState(0);
   const [isClearing, setIsClearing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('choose');
+  const [selectedPrimaryId, setSelectedPrimaryId] = useState<string | null>(null);
 
   const resetState = useCallback(() => {
     setPhase('idle');
@@ -30,6 +33,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     setError(null);
     setScanProgress(0);
     setResolvedCount(0);
+    setViewMode('choose');
+    setSelectedPrimaryId(null);
   }, []);
 
   useEffect(() => {
@@ -151,16 +156,71 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
     }
   };
 
+  // Merge all copies into the selected primary
+  const handleMerge = async () => {
+    const group = duplicates[currentIndex];
+    if (!group || !selectedPrimaryId) return;
+
+    setIsProcessing(true);
+    const toMerge = group.games.filter(g => g.id !== selectedPrimaryId).map(g => g.id);
+
+    try {
+      const result = await mergeDuplicateGames(selectedPrimaryId, toMerge);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setResolvedCount(prev => prev + 1);
+        goToNext();
+        onSuccess();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to merge');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const goToNext = () => {
+    setViewMode('choose');
+    setSelectedPrimaryId(null);
     if (currentIndex < duplicates.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
   };
 
   const goToPrev = () => {
+    setViewMode('choose');
+    setSelectedPrimaryId(null);
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
     }
+  };
+
+  // Compute merged stats for preview
+  const getMergedStats = (games: UserGame[]) => {
+    let totalPlaytime = 0;
+    let maxAchievementsEarned = 0;
+    let maxAchievementsTotal = 0;
+    let maxCompletion = 0;
+    let latestPlayed: string | null = null;
+    let bestRating: number | null = null;
+    const allNotes: string[] = [];
+
+    for (const game of games) {
+      totalPlaytime += game.playtime_hours || 0;
+      maxAchievementsEarned = Math.max(maxAchievementsEarned, game.achievements_earned || 0);
+      maxAchievementsTotal = Math.max(maxAchievementsTotal, game.achievements_total || 0);
+      maxCompletion = Math.max(maxCompletion, game.completion_percentage || 0);
+      if (game.last_played_at && (!latestPlayed || new Date(game.last_played_at) > new Date(latestPlayed))) {
+        latestPlayed = game.last_played_at;
+      }
+      if (game.personal_rating && (!bestRating || game.personal_rating > bestRating)) {
+        bestRating = game.personal_rating;
+      }
+      if (game.notes) allNotes.push(game.notes);
+    }
+
+    return { totalPlaytime, maxAchievementsEarned, maxAchievementsTotal, maxCompletion, latestPlayed, bestRating, allNotes };
   };
 
   if (!isOpen) return null;
@@ -373,8 +433,8 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
             </div>
           )}
 
-          {/* Results - Current Group */}
-          {phase === 'complete' && !isComplete && currentGroup && (
+          {/* Results - Current Group - Choose View */}
+          {phase === 'complete' && !isComplete && currentGroup && viewMode === 'choose' && (
             <div className="p-6">
               {/* Game Title */}
               <div className="text-center mb-6">
@@ -491,7 +551,28 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
               <div className="border-t border-white/[0.04] pt-5">
                 <p className="text-[10px] text-white/30 uppercase tracking-wider mb-3 text-center">Or choose an action</p>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Merge All */}
+                  <button
+                    onClick={() => setViewMode('merge')}
+                    disabled={isProcessing}
+                    className="group p-4 rounded-xl text-left transition-all disabled:opacity-50"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(34, 211, 238, 0.08) 100%)',
+                      border: '1px solid rgba(168, 85, 247, 0.25)',
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500/15 to-cyan-500/15 flex items-center justify-center border border-violet-500/20">
+                        <Merge className="w-5 h-5 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-violet-400">Merge</p>
+                        <p className="text-[11px] text-white/40">Combine stats</p>
+                      </div>
+                    </div>
+                  </button>
+
                   {/* Keep All */}
                   <button
                     onClick={() => handleKeepAll(true)}
@@ -508,7 +589,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-cyan-400">Keep All</p>
-                        <p className="text-[11px] text-white/40">Not duplicates, keep both</p>
+                        <p className="text-[11px] text-white/40">Not duplicates</p>
                       </div>
                     </div>
                   </button>
@@ -529,7 +610,7 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-red-400">Delete All</p>
-                        <p className="text-[11px] text-white/40">Remove all copies</p>
+                        <p className="text-[11px] text-white/40">Remove all</p>
                       </div>
                     </div>
                   </button>
@@ -547,6 +628,174 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
               </div>
             </div>
           )}
+
+          {/* Results - Current Group - Merge View */}
+          {phase === 'complete' && !isComplete && currentGroup && viewMode === 'merge' && (() => {
+            const mergedStats = getMergedStats(currentGroup.games);
+            const game = currentGroup.games[0]?.game as Game;
+
+            return (
+              <div className="p-6">
+                {/* Back button */}
+                <button
+                  onClick={() => { setViewMode('choose'); setSelectedPrimaryId(null); }}
+                  className="flex items-center gap-2 text-sm text-white/40 hover:text-white mb-4 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to options
+                </button>
+
+                {/* Header */}
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-3">
+                    <Merge className="w-4 h-4 text-violet-400" />
+                    <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">Merge Mode</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-family-display)' }}>
+                    {game?.title || 'Unknown Game'}
+                  </h3>
+                  <p className="text-sm text-white/40 mt-1">
+                    Combine all copies into one
+                  </p>
+                </div>
+
+                {/* Merged Stats Preview */}
+                <div
+                  className="p-5 rounded-xl mb-6"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(34, 211, 238, 0.05) 100%)',
+                    border: '1px solid rgba(168, 85, 247, 0.15)',
+                  }}
+                >
+                  <p className="text-[10px] text-white/40 uppercase tracking-wider mb-3 font-mono">// Combined Stats</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-5 h-5 text-cyan-400" />
+                      <div>
+                        <p className="text-lg font-bold text-white">{mergedStats.totalPlaytime.toFixed(1)}h</p>
+                        <p className="text-[10px] text-white/40 uppercase">Total Playtime</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Trophy className="w-5 h-5 text-amber-400" />
+                      <div>
+                        <p className="text-lg font-bold text-white">
+                          {mergedStats.maxAchievementsEarned}
+                          {mergedStats.maxAchievementsTotal > 0 && (
+                            <span className="text-white/40">/{mergedStats.maxAchievementsTotal}</span>
+                          )}
+                        </p>
+                        <p className="text-[10px] text-white/40 uppercase">Best Achievements</p>
+                      </div>
+                    </div>
+                    {mergedStats.maxCompletion > 0 && (
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-5 h-5 text-emerald-400" />
+                        <div>
+                          <p className="text-lg font-bold text-white">{mergedStats.maxCompletion}%</p>
+                          <p className="text-[10px] text-white/40 uppercase">Best Completion</p>
+                        </div>
+                      </div>
+                    )}
+                    {mergedStats.bestRating && (
+                      <div className="flex items-center gap-3">
+                        <Star className="w-5 h-5 text-violet-400" />
+                        <div>
+                          <p className="text-lg font-bold text-white">{mergedStats.bestRating}/10</p>
+                          <p className="text-[10px] text-white/40 uppercase">Your Rating</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {mergedStats.allNotes.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                      <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Notes will be preserved</p>
+                      <p className="text-xs text-white/50 truncate">"{mergedStats.allNotes[0]}"</p>
+                      {mergedStats.allNotes.length > 1 && (
+                        <p className="text-[10px] text-white/30 mt-1">+{mergedStats.allNotes.length - 1} more notes</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Select Platform to Keep */}
+                <div className="mb-6">
+                  <p className="text-sm text-white/70 mb-3">Which platform version should be kept?</p>
+                  <div className="grid gap-2">
+                    {currentGroup.games.map((userGame) => {
+                      const platform = (() => {
+                        const match = userGame.platform.match(/^(.+?)\s*\((.+)\)$/);
+                        return match ? match[2] : userGame.platform;
+                      })();
+                      const isSelected = selectedPrimaryId === userGame.id;
+
+                      return (
+                        <button
+                          key={userGame.id}
+                          onClick={() => setSelectedPrimaryId(userGame.id)}
+                          disabled={isProcessing}
+                          className={`relative p-3 rounded-xl text-left transition-all ${
+                            isSelected ? 'ring-2 ring-violet-400' : ''
+                          }`}
+                          style={{
+                            background: isSelected ? 'rgba(168, 85, 247, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                            border: `1px solid ${isSelected ? 'rgba(168, 85, 247, 0.4)' : 'rgba(255, 255, 255, 0.06)'}`,
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                isSelected ? 'border-violet-400 bg-violet-400' : 'border-white/20'
+                              }`}>
+                                {isSelected && <div className="w-2 h-2 rounded-full bg-void" />}
+                              </div>
+                              <span className="text-sm font-medium text-white">{platform}</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-white/40">
+                              {userGame.playtime_hours > 0 && (
+                                <span>{userGame.playtime_hours.toFixed(1)}h</span>
+                              )}
+                              <span className={`px-2 py-0.5 rounded ${
+                                userGame.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
+                                userGame.status === 'playing' ? 'bg-cyan-500/10 text-cyan-400' :
+                                'bg-white/[0.05] text-white/40'
+                              }`}>
+                                {userGame.status}
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Merge Button */}
+                <button
+                  onClick={handleMerge}
+                  disabled={isProcessing || !selectedPrimaryId}
+                  className="w-full py-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{
+                    background: selectedPrimaryId
+                      ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)'
+                      : 'rgba(255, 255, 255, 0.02)',
+                    border: `1px solid ${selectedPrimaryId ? 'rgba(168, 85, 247, 0.4)' : 'rgba(255, 255, 255, 0.06)'}`,
+                  }}
+                >
+                  {isProcessing ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-violet-400" />
+                  ) : (
+                    <>
+                      <Merge className="w-5 h-5 text-violet-400" />
+                      <span className={selectedPrimaryId ? 'text-white' : 'text-white/40'}>
+                        {selectedPrimaryId ? 'Merge & Keep Selected' : 'Select a platform first'}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Navigation Footer */}
