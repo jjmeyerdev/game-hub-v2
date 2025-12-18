@@ -6,7 +6,9 @@ export const PLATFORMS = [
   { id: 'Epic Games', label: 'Epic Games', color: 'from-slate-600 to-slate-700', hasConsoles: false },
   { id: 'EA App', label: 'EA App', color: 'from-red-600 to-rose-600', hasConsoles: false },
   { id: 'Nintendo', label: 'Nintendo', color: 'from-red-500 to-red-600', hasConsoles: true },
-  { id: 'Battle.net', label: 'Battle.net', color: 'from-blue-500 to-cyan-500', hasConsoles: false },  
+  { id: 'Battle.net', label: 'Battle.net', color: 'from-blue-500 to-cyan-500', hasConsoles: false },
+  { id: 'GOG', label: 'GOG', color: 'from-purple-600 to-violet-600', hasConsoles: false },
+  { id: 'Ubisoft Connect', label: 'Ubisoft Connect', color: 'from-blue-400 to-blue-600', hasConsoles: false },
   { id: 'Physical', label: 'Physical Copy', color: 'from-amber-500 to-orange-500', hasConsoles: true },
 ] as const;
 
@@ -81,7 +83,7 @@ export function isPcPlatform(platform: string): boolean {
 }
 
 // Library filter constants
-export const LIBRARY_FILTER_PLATFORMS = ['All', 'Steam', 'PlayStation', 'Xbox', 'Windows', 'Epic Games', 'EA App', 'Battle.net', 'Physical'] as const;
+export const LIBRARY_FILTER_PLATFORMS = ['All', 'Steam', 'PlayStation', 'Xbox', 'Nintendo', 'Windows', 'Epic Games', 'EA App', 'GOG', 'Battle.net', 'Ubisoft Connect', 'Physical'] as const;
 
 // Sync source filter options
 export const SYNC_SOURCE_OPTIONS = [
@@ -113,6 +115,134 @@ export interface ConsoleGeneration {
   gradient: string;
   glow: string;
   consoles: ConsoleInfo[];
+}
+
+// Platform brand colors for badges
+export interface PlatformBrandStyle {
+  bg: string;
+  text: string;
+  border: string;
+  glow?: string;
+}
+
+export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
+  const p = platform.toLowerCase();
+
+  // Steam
+  if (p.includes('steam')) {
+    return {
+      bg: 'bg-[#1b2838]',
+      text: 'text-[#66c0f4]',
+      border: 'border-[#66c0f4]/30',
+      glow: 'shadow-[0_0_8px_rgba(102,192,244,0.3)]',
+    };
+  }
+
+  // PlayStation (PS5, PS4, PS3, etc.)
+  if (p.includes('playstation') || p.includes('ps5') || p.includes('ps4') || p.includes('ps3') || p.includes('ps2') || p.includes('ps1') || p.includes('psp') || p.includes('vita') || p === 'psn') {
+    return {
+      bg: 'bg-[#003087]',
+      text: 'text-[#00aef0]',
+      border: 'border-[#0070d1]/40',
+      glow: 'shadow-[0_0_8px_rgba(0,112,209,0.35)]',
+    };
+  }
+
+  // Xbox (Series X|S, One, 360, etc.)
+  if (p.includes('xbox') || p.includes('series x') || p.includes('series s')) {
+    return {
+      bg: 'bg-[#107c10]',
+      text: 'text-[#9bf00b]',
+      border: 'border-[#52b043]/40',
+      glow: 'shadow-[0_0_8px_rgba(16,124,16,0.4)]',
+    };
+  }
+
+  // Nintendo (Switch, Wii, 3DS, etc.)
+  if (p.includes('nintendo') || p.includes('switch') || p.includes('wii') || p.includes('3ds') || p.includes('ds') || p.includes('gamecube') || p.includes('n64') || p.includes('snes') || p.includes('nes') || p.includes('game boy') || p.includes('gba')) {
+    return {
+      bg: 'bg-[#e60012]',
+      text: 'text-white',
+      border: 'border-[#ff4554]/40',
+      glow: 'shadow-[0_0_8px_rgba(230,0,18,0.35)]',
+    };
+  }
+
+  // Epic Games
+  if (p.includes('epic')) {
+    return {
+      bg: 'bg-[#1a1a1a]',
+      text: 'text-white',
+      border: 'border-white/20',
+      glow: 'shadow-[0_0_8px_rgba(255,255,255,0.1)]',
+    };
+  }
+
+  // EA App
+  if (p.includes('ea app') || p.includes('origin')) {
+    return {
+      bg: 'bg-[#ff4747]',
+      text: 'text-white',
+      border: 'border-[#ff6b6b]/40',
+      glow: 'shadow-[0_0_8px_rgba(255,71,71,0.35)]',
+    };
+  }
+
+  // Battle.net
+  if (p.includes('battle.net') || p.includes('blizzard')) {
+    return {
+      bg: 'bg-[#00aeff]',
+      text: 'text-white',
+      border: 'border-[#00c8ff]/40',
+      glow: 'shadow-[0_0_8px_rgba(0,174,255,0.35)]',
+    };
+  }
+
+  // GOG
+  if (p.includes('gog')) {
+    return {
+      bg: 'bg-[#a855f7]',
+      text: 'text-white',
+      border: 'border-[#c084fc]/40',
+      glow: 'shadow-[0_0_8px_rgba(168,85,247,0.35)]',
+    };
+  }
+
+  // Ubisoft Connect
+  if (p.includes('ubisoft')) {
+    return {
+      bg: 'bg-[#0070ff]',
+      text: 'text-white',
+      border: 'border-[#3d9aff]/40',
+      glow: 'shadow-[0_0_8px_rgba(0,112,255,0.35)]',
+    };
+  }
+
+  // Physical
+  if (p.includes('physical') || p.includes('dvd') || p.includes('disc')) {
+    return {
+      bg: 'bg-amber-600',
+      text: 'text-amber-100',
+      border: 'border-amber-500/40',
+      glow: 'shadow-[0_0_8px_rgba(217,119,6,0.35)]',
+    };
+  }
+
+  // PC / Windows (default for PC platforms)
+  if (p.includes('pc') || p.includes('windows')) {
+    return {
+      bg: 'bg-slate-600',
+      text: 'text-slate-200',
+      border: 'border-slate-500/40',
+    };
+  }
+
+  // Default fallback
+  return {
+    bg: 'bg-white/10',
+    text: 'text-white/70',
+    border: 'border-white/[0.08]',
+  };
 }
 
 export const CONSOLE_GENERATIONS: ConsoleGeneration[] = [

@@ -1,10 +1,9 @@
 'use client';
 
 import {
-  Layers,
   RefreshCw,
   Loader2,
-  Image,
+  ImageIcon,
   Sparkles,
   X,
   Building2,
@@ -12,10 +11,10 @@ import {
   FileText,
   Lock,
   Unlock,
+  Tag,
 } from 'lucide-react';
 
 interface GameMetadataSectionProps {
-  // Game metadata
   title: string;
   setTitle: (value: string) => void;
   coverUrl: string;
@@ -32,16 +31,86 @@ interface GameMetadataSectionProps {
   setGenreInput: (value: string) => void;
   addGenre: (genre: string) => void;
   removeGenre: (genre: string) => void;
-  // Field locking
   isFieldLocked: (field: string) => boolean;
   toggleFieldLock: (field: string) => void;
-  // Actions
   onRefreshFromIGDB: () => void;
   refreshingMetadata: boolean;
-  // Edit mode specific
   isEditMode: boolean;
   onUpdateCoverFromIGDB?: () => void;
   updatingCover?: boolean;
+}
+
+function FieldLabel({
+  children,
+  icon: Icon,
+  isLocked,
+  onToggleLock,
+  required,
+}: {
+  children: React.ReactNode;
+  icon?: React.ComponentType<{ className?: string }>;
+  isLocked?: boolean;
+  onToggleLock?: () => void;
+  required?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between mb-2">
+      <label className="flex items-center gap-1.5 text-[11px] font-medium text-white/40 uppercase tracking-wider">
+        {Icon && <Icon className="w-3 h-3" />}
+        {children}
+        {required && <span className="text-red-400">*</span>}
+      </label>
+      {onToggleLock && (
+        <button
+          type="button"
+          onClick={onToggleLock}
+          className={`p-1 rounded transition-all ${isLocked ? 'text-amber-400 bg-amber-500/10' : 'text-white/20 hover:text-white/40'}`}
+          title={isLocked ? 'Unlock field' : 'Lock from IGDB updates'}
+        >
+          {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function InputField({
+  value,
+  onChange,
+  onClear,
+  placeholder,
+  isLocked,
+  type = 'text',
+  className = '',
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onClear?: () => void;
+  placeholder?: string;
+  isLocked?: boolean;
+  type?: 'text' | 'url' | 'date';
+  className?: string;
+}) {
+  return (
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full px-3 py-2.5 bg-white/[0.03] border rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all ${isLocked ? 'border-amber-500/30' : 'border-white/[0.06]'} ${type === 'date' ? '[color-scheme:dark]' : ''} ${className}`}
+      />
+      {value && onClear && (
+        <button
+          type="button"
+          onClick={onClear}
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-white/20 hover:text-white/50 transition-colors"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      )}
+    </div>
+  );
 }
 
 export function GameMetadataSection({
@@ -72,17 +141,13 @@ export function GameMetadataSection({
   return (
     <div className="space-y-4">
       {/* Section Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-steel/30">
-        <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400" />
-          <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Game Info</span>
-        </div>
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.04]">
+        <span className="text-xs font-medium text-white/50">Game Info</span>
         <button
           type="button"
           onClick={onRefreshFromIGDB}
           disabled={refreshingMetadata || !title.trim()}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-[10px] font-semibold text-cyan-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Refresh all metadata from IGDB"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.1] rounded-lg text-[10px] font-medium text-white/50 hover:text-white/70 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {refreshingMetadata ? (
             <Loader2 className="w-3 h-3 animate-spin" />
@@ -97,24 +162,22 @@ export function GameMetadataSection({
       <div className="flex gap-4">
         {/* Cover Preview */}
         <div className="flex-shrink-0">
-          <div className="w-24 h-32 bg-deep rounded-xl overflow-hidden border-2 border-steel/50 relative group">
+          <div className="w-24 h-32 bg-white/[0.02] rounded-xl overflow-hidden border border-white/[0.06] relative group">
             {coverUrl ? (
               <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
-                <Image className="w-8 h-8 mb-1" />
+              <div className="w-full h-full flex flex-col items-center justify-center text-white/10">
+                <ImageIcon className="w-8 h-8 mb-1" />
                 <span className="text-[10px]">No Cover</span>
               </div>
             )}
-            {/* Scanline effect */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
           {isEditMode && onUpdateCoverFromIGDB && (
             <button
               type="button"
               onClick={onUpdateCoverFromIGDB}
-              disabled={updatingCover}
-              className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-[10px] font-semibold text-cyan-400 transition-all disabled:opacity-50"
+              disabled={updatingCover || !title.trim()}
+              className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] rounded-lg text-[10px] font-medium text-white/40 hover:text-white/60 transition-all disabled:opacity-30"
             >
               {updatingCover ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
               {updatingCover ? 'Updating...' : 'Get Cover'}
@@ -125,146 +188,74 @@ export function GameMetadataSection({
         {/* Title + Cover URL */}
         <div className="flex-1 space-y-3">
           <div>
-            <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-              <span>Title <span className="text-red-400">*</span></span>
-              <button
-                type="button"
-                onClick={() => toggleFieldLock('title')}
-                className={`p-1 rounded transition-all ${isFieldLocked('title') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
-                title={isFieldLocked('title') ? 'Unlock field' : 'Lock field from IGDB updates'}
-              >
-                {isFieldLocked('title') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-              </button>
-            </div>
-            <div className="relative">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Game title..."
-                className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm ${isFieldLocked('title') ? 'border-amber-500/50' : 'border-steel/50'}`}
-                required
-              />
-              {title && (
-                <button
-                  type="button"
-                  onClick={() => setTitle('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+            <FieldLabel required isLocked={isFieldLocked('title')} onToggleLock={() => toggleFieldLock('title')}>
+              Title
+            </FieldLabel>
+            <InputField
+              value={title}
+              onChange={setTitle}
+              onClear={() => setTitle('')}
+              placeholder="Game title..."
+              isLocked={isFieldLocked('title')}
+            />
           </div>
           <div>
-            <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-              <span>Cover URL</span>
-              <button
-                type="button"
-                onClick={() => toggleFieldLock('cover')}
-                className={`p-1 rounded transition-all ${isFieldLocked('cover') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
-                title={isFieldLocked('cover') ? 'Unlock field' : 'Lock field from IGDB updates'}
-              >
-                {isFieldLocked('cover') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-              </button>
-            </div>
-            <div className="relative">
-              <input
-                type="url"
-                value={coverUrl}
-                onChange={(e) => setCoverUrl(e.target.value)}
-                placeholder="https://..."
-                className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm font-mono ${isFieldLocked('cover') ? 'border-amber-500/50' : 'border-steel/50'}`}
-              />
-              {coverUrl && (
-                <button
-                  type="button"
-                  onClick={() => setCoverUrl('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+            <FieldLabel isLocked={isFieldLocked('cover')} onToggleLock={() => toggleFieldLock('cover')}>
+              Cover URL
+            </FieldLabel>
+            <InputField
+              value={coverUrl}
+              onChange={setCoverUrl}
+              onClear={() => setCoverUrl('')}
+              placeholder="https://..."
+              type="url"
+              isLocked={isFieldLocked('cover')}
+              className="font-mono text-xs"
+            />
           </div>
         </div>
       </div>
 
       {/* Developer */}
       <div>
-        <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-          <span className="flex items-center gap-1.5"><Building2 className="w-3 h-3" /> Developer</span>
-          <button
-            type="button"
-            onClick={() => toggleFieldLock('developer')}
-            className={`p-1 rounded transition-all ${isFieldLocked('developer') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
-            title={isFieldLocked('developer') ? 'Unlock field' : 'Lock field from IGDB updates'}
-          >
-            {isFieldLocked('developer') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-          </button>
-        </div>
-        <div className="relative">
-          <input
-            type="text"
-            value={developer}
-            onChange={(e) => setDeveloper(e.target.value)}
-            placeholder="Studio name..."
-            className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm ${isFieldLocked('developer') ? 'border-amber-500/50' : 'border-steel/50'}`}
-          />
-          {developer && (
-            <button
-              type="button"
-              onClick={() => setDeveloper('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
+        <FieldLabel icon={Building2} isLocked={isFieldLocked('developer')} onToggleLock={() => toggleFieldLock('developer')}>
+          Developer
+        </FieldLabel>
+        <InputField
+          value={developer}
+          onChange={setDeveloper}
+          onClear={() => setDeveloper('')}
+          placeholder="Studio name..."
+          isLocked={isFieldLocked('developer')}
+        />
       </div>
 
       {/* Release Date */}
       <div>
-        <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-          <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Release Date</span>
-          <button
-            type="button"
-            onClick={() => toggleFieldLock('releaseDate')}
-            className={`p-1 rounded transition-all ${isFieldLocked('releaseDate') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
-            title={isFieldLocked('releaseDate') ? 'Unlock field' : 'Lock field from IGDB updates'}
-          >
-            {isFieldLocked('releaseDate') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-          </button>
-        </div>
-        <div className="relative">
-          <input
-            type="date"
-            value={releaseDate}
-            onChange={(e) => setReleaseDate(e.target.value)}
-            className={`w-full px-3 py-2.5 pr-8 bg-abyss border rounded-lg text-white focus:outline-none focus:border-cyan-500/50 text-sm [color-scheme:dark] ${isFieldLocked('releaseDate') ? 'border-amber-500/50' : 'border-steel/50'}`}
-          />
-          {releaseDate && (
-            <button
-              type="button"
-              onClick={() => setReleaseDate('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
+        <FieldLabel icon={Calendar} isLocked={isFieldLocked('releaseDate')} onToggleLock={() => toggleFieldLock('releaseDate')}>
+          Release Date
+        </FieldLabel>
+        <InputField
+          value={releaseDate}
+          onChange={setReleaseDate}
+          onClear={() => setReleaseDate('')}
+          type="date"
+          isLocked={isFieldLocked('releaseDate')}
+        />
       </div>
 
       {/* Genres */}
       <div>
-        <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-          <span className="flex items-center gap-1.5"><Layers className="w-3 h-3" /> Genres</span>
+        <div className="flex items-center justify-between mb-2">
+          <label className="flex items-center gap-1.5 text-[11px] font-medium text-white/40 uppercase tracking-wider">
+            <Tag className="w-3 h-3" /> Genres
+          </label>
           <div className="flex items-center gap-2">
             {genres.length > 0 && (
               <button
                 type="button"
                 onClick={() => setGenres([])}
-                className="text-gray-600 hover:text-red-400 transition-colors"
+                className="text-[10px] text-white/20 hover:text-red-400/70 transition-colors"
               >
                 Clear all
               </button>
@@ -272,21 +263,20 @@ export function GameMetadataSection({
             <button
               type="button"
               onClick={() => toggleFieldLock('genres')}
-              className={`p-1 rounded transition-all ${isFieldLocked('genres') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
-              title={isFieldLocked('genres') ? 'Unlock field' : 'Lock field from IGDB updates'}
+              className={`p-1 rounded transition-all ${isFieldLocked('genres') ? 'text-amber-400 bg-amber-500/10' : 'text-white/20 hover:text-white/40'}`}
             >
               {isFieldLocked('genres') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
             </button>
           </div>
         </div>
-        <div className={`flex flex-wrap gap-1.5 p-2.5 bg-abyss border rounded-lg min-h-[42px] ${isFieldLocked('genres') ? 'border-amber-500/50' : 'border-steel/50'}`}>
+        <div className={`flex flex-wrap gap-1.5 p-2.5 bg-white/[0.03] border rounded-lg min-h-[42px] ${isFieldLocked('genres') ? 'border-amber-500/30' : 'border-white/[0.06]'}`}>
           {genres.map((genre) => (
             <span
               key={genre}
-              className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/20 border border-purple-500/40 rounded text-xs text-purple-300"
+              className="inline-flex items-center gap-1 px-2 py-1 bg-violet-500/10 border border-violet-500/20 rounded text-xs text-violet-400/80"
             >
               {genre}
-              <button type="button" onClick={() => removeGenre(genre)} className="hover:text-white">
+              <button type="button" onClick={() => removeGenre(genre)} className="hover:text-white transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -299,21 +289,23 @@ export function GameMetadataSection({
               if (e.key === 'Enter') { e.preventDefault(); addGenre(genreInput); }
             }}
             placeholder={genres.length === 0 ? "Add genre..." : ""}
-            className="flex-1 min-w-[80px] bg-transparent text-sm text-white placeholder:text-gray-600 outline-none"
+            className="flex-1 min-w-[80px] bg-transparent text-sm text-white placeholder:text-white/20 outline-none"
           />
         </div>
       </div>
 
       {/* Description */}
       <div>
-        <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-          <span className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Description</span>
+        <div className="flex items-center justify-between mb-2">
+          <label className="flex items-center gap-1.5 text-[11px] font-medium text-white/40 uppercase tracking-wider">
+            <FileText className="w-3 h-3" /> Description
+          </label>
           <div className="flex items-center gap-2">
             {description && (
               <button
                 type="button"
                 onClick={() => setDescription('')}
-                className="text-gray-600 hover:text-red-400 transition-colors"
+                className="text-[10px] text-white/20 hover:text-red-400/70 transition-colors"
               >
                 Clear
               </button>
@@ -321,8 +313,7 @@ export function GameMetadataSection({
             <button
               type="button"
               onClick={() => toggleFieldLock('description')}
-              className={`p-1 rounded transition-all ${isFieldLocked('description') ? 'text-amber-400 bg-amber-500/20' : 'text-gray-600 hover:text-gray-400'}`}
-              title={isFieldLocked('description') ? 'Unlock field' : 'Lock field from IGDB updates'}
+              className={`p-1 rounded transition-all ${isFieldLocked('description') ? 'text-amber-400 bg-amber-500/10' : 'text-white/20 hover:text-white/40'}`}
             >
               {isFieldLocked('description') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
             </button>
@@ -333,7 +324,7 @@ export function GameMetadataSection({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Game description..."
           rows={3}
-          className={`w-full px-3 py-2.5 bg-abyss border rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm resize-none ${isFieldLocked('description') ? 'border-amber-500/50' : 'border-steel/50'}`}
+          className={`w-full px-3 py-2.5 bg-white/[0.03] border rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] resize-none transition-all ${isFieldLocked('description') ? 'border-amber-500/30' : 'border-white/[0.06]'}`}
         />
       </div>
     </div>
