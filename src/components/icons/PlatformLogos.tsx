@@ -53,11 +53,170 @@ export function EpicLogo({ className, size = 'md' }: LogoProps) {
   );
 }
 
-// Nintendo Switch Logo - Joy-Con controllers
+// Nintendo Switch Logo - Joy-Con controllers (Bootstrap Icons)
 export function NintendoLogo({ className, size = 'md' }: LogoProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
       <path d="M14.176 24h3.674c3.376 0 6.15-2.774 6.15-6.15V6.15C24 2.775 21.226 0 17.85 0h-3.674a.15.15 0 0 0-.15.15v23.7c0 .082.068.15.15.15zm4.133-17.259a2.809 2.809 0 0 1 0 5.617 2.809 2.809 0 0 1 0-5.617zM6.15 0C2.774 0 0 2.774 0 6.15v11.7C0 21.226 2.774 24 6.15 24h3.674a.15.15 0 0 0 .15-.15V.15A.15.15 0 0 0 9.824 0zm-.041 12.369a2.809 2.809 0 1 1 0-5.617 2.809 2.809 0 0 1 0 5.617z" />
+    </svg>
+  );
+}
+
+// Nintendo Switch Logo - Alias for clarity
+export function NintendoSwitchLogo({ className, size = 'md' }: LogoProps) {
+  return <NintendoLogo className={className} size={size} />;
+}
+
+// Wii Logo - Stylized "Wii" text
+export function WiiLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M1.5 6L4.5 18H6.5L8 12L9.5 18H11.5L14.5 6H12.5L10.5 14L9 8H7L5.5 14L3.5 6H1.5Z" />
+      <circle cx="17" cy="8" r="1.5" />
+      <rect x="16" y="11" width="2" height="7" rx="1" />
+      <circle cx="21" cy="8" r="1.5" />
+      <rect x="20" y="11" width="2" height="7" rx="1" />
+    </svg>
+  );
+}
+
+// Wii U Logo - Stylized "Wii U" with gamepad shape
+export function WiiULogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M1 7L3.5 17H5L6 13L7 17H8.5L11 7H9.5L8 13L7 9H5L4 13L2.5 7H1Z" />
+      <circle cx="13" cy="9" r="1" />
+      <rect x="12.5" y="11" width="1" height="5" rx="0.5" />
+      <circle cx="16" cy="9" r="1" />
+      <rect x="15.5" y="11" width="1" height="5" rx="0.5" />
+      <path d="M19 8C19 7.45 19.45 7 20 7H22C22.55 7 23 7.45 23 8V14C23 15.1 22.1 16 21 16C19.9 16 19 15.1 19 14V8Z" />
+    </svg>
+  );
+}
+
+// Nintendo 3DS Logo - "3DS" with 3D effect
+export function Nintendo3DSLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M2 8C2 6.9 2.9 6 4 6H6C7.1 6 8 6.9 8 8V9H6V8H4V11H6V10H8V12C8 13.1 7.1 14 6 14H4C2.9 14 2 13.1 2 12V8Z" />
+      <path d="M2 16C2 14.9 2.9 14 4 14H6C7.1 14 8 14.9 8 16V17H6V16H4V18H6C7.1 18 8 18.9 8 20C8 21.1 7.1 22 6 22H4C2.9 22 2 21.1 2 20V19H4V20H6V18H4C2.9 18 2 17.1 2 16Z" />
+      <path d="M10 6H14C15.66 6 17 7.34 17 9V11C17 12.66 15.66 14 14 14H12V18H14C15.66 18 17 19.34 17 21C17 22.66 15.66 24 14 24H10V6ZM12 8V12H14C14.55 12 15 11.55 15 11V9C15 8.45 14.55 8 14 8H12ZM12 20V22H14C14.55 22 15 21.55 15 21C15 20.45 14.55 20 14 20H12Z" />
+      <path d="M19 10C19 8.34 20.34 7 22 7V9C21.45 9 21 9.45 21 10V11C21 11.55 21.45 12 22 12V14C20.34 14 19 12.66 19 11V10Z" />
+      <path d="M19 17C19 15.34 20.34 14 22 14V16C21.45 16 21 16.45 21 17V18H22V20H21V21C21 21.55 21.45 22 22 22V24C20.34 24 19 22.66 19 21V17Z" />
+    </svg>
+  );
+}
+
+// Nintendo DS Logo - Dual screen handheld
+export function NintendoDSLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M6 2C4.9 2 4 2.9 4 4V10C4 11.1 4.9 12 6 12H18C19.1 12 20 11.1 20 10V4C20 2.9 19.1 2 18 2H6ZM6 4H18V10H6V4Z" />
+      <path d="M6 14C4.9 14 4 14.9 4 16V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V16C20 14.9 19.1 14 18 14H6ZM6 16H18V20H6V16Z" />
+      <circle cx="8" cy="18" r="1" />
+      <circle cx="16" cy="18" r="1" />
+    </svg>
+  );
+}
+
+// GameCube Logo - Iconic cube with G
+export function GameCubeLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M12 1L3 6V18L12 23L21 18V6L12 1ZM12 3.5L18.5 7L12 10.5L5.5 7L12 3.5ZM5 8.5L11 12V19.5L5 16V8.5ZM13 19.5V12L19 8.5V16L13 19.5Z" />
+      <path d="M12 8C10.34 8 9 9.34 9 11V13H11V11C11 10.45 11.45 10 12 10H13V12H15V10C15 8.9 14.1 8 13 8H12Z" />
+    </svg>
+  );
+}
+
+// Nintendo 64 Logo - N64 "N" shape
+export function Nintendo64Logo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M4 4V20H8V12L12 20H12L16 12V20H20V4H16L12 12L8 4H4Z" />
+    </svg>
+  );
+}
+
+// Game Boy Logo - Handheld shape
+export function GameBoyLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M6 2C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V4C20 2.9 19.1 2 18 2H6ZM6 4H18V12H6V4ZM8 14H10V16H8V14ZM12 14H14V16H12V14ZM9 17H11V19H9V17ZM15 15C16.1 15 17 15.9 17 17C17 18.1 16.1 19 15 19C13.9 19 13 18.1 13 17C13 15.9 13.9 15 15 15Z" />
+    </svg>
+  );
+}
+
+// GBA Logo - Game Boy Advance (wider handheld)
+export function GBALogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M2 8C2 6.9 2.9 6 4 6H20C21.1 6 22 6.9 22 8V16C22 17.1 21.1 18 20 18H4C2.9 18 2 17.1 2 16V8ZM4 8V16H20V8H4Z" />
+      <rect x="7" y="9" width="10" height="6" rx="1" />
+      <circle cx="5" cy="12" r="1.5" />
+      <circle cx="19" cy="11" r="1" />
+      <circle cx="19" cy="14" r="1" />
+    </svg>
+  );
+}
+
+// SNES Logo - Super Nintendo controller shape
+export function SNESLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M2 9C2 7.9 2.9 7 4 7H20C21.1 7 22 7.9 22 9V15C22 16.1 21.1 17 20 17H4C2.9 17 2 16.1 2 15V9Z" />
+      <circle cx="6" cy="12" r="2" fill="currentColor" className="opacity-50" />
+      <circle cx="17" cy="10" r="1" fill="currentColor" className="opacity-50" />
+      <circle cx="19" cy="12" r="1" fill="currentColor" className="opacity-50" />
+      <circle cx="17" cy="14" r="1" fill="currentColor" className="opacity-50" />
+      <circle cx="15" cy="12" r="1" fill="currentColor" className="opacity-50" />
+    </svg>
+  );
+}
+
+// NES Logo - Classic Nintendo controller
+export function NESLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <rect x="2" y="7" width="20" height="10" rx="1" />
+      <rect x="4" y="10" width="4" height="4" rx="0.5" fill="currentColor" className="opacity-50" />
+      <circle cx="16" cy="12" r="1.5" fill="currentColor" className="opacity-50" />
+      <circle cx="19" cy="12" r="1.5" fill="currentColor" className="opacity-50" />
+      <rect x="10" y="11" width="3" height="2" rx="0.5" fill="currentColor" className="opacity-50" />
+    </svg>
+  );
+}
+
+// PSP Logo - PlayStation Portable
+export function PSPLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M1 8C1 6.9 1.9 6 3 6H21C22.1 6 23 6.9 23 8V16C23 17.1 22.1 18 21 18H3C1.9 18 1 17.1 1 16V8Z" />
+      <rect x="6" y="8" width="12" height="8" rx="1" fill="currentColor" className="opacity-30" />
+      <circle cx="4" cy="10" r="0.8" fill="currentColor" className="opacity-50" />
+      <circle cx="4" cy="14" r="0.8" fill="currentColor" className="opacity-50" />
+      <circle cx="3" cy="12" r="0.8" fill="currentColor" className="opacity-50" />
+      <circle cx="5" cy="12" r="0.8" fill="currentColor" className="opacity-50" />
+      <circle cx="20" cy="10" r="0.8" fill="currentColor" className="opacity-50" />
+      <circle cx="20" cy="14" r="0.8" fill="currentColor" className="opacity-50" />
+    </svg>
+  );
+}
+
+// PS Vita Logo
+export function PSVitaLogo({ className, size = 'md' }: LogoProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={cn(sizeMap[size], className)}>
+      <path d="M0 9C0 7.34 1.34 6 3 6H21C22.66 6 24 7.34 24 9V15C24 16.66 22.66 18 21 18H3C1.34 18 0 16.66 0 15V9Z" />
+      <rect x="5" y="7.5" width="14" height="9" rx="1" fill="currentColor" className="opacity-30" />
+      <circle cx="3" cy="10" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="3" cy="14" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="2" cy="12" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="4" cy="12" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="21" cy="10" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="21" cy="14" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="22" cy="12" r="0.6" fill="currentColor" className="opacity-50" />
+      <circle cx="20" cy="12" r="0.6" fill="currentColor" className="opacity-50" />
     </svg>
   );
 }

@@ -79,6 +79,10 @@ export function filterGames(games: UserGame[], options: GameFilterOptions): User
         if (lowerFilter === 'pc') {
           return gamePlatform === 'pc';
         }
+        // Special case: PlayStation filter should match PS5, PS4, PS3, PS Vita, etc.
+        if (lowerFilter === 'playstation') {
+          return gamePlatform.startsWith('ps') || gamePlatform.includes('playstation');
+        }
         // For other platforms, check if game platform contains the filter
         return gamePlatform.includes(lowerFilter);
       });
