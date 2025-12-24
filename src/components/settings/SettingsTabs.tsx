@@ -129,8 +129,8 @@ export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) 
               className={`
                 relative group overflow-hidden rounded-xl p-4 transition-all duration-200
                 ${isActive
-                  ? `bg-abyss border ${c.border}`
-                  : 'bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.03]'
+                  ? `bg-[var(--theme-bg-secondary)] border ${c.border}`
+                  : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border)] hover:bg-[var(--theme-hover-bg)]'
                 }
               `}
               style={{ animation: `fadeIn 0.3s ease-out ${index * 0.05}s both` }}
@@ -149,9 +149,9 @@ export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) 
                 {/* Icon */}
                 <div className={`
                   relative p-2 rounded-lg transition-all duration-200
-                  ${isActive ? `${c.bg} ${c.border} border` : 'bg-white/[0.04] border border-white/[0.06]'}
+                  ${isActive ? `${c.bg} ${c.border} border` : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]'}
                 `}>
-                  <Icon className={`w-4 h-4 ${isActive ? c.text : 'text-white/40'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? c.text : 'text-[var(--theme-text-muted)]'}`} />
                   {isActive && (
                     <div className={`absolute -top-0.5 -right-0.5 w-1.5 h-1.5 ${c.indicator} rounded-full animate-pulse`} />
                   )}
@@ -160,12 +160,12 @@ export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) 
                 {/* Text */}
                 <div className="flex-1 text-left">
                   <div className="flex items-center gap-2">
-                    <h3 className={`font-semibold text-sm uppercase tracking-wide font-[family-name:var(--font-family-display)] ${isActive ? 'text-white' : 'text-white/60'}`}>
+                    <h3 className={`font-semibold text-sm uppercase tracking-wide font-[family-name:var(--font-family-display)] ${isActive ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]'}`}>
                       {tab.label}
                     </h3>
                     {isActive && <ChevronRight className={`w-3 h-3 ${c.text}`} />}
                   </div>
-                  <p className="text-[10px] font-mono text-white/30 mt-0.5 uppercase tracking-wider">
+                  <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] mt-0.5 uppercase tracking-wider">
                     {isActive ? `// ${tab.terminalLabel}` : tab.description}
                   </p>
                 </div>
@@ -209,14 +209,14 @@ function PlatformsContent() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Cpu className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+          <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
             Platform Integrations
           </h2>
-          <div className="h-px flex-1 bg-white/[0.06] w-20" />
+          <div className="h-px flex-1 bg-[var(--theme-border)] w-20" />
         </div>
         <Link
           href="/guide"
-          className="group flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.03] hover:bg-cyan-500/10 border border-white/[0.06] hover:border-cyan-500/30 rounded-lg text-[10px] font-mono font-medium text-white/50 hover:text-cyan-400 transition-all uppercase tracking-wider"
+          className="group flex items-center gap-1.5 px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/10 border border-[var(--theme-border)] hover:border-cyan-500/30 rounded-lg text-[10px] font-mono font-medium text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all uppercase tracking-wider"
         >
           <Book className="w-3 h-3" />
           Setup Guide
@@ -224,7 +224,7 @@ function PlatformsContent() {
         </Link>
       </div>
 
-      <p className="text-sm text-white/40">
+      <p className="text-sm text-[var(--theme-text-muted)]">
         Connect your gaming accounts to import libraries, achievements, and playtime data.
       </p>
 
@@ -251,11 +251,11 @@ function PlatformsContent() {
       <div className="pt-4">
         <div className="flex items-center gap-3 mb-4">
           <Terminal className="w-4 h-4 text-amber-400" />
-          <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
             Sync Diagnostics
           </h3>
-          <span className="text-[10px] font-mono text-white/30">// SYNC_LOGS</span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// SYNC_LOGS</span>
+          <div className="h-px flex-1 bg-[var(--theme-border)]" />
         </div>
 
         <SettingsCard color="amber">
@@ -267,10 +267,10 @@ function PlatformsContent() {
       <div className="pt-4">
         <div className="flex items-center gap-3 mb-4">
           <Database className="w-4 h-4 text-red-400" />
-          <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
             Library Management
           </h3>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-[var(--theme-border)]" />
           <div className="flex items-center gap-2 px-2 py-1 bg-red-500/10 border border-red-500/20 rounded">
             <div className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
             <span className="text-[10px] font-mono font-medium text-red-400 uppercase tracking-wider">Danger Zone</span>
@@ -295,11 +295,11 @@ function AccountContent({ profile, userEmail }: { profile: SettingsTabsProps['pr
       {/* Section header */}
       <div className="flex items-center gap-3">
         <User className="w-4 h-4 text-violet-400" />
-        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+        <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
           Account Settings
         </h2>
-        <span className="text-[10px] font-mono text-white/30">// USER_PROFILE</span>
-        <div className="h-px flex-1 bg-white/[0.06]" />
+        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// USER_PROFILE</span>
+        <div className="h-px flex-1 bg-[var(--theme-border)]" />
       </div>
 
       <SettingsCard color="violet">
@@ -319,11 +319,11 @@ function NotificationsContent() {
       {/* Section header */}
       <div className="flex items-center gap-3">
         <Bell className="w-4 h-4 text-amber-400" />
-        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+        <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
           Notification Preferences
         </h2>
-        <span className="text-[10px] font-mono text-white/30">// ALERT_CONFIG</span>
-        <div className="h-px flex-1 bg-white/[0.06]" />
+        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// ALERT_CONFIG</span>
+        <div className="h-px flex-1 bg-[var(--theme-border)]" />
       </div>
 
       <SettingsCard color="amber">
@@ -343,11 +343,11 @@ function PrivacyContent() {
       {/* Section header */}
       <div className="flex items-center gap-3">
         <Shield className="w-4 h-4 text-emerald-400" />
-        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+        <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
           Privacy & Security
         </h2>
-        <span className="text-[10px] font-mono text-white/30">// SECURITY_LAYER</span>
-        <div className="h-px flex-1 bg-white/[0.06]" />
+        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// SECURITY_LAYER</span>
+        <div className="h-px flex-1 bg-[var(--theme-border)]" />
         <div className="flex items-center gap-2 px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded">
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
           <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Protected</span>
@@ -375,7 +375,7 @@ function SettingsCard({ children, color }: SettingsCardProps) {
     cyan: { border: 'border-cyan-500/20', corner: 'border-cyan-400/30' },
     blue: { border: 'border-blue-500/20', corner: 'border-blue-400/30' },
     emerald: { border: 'border-emerald-500/20', corner: 'border-emerald-400/30' },
-    gray: { border: 'border-white/[0.08]', corner: 'border-white/[0.12]' },
+    gray: { border: 'border-[var(--theme-border)]', corner: 'border-[var(--theme-border)]' },
     violet: { border: 'border-violet-500/20', corner: 'border-violet-400/30' },
     amber: { border: 'border-amber-500/20', corner: 'border-amber-400/30' },
     red: { border: 'border-red-500/20', corner: 'border-red-400/30' },
@@ -384,7 +384,7 @@ function SettingsCard({ children, color }: SettingsCardProps) {
   const c = colorMap[color];
 
   return (
-    <div className={`relative bg-abyss border ${c.border} rounded-xl p-6 overflow-hidden`}>
+    <div className={`relative bg-[var(--theme-bg-secondary)] border ${c.border} rounded-xl p-6 overflow-hidden`}>
       {/* HUD corners */}
       <div className={`absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 ${c.corner}`} />
       <div className={`absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 ${c.corner}`} />
@@ -431,11 +431,11 @@ function PlatformCard({ children, color, label, icon }: PlatformCardProps) {
       corner: 'border-emerald-400/30',
     },
     gray: {
-      border: 'border-white/[0.08]',
-      hoverBorder: 'hover:border-white/[0.16]',
-      text: 'text-white/50',
-      headerBg: 'bg-white/[0.02]',
-      corner: 'border-white/[0.12]',
+      border: 'border-[var(--theme-border)]',
+      hoverBorder: 'hover:border-[var(--theme-border)]',
+      text: 'text-[var(--theme-text-muted)]',
+      headerBg: 'bg-[var(--theme-hover-bg)]',
+      corner: 'border-[var(--theme-border)]',
     },
   };
 
@@ -452,7 +452,7 @@ function PlatformCard({ children, color, label, icon }: PlatformCardProps) {
   }[icon];
 
   return (
-    <div className={`group relative bg-abyss border ${c.border} ${c.hoverBorder} rounded-xl overflow-hidden transition-all duration-200`}>
+    <div className={`group relative bg-[var(--theme-bg-secondary)] border ${c.border} ${c.hoverBorder} rounded-xl overflow-hidden transition-all duration-200`}>
       {/* HUD corners */}
       <div className={`absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
       <div className={`absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -460,13 +460,13 @@ function PlatformCard({ children, color, label, icon }: PlatformCardProps) {
       <div className={`absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
 
       {/* Header */}
-      <div className={`relative px-4 py-3 ${c.headerBg} border-b border-white/[0.06] flex items-center gap-2`}>
+      <div className={`relative px-4 py-3 ${c.headerBg} border-b border-[var(--theme-border)] flex items-center gap-2`}>
         <IconComponent size="sm" className={c.text} />
         <span className={`text-sm font-semibold uppercase tracking-wide font-[family-name:var(--font-family-display)] ${c.text}`}>
           {label}
         </span>
         <div className="flex-1" />
-        <span className="text-[9px] font-mono text-white/20 uppercase tracking-wider">
+        <span className="text-[9px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
           // {icon.toUpperCase()}_API
         </span>
       </div>

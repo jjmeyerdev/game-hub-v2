@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user } = useDashboardData();
 
   return (
-    <div className="min-h-screen bg-void text-white flex">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)] flex overflow-hidden">
       {/* Noise texture overlay */}
       <div className="noise-overlay" />
 
@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       />
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-500 ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}>
+      <main className={`flex-1 transition-all duration-500 overflow-x-hidden ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}>
         {children}
       </main>
     </div>

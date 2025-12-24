@@ -35,11 +35,36 @@ export default function LibraryPage() {
   const [showHiddenGames, setShowHiddenGames] = useState(false);
   const [censorHidden, setCensorHidden] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Close sort menu on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
+        setShowSortMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+    { value: 'title-asc', label: 'Name: A-Z' },
+    { value: 'title-desc', label: 'Name: Z-A' },
+    { value: 'recent', label: 'Recently Added' },
+    { value: 'release-newest', label: 'Newest Release' },
+    { value: 'release-oldest', label: 'Oldest Release' },
+    { value: 'priority-high', label: 'High Priority' },
+    { value: 'priority-low', label: 'Low Priority' },
+    { value: 'completion-desc', label: 'Most Complete' },
+    { value: 'playtime-desc', label: 'Most Played' },
+  ];
 
   const togglePlatform = (platform: string) => {
     setSelectedPlatforms(prev =>
@@ -133,7 +158,7 @@ export default function LibraryPage() {
   const hiddenGamesCount = userGames.filter(g => g.hidden).length;
 
   return (
-    <div className="relative min-h-screen bg-void">
+    <div className="relative min-h-screen bg-[var(--theme-bg-primary)]">
       {/* Ambient glow orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div
@@ -151,7 +176,7 @@ export default function LibraryPage() {
 
       <div className={`relative transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
         {/* Header */}
-        <header className="sticky top-0 z-30 border-b border-white/[0.04] bg-abyss/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]/80 backdrop-blur-xl">
           <div className="px-8 py-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -166,10 +191,10 @@ export default function LibraryPage() {
                   <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider block mb-1">
                     // GAME_LIBRARY
                   </span>
-                  <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-family-display)]">LIBRARY</h1>
+                  <h1 className="text-2xl font-bold text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">LIBRARY</h1>
                 </div>
                 <span className="px-3 py-1.5 text-xs font-mono text-cyan-400/80 bg-cyan-400/10 border border-cyan-400/20 rounded-lg">
                   {totalGames} games
@@ -199,9 +224,9 @@ export default function LibraryPage() {
           {/* Stats Bar */}
           <div className="mb-6">
             <div className="flex items-center gap-4 mb-4">
-              <Gamepad2 className="w-4 h-4 text-white/20" />
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// LIBRARY_STATS</span>
-              <div className="flex-1 h-px bg-white/[0.06]" />
+              <Gamepad2 className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// LIBRARY_STATS</span>
+              <div className="flex-1 h-px bg-[var(--theme-border)]" />
             </div>
             <div className="grid grid-cols-4 gap-4">
               <StatBox label="Total Games" value={totalGames.toString()} color="cyan" />
@@ -214,11 +239,11 @@ export default function LibraryPage() {
           {/* Search & Filter Bar */}
           <div className="mb-6">
             <div className="flex items-center gap-4 mb-4">
-              <Search className="w-4 h-4 text-white/20" />
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// SEARCH_FILTER</span>
-              <div className="flex-1 h-px bg-white/[0.06]" />
+              <Search className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// SEARCH_FILTER</span>
+              <div className="flex-1 h-px bg-[var(--theme-border)]" />
             </div>
-            <div className="relative bg-abyss border border-white/[0.06] rounded-2xl p-4 overflow-hidden">
+            <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl p-4">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/20" />
               <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/20" />
@@ -229,36 +254,68 @@ export default function LibraryPage() {
               <div className="relative flex flex-col lg:flex-row gap-3">
                 {/* Search */}
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--theme-text-subtle)]" />
                   <input
                     type="text"
                     placeholder="Search games..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-400/30 focus:bg-white/[0.05] transition-all font-mono"
+                    className="w-full bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl pl-11 pr-4 py-3 text-sm text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-cyan-400/30 focus:bg-[var(--theme-active-bg)] transition-all font-mono"
                   />
                 </div>
 
               {/* Controls */}
               <div className="flex items-center gap-2 flex-shrink-0">
                 {/* Sort */}
-                <div className="relative">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="appearance-none bg-white/[0.03] border border-white/[0.06] rounded-xl pl-4 pr-9 py-3 text-sm text-white/70 focus:outline-none focus:border-white/[0.12] transition-all cursor-pointer hover:text-white"
+                <div className="relative" ref={sortMenuRef}>
+                  <button
+                    onClick={() => setShowSortMenu(!showSortMenu)}
+                    className={`group relative flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all overflow-hidden ${
+                      showSortMenu
+                        ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
+                        : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
+                    }`}
                   >
-                    <option value="title-asc">A → Z</option>
-                    <option value="title-desc">Z → A</option>
-                    <option value="recent">Recent</option>
-                    <option value="release-newest">Release ↓</option>
-                    <option value="release-oldest">Release ↑</option>
-                    <option value="priority-high">Priority ↑</option>
-                    <option value="priority-low">Priority ↓</option>
-                    <option value="completion-desc">Complete ↑</option>
-                    <option value="playtime-desc">Playtime ↑</option>
-                  </select>
-                  <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/30 pointer-events-none" />
+                    {/* HUD corners */}
+                    <div className={`absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400/50 transition-opacity ${showSortMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                    <div className={`absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400/50 transition-opacity ${showSortMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                    <div className={`absolute bottom-0 left-0 w-2 h-2 border-l border-b border-cyan-400/50 transition-opacity ${showSortMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                    <div className={`absolute bottom-0 right-0 w-2 h-2 border-r border-b border-cyan-400/50 transition-opacity ${showSortMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+
+                    <ArrowUpDown className="w-3.5 h-3.5" />
+                    <span className="font-medium">{SORT_OPTIONS.find(o => o.value === sortBy)?.label}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showSortMenu ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Sort Dropdown */}
+                  {showSortMenu && (
+                    <div className="absolute top-full mt-2 right-0 z-[100] min-w-[160px] bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-xl overflow-hidden">
+                      {/* HUD corners */}
+                      <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-cyan-400/30" />
+                      <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-cyan-400/30" />
+                      <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-cyan-400/30" />
+                      <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-cyan-400/30" />
+
+                      <div className="py-1">
+                        {SORT_OPTIONS.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setSortBy(option.value);
+                              setShowSortMenu(false);
+                            }}
+                            className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                              sortBy === option.value
+                                ? 'bg-cyan-500/10 text-cyan-400'
+                                : 'text-[var(--theme-text-secondary)] hover:bg-[var(--theme-hover-bg)] hover:text-[var(--theme-text-primary)]'
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Filters toggle */}
@@ -267,7 +324,7 @@ export default function LibraryPage() {
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all ${
                     showFilters || hasActiveFilters
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                      : 'bg-white/[0.03] border border-white/[0.06] text-white/60 hover:text-white hover:border-white/[0.12]'
+                      : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
                   }`}
                 >
                   <Gamepad2 className="w-4 h-4" />
@@ -279,45 +336,17 @@ export default function LibraryPage() {
                   )}
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                 </button>
-
-                {/* Hidden toggle */}
-                <button
-                  onClick={() => setShowHiddenGames(!showHiddenGames)}
-                  className={`p-3 rounded-xl transition-all ${
-                    showHiddenGames
-                      ? 'bg-violet-500/10 text-violet-400 border border-violet-500/30'
-                      : 'bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:border-white/[0.12]'
-                  }`}
-                  title={showHiddenGames ? 'Hide private games' : 'Show private games'}
-                >
-                  {showHiddenGames ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </button>
-
-                {/* Censor toggle */}
-                {showHiddenGames && (
-                  <button
-                    onClick={() => setCensorHidden(!censorHidden)}
-                    className={`p-3 rounded-xl transition-all ${
-                      censorHidden
-                        ? 'bg-violet-500/10 text-violet-400 border border-violet-500/30'
-                        : 'bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:border-white/[0.12]'
-                    }`}
-                    title={censorHidden ? 'Show hidden covers' : 'Blur hidden covers'}
-                  >
-                    {censorHidden ? <Shield className="w-4 h-4" /> : <ShieldOff className="w-4 h-4" />}
-                  </button>
-                )}
               </div>
             </div>
 
             {/* Expandable Filters */}
             {showFilters && (
-              <div className="mt-4 pt-4 border-t border-white/[0.04] space-y-5">
+              <div className="mt-4 pt-4 border-t border-[var(--theme-border)] space-y-5">
                 {/* Platform Filter */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Gamepad2 className="w-3.5 h-3.5 text-white/30" />
-                    <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider">Platform</span>
+                    <Gamepad2 className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                    <span className="text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">Platform</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {LIBRARY_FILTER_PLATFORMS.filter(p => p !== 'All').map((platform) => {
@@ -326,41 +355,41 @@ export default function LibraryPage() {
                       const getPlatformStyle = () => {
                         switch (platform) {
                           case 'Steam': return isSelected
-                            ? 'bg-[#1b2838]/40 text-white border-[#66c0f4]/40'
-                            : 'bg-white/[0.03] text-white border-[#66c0f4]/20 hover:border-[#66c0f4]/40';
+                            ? 'bg-[#1b2838]/40 text-[var(--theme-text-primary)] border-[#66c0f4]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#66c0f4]/20 hover:border-[#66c0f4]/40';
                           case 'PlayStation': return isSelected
-                            ? 'bg-[#003791]/30 text-white border-[#0070cc]/40'
-                            : 'bg-white/[0.03] text-white border-[#0070cc]/20 hover:border-[#0070cc]/40';
+                            ? 'bg-[#003791]/30 text-[var(--theme-text-primary)] border-[#0070cc]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#0070cc]/20 hover:border-[#0070cc]/40';
                           case 'Xbox': return isSelected
-                            ? 'bg-[#107c10]/30 text-white border-[#52b043]/40'
-                            : 'bg-white/[0.03] text-white border-[#52b043]/20 hover:border-[#52b043]/40';
+                            ? 'bg-[#107c10]/30 text-[var(--theme-text-primary)] border-[#52b043]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#52b043]/20 hover:border-[#52b043]/40';
                           case 'Nintendo': return isSelected
-                            ? 'bg-[#e60012]/20 text-white border-[#e60012]/40'
-                            : 'bg-white/[0.03] text-white border-[#e60012]/20 hover:border-[#e60012]/40';
+                            ? 'bg-[#e60012]/20 text-[var(--theme-text-primary)] border-[#e60012]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#e60012]/20 hover:border-[#e60012]/40';
                           case 'Epic Games': return isSelected
-                            ? 'bg-white/10 text-white border-white/30'
-                            : 'bg-white/[0.03] text-white border-white/10 hover:border-white/20';
+                            ? 'bg-[var(--theme-active-bg)] text-[var(--theme-text-primary)] border-[var(--theme-border-hover)]'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[var(--theme-border)] hover:border-[var(--theme-border-hover)]';
                           case 'GOG': return isSelected
-                            ? 'bg-[#86328a]/30 text-white border-[#a358ff]/40'
-                            : 'bg-white/[0.03] text-white border-[#a358ff]/20 hover:border-[#a358ff]/40';
+                            ? 'bg-[#86328a]/30 text-[var(--theme-text-primary)] border-[#a358ff]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#a358ff]/20 hover:border-[#a358ff]/40';
                           case 'EA App': return isSelected
-                            ? 'bg-[#ff4747]/20 text-white border-[#ff4747]/40'
-                            : 'bg-white/[0.03] text-white border-[#ff4747]/20 hover:border-[#ff4747]/40';
+                            ? 'bg-[#ff4747]/20 text-[var(--theme-text-primary)] border-[#ff4747]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#ff4747]/20 hover:border-[#ff4747]/40';
                           case 'Battle.net': return isSelected
-                            ? 'bg-[#00aeff]/20 text-white border-[#00aeff]/40'
-                            : 'bg-white/[0.03] text-white border-[#00aeff]/20 hover:border-[#00aeff]/40';
+                            ? 'bg-[#00aeff]/20 text-[var(--theme-text-primary)] border-[#00aeff]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#00aeff]/20 hover:border-[#00aeff]/40';
                           case 'Ubisoft Connect': return isSelected
-                            ? 'bg-[#0070ff]/20 text-white border-[#0070ff]/40'
-                            : 'bg-white/[0.03] text-white border-[#0070ff]/20 hover:border-[#0070ff]/40';
+                            ? 'bg-[#0070ff]/20 text-[var(--theme-text-primary)] border-[#0070ff]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#0070ff]/20 hover:border-[#0070ff]/40';
                           case 'Windows': return isSelected
-                            ? 'bg-[#0078d4]/20 text-white border-[#0078d4]/40'
-                            : 'bg-white/[0.03] text-white border-[#0078d4]/20 hover:border-[#0078d4]/40';
+                            ? 'bg-[#0078d4]/20 text-[var(--theme-text-primary)] border-[#0078d4]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#0078d4]/20 hover:border-[#0078d4]/40';
                           case 'Physical': return isSelected
-                            ? 'bg-amber-500/20 text-white border-amber-500/40'
-                            : 'bg-white/[0.03] text-white border-amber-500/20 hover:border-amber-500/40';
+                            ? 'bg-amber-500/20 text-[var(--theme-text-primary)] border-amber-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-amber-500/20 hover:border-amber-500/40';
                           default: return isSelected
-                            ? 'bg-cyan-500/20 text-white border-cyan-500/40'
-                            : 'bg-white/[0.03] text-white border-white/[0.08] hover:border-white/[0.15]';
+                            ? 'bg-cyan-500/20 text-[var(--theme-text-primary)] border-cyan-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[var(--theme-border)] hover:border-[var(--theme-border-hover)]';
                         }
                       };
 
@@ -370,7 +399,7 @@ export default function LibraryPage() {
                           case 'PlayStation': return <PlayStationLogo size="sm" className={isSelected ? 'text-[#0070cc]' : 'text-[#0070cc]/60'} />;
                           case 'Xbox': return <XboxLogo size="sm" className={isSelected ? 'text-[#52b043]' : 'text-[#52b043]/60'} />;
                           case 'Nintendo': return <NintendoLogo size="sm" className={isSelected ? 'text-[#e60012]' : 'text-[#e60012]/60'} />;
-                          case 'Epic Games': return <EpicLogo size="sm" className={isSelected ? 'text-white' : 'text-white/50'} />;
+                          case 'Epic Games': return <EpicLogo size="sm" className={isSelected ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]'} />;
                           case 'GOG': return <GOGLogo size="sm" className={isSelected ? 'text-[#a358ff]' : 'text-[#a358ff]/60'} />;
                           case 'EA App': return <EALogo size="sm" className={isSelected ? 'text-[#ff4747]' : 'text-[#ff4747]/60'} />;
                           case 'Battle.net': return <BattleNetLogo size="sm" className={isSelected ? 'text-[#00aeff]' : 'text-[#00aeff]/60'} />;
@@ -398,8 +427,8 @@ export default function LibraryPage() {
                 {/* Priority Filter */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Flame className="w-3.5 h-3.5 text-white/30" />
-                    <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider">Priority</span>
+                    <Flame className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                    <span className="text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">Priority</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {PRIORITY_OPTIONS.filter(p => p.id !== 'all').map((priority) => {
@@ -409,15 +438,15 @@ export default function LibraryPage() {
                       const getPriorityStyle = () => {
                         switch (priority.id) {
                           case 'high': return isSelected
-                            ? 'bg-red-500/20 text-white border-red-500/40'
-                            : 'bg-white/[0.03] text-white border-red-500/20 hover:border-red-500/40';
+                            ? 'bg-red-500/20 text-[var(--theme-text-primary)] border-red-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-red-500/20 hover:border-red-500/40';
                           case 'medium': return isSelected
-                            ? 'bg-amber-500/20 text-white border-amber-500/40'
-                            : 'bg-white/[0.03] text-white border-amber-500/20 hover:border-amber-500/40';
+                            ? 'bg-amber-500/20 text-[var(--theme-text-primary)] border-amber-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-amber-500/20 hover:border-amber-500/40';
                           case 'low': return isSelected
-                            ? 'bg-blue-500/20 text-white border-blue-500/40'
-                            : 'bg-white/[0.03] text-white border-blue-500/20 hover:border-blue-500/40';
-                          default: return 'bg-white/[0.03] text-white border-white/[0.08] hover:border-white/[0.15]';
+                            ? 'bg-blue-500/20 text-[var(--theme-text-primary)] border-blue-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-blue-500/20 hover:border-blue-500/40';
+                          default: return 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[var(--theme-border)] hover:border-[var(--theme-border-hover)]';
                         }
                       };
 
@@ -426,7 +455,7 @@ export default function LibraryPage() {
                           case 'high': return isSelected ? 'text-red-400' : 'text-red-400/60';
                           case 'medium': return isSelected ? 'text-amber-400' : 'text-amber-400/60';
                           case 'low': return isSelected ? 'text-blue-400' : 'text-blue-400/60';
-                          default: return 'text-white/40';
+                          default: return 'text-[var(--theme-text-subtle)]';
                         }
                       };
 
@@ -447,8 +476,8 @@ export default function LibraryPage() {
                 {/* Source Filter */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Link2 className="w-3.5 h-3.5 text-white/30" />
-                    <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider">Synced From</span>
+                    <Link2 className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                    <span className="text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">Synced From</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {SYNC_SOURCE_OPTIONS.filter(s => s.id !== 'all').map((source) => {
@@ -460,23 +489,23 @@ export default function LibraryPage() {
                       const getSourceStyle = () => {
                         switch (sourceId) {
                           case 'steam': return isSelected
-                            ? 'bg-[#1b2838]/40 text-white border-[#66c0f4]/40'
-                            : 'bg-white/[0.03] text-white border-[#66c0f4]/20 hover:border-[#66c0f4]/40';
+                            ? 'bg-[#1b2838]/40 text-[var(--theme-text-primary)] border-[#66c0f4]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#66c0f4]/20 hover:border-[#66c0f4]/40';
                           case 'psn': return isSelected
-                            ? 'bg-[#003791]/30 text-white border-[#0070cc]/40'
-                            : 'bg-white/[0.03] text-white border-[#0070cc]/20 hover:border-[#0070cc]/40';
+                            ? 'bg-[#003791]/30 text-[var(--theme-text-primary)] border-[#0070cc]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#0070cc]/20 hover:border-[#0070cc]/40';
                           case 'xbox': return isSelected
-                            ? 'bg-[#107c10]/30 text-white border-[#52b043]/40'
-                            : 'bg-white/[0.03] text-white border-[#52b043]/20 hover:border-[#52b043]/40';
+                            ? 'bg-[#107c10]/30 text-[var(--theme-text-primary)] border-[#52b043]/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#52b043]/20 hover:border-[#52b043]/40';
                           case 'epic': return isSelected
-                            ? 'bg-white/10 text-white border-white/30'
-                            : 'bg-white/[0.03] text-white border-white/10 hover:border-white/20';
+                            ? 'bg-[var(--theme-active-bg)] text-[var(--theme-text-primary)] border-[var(--theme-border-hover)]'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[var(--theme-border)] hover:border-[var(--theme-border-hover)]';
                           case 'manual': return isSelected
-                            ? 'bg-[#701a75]/30 text-white border-[#e879f9]/60'
-                            : 'bg-white/[0.03] text-white border-[#e879f9]/35 hover:border-[#e879f9]/60';
+                            ? 'bg-[#701a75]/30 text-[var(--theme-text-primary)] border-[#e879f9]/60'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[#e879f9]/35 hover:border-[#e879f9]/60';
                           default: return isSelected
-                            ? 'bg-cyan-500/20 text-white border-cyan-500/40'
-                            : 'bg-white/[0.03] text-white border-white/[0.08] hover:border-white/[0.15]';
+                            ? 'bg-cyan-500/20 text-[var(--theme-text-primary)] border-cyan-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-[var(--theme-border)] hover:border-[var(--theme-border-hover)]';
                         }
                       };
 
@@ -485,7 +514,7 @@ export default function LibraryPage() {
                           case 'steam': return <SteamLogo size="sm" className={isSelected ? 'text-[#66c0f4]' : 'text-[#66c0f4]/60'} />;
                           case 'psn': return <PlayStationLogo size="sm" className={isSelected ? 'text-[#0070cc]' : 'text-[#0070cc]/60'} />;
                           case 'xbox': return <XboxLogo size="sm" className={isSelected ? 'text-[#52b043]' : 'text-[#52b043]/60'} />;
-                          case 'epic': return <EpicLogo size="sm" className={isSelected ? 'text-white' : 'text-white/50'} />;
+                          case 'epic': return <EpicLogo size="sm" className={isSelected ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]'} />;
                           case 'manual': return <Pencil className="w-3.5 h-3.5" style={{ color: isSelected ? '#e879f9' : 'rgba(232, 121, 249, 0.6)' }} />;
                           default: return null;
                         }
@@ -501,7 +530,7 @@ export default function LibraryPage() {
                           {getSourceLogo()}
                           {source.label}
                           {count > 0 && (
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] ${isSelected ? 'bg-white/20' : 'bg-white/[0.06]'}`}>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] ${isSelected ? 'bg-[var(--theme-active-bg)]' : 'bg-[var(--theme-hover-bg)]'}`}>
                               {count}
                             </span>
                           )}
@@ -516,8 +545,8 @@ export default function LibraryPage() {
                   selectedSources.includes('psn') || selectedSources.includes('xbox')) && (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <Monitor className="w-3.5 h-3.5 text-white/30" />
-                      <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider">Console</span>
+                      <Monitor className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                      <span className="text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">Console</span>
                     </div>
                     <ConsoleFilter
                       userGames={userGames.filter(g => !g.hidden || showHiddenGames)}
@@ -529,10 +558,53 @@ export default function LibraryPage() {
                   </div>
                 )}
 
+                {/* Visibility Filter */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <EyeOff className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                    <span className="text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">Visibility</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setShowHiddenGames(!showHiddenGames)}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                        showHiddenGames
+                          ? 'bg-violet-500/20 text-[var(--theme-text-primary)] border-violet-500/40'
+                          : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-violet-500/20 hover:border-violet-500/40'
+                      }`}
+                    >
+                      {showHiddenGames ? (
+                        <Eye className="w-3.5 h-3.5 text-violet-400" />
+                      ) : (
+                        <EyeOff className="w-3.5 h-3.5 text-violet-400/60" />
+                      )}
+                      Show Private
+                    </button>
+
+                    {showHiddenGames && (
+                      <button
+                        onClick={() => setCensorHidden(!censorHidden)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                          censorHidden
+                            ? 'bg-violet-500/20 text-[var(--theme-text-primary)] border-violet-500/40'
+                            : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-secondary)] border-violet-500/20 hover:border-violet-500/40'
+                        }`}
+                      >
+                        {censorHidden ? (
+                          <Shield className="w-3.5 h-3.5 text-violet-400" />
+                        ) : (
+                          <ShieldOff className="w-3.5 h-3.5 text-violet-400/60" />
+                        )}
+                        Blur Covers
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 {/* Active Filters */}
                 {hasActiveFilters && (
-                  <div className="flex items-center gap-2 pt-4 border-t border-white/[0.04]">
-                    <span className="text-[10px] text-white/30 uppercase tracking-wider">Active:</span>
+                  <div className="flex items-center gap-2 pt-4 border-t border-[var(--theme-border)]">
+                    <span className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider">Active:</span>
                     <div className="flex flex-wrap gap-1.5">
                       {selectedPlatforms.map(platform => (
                         <FilterTag key={platform} label={platform} onRemove={() => togglePlatform(platform)} />
@@ -557,7 +629,7 @@ export default function LibraryPage() {
                         setSelectedSources([]);
                         setSelectedConsoles([]);
                       }}
-                      className="ml-auto text-[10px] font-mono text-white/30 hover:text-white/60 transition-colors uppercase tracking-wider"
+                      className="ml-auto text-[10px] font-mono text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-muted)] transition-colors uppercase tracking-wider"
                     >
                       Clear all
                     </button>
@@ -570,9 +642,9 @@ export default function LibraryPage() {
 
           {/* Results Count */}
           <div className="mb-6 flex items-center justify-between">
-            <p className="text-sm font-mono text-white/40">
-              <span className="text-[10px] text-white/30 uppercase tracking-wider">// RESULTS:</span>{' '}
-              <span className="text-white font-medium">{sortedGames.length}</span> of {totalGames} games
+            <p className="text-sm font-mono text-[var(--theme-text-subtle)]">
+              <span className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider">// RESULTS:</span>{' '}
+              <span className="text-[var(--theme-text-primary)] font-medium">{sortedGames.length}</span> of {totalGames} games
               {hasActiveFilters && <span className="text-cyan-400/60"> (filtered)</span>}
               {hiddenGamesCount > 0 && !showHiddenGames && (
                 <span className="text-violet-400/60 ml-2">• {hiddenGamesCount} hidden</span>
@@ -583,26 +655,26 @@ export default function LibraryPage() {
               {/* Find Duplicates */}
               <button
                 onClick={() => setShowDuplicateFinderModal(true)}
-                className="group relative flex items-center gap-2 px-3 py-2 overflow-hidden rounded-lg transition-all duration-300 bg-white/[0.03] border border-violet-500/20 hover:border-violet-500/40"
+                className="group relative flex items-center gap-2 px-3 py-2 overflow-hidden rounded-lg transition-all duration-300 bg-[var(--theme-hover-bg)] border border-violet-500/20 hover:border-violet-500/40"
                 title="Find duplicate games"
               >
                 <Copy className="w-4 h-4 text-violet-400/70 group-hover:text-violet-400 transition-colors" />
-                <span className="hidden sm:inline text-xs font-medium text-white/50 group-hover:text-white/70 transition-colors">
+                <span className="hidden sm:inline text-xs font-medium text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-secondary)] transition-colors">
                   Duplicates
                 </span>
               </button>
 
               {/* View Toggle */}
-              <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+              <div className="flex items-center gap-1 p-1 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-white/40 hover:text-white/70 border border-transparent'}`}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-secondary)] border border-transparent'}`}
                 >
                   <Grid3x3 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-white/40 hover:text-white/70 border border-transparent'}`}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-secondary)] border border-transparent'}`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -617,21 +689,21 @@ export default function LibraryPage() {
                 <Library className="w-12 h-12 text-cyan-400/60 animate-pulse" />
                 <div className="absolute inset-0 w-12 h-12 border-2 border-cyan-400/20 rounded-full animate-ping" />
               </div>
-              <p className="mt-4 text-[11px] font-mono text-white/30 uppercase tracking-wider">// Loading library data...</p>
+              <p className="mt-4 text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// Loading library data...</p>
             </div>
           ) : sortedGames.length === 0 ? (
-            <div className="relative flex flex-col items-center justify-center py-20 bg-abyss border border-white/[0.06] rounded-2xl overflow-hidden">
+            <div className="relative flex flex-col items-center justify-center py-20 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl overflow-hidden">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-cyan-400/30" />
               <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-cyan-400/30" />
               <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-cyan-400/30" />
               <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-cyan-400/30" />
 
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-4">// {userGames.length === 0 ? 'EMPTY_LIBRARY' : 'NO_RESULTS'}</span>
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-4">// {userGames.length === 0 ? 'EMPTY_LIBRARY' : 'NO_RESULTS'}</span>
               <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
                 <Library className="w-7 h-7 text-cyan-400" />
               </div>
-              <p className="text-sm text-white/50 mb-2 font-[family-name:var(--font-family-display)]">
+              <p className="text-sm text-[var(--theme-text-muted)] mb-2 font-[family-name:var(--font-family-display)]">
                 {userGames.length === 0 ? 'YOUR LIBRARY IS EMPTY' : 'NO GAMES FOUND'}
               </p>
               {userGames.length === 0 ? (
@@ -643,7 +715,7 @@ export default function LibraryPage() {
                   <span className="relative font-semibold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">Add Your First Game</span>
                 </button>
               ) : (
-                <p className="text-xs font-mono text-white/30">Try adjusting your filters</p>
+                <p className="text-xs font-mono text-[var(--theme-text-subtle)]">Try adjusting your filters</p>
               )}
             </div>
           ) : viewMode === 'grid' ? (
@@ -713,7 +785,7 @@ function StatBox({ label, value, color }: { label: string; value: string; color:
   };
 
   return (
-    <div className="group relative bg-abyss border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.1] transition-colors overflow-hidden">
+    <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-[var(--theme-border-hover)] transition-colors overflow-hidden">
       {/* Hover HUD corners */}
       <div className={`absolute top-0 left-0 w-2 h-2 border-l border-t ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
       <div className={`absolute top-0 right-0 w-2 h-2 border-r border-t ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -722,7 +794,7 @@ function StatBox({ label, value, color }: { label: string; value: string; color:
 
       <div className="relative">
         <div className={`text-2xl font-bold font-mono ${colorMap[color].text} tabular-nums`}>{value}</div>
-        <div className="text-[10px] font-mono text-white/40 mt-1 uppercase tracking-wider">{label}</div>
+        <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] mt-1 uppercase tracking-wider">{label}</div>
       </div>
     </div>
   );

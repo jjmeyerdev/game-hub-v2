@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getGameSyncSource } from '@/lib/utils';
 import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
-import { getPlatformBrandStyle } from '@/lib/constants/platforms';
 
 interface GameCardProps {
   game: UserGame;
@@ -43,8 +42,60 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
       case 'finished': return 'bg-amber-400';
       case 'on_hold': return 'bg-rose-400';
       case 'dropped': return 'bg-red-400';
-      default: return 'bg-white/20';
+      default: return 'bg-[var(--theme-text-subtle)]';
     }
+  };
+
+  // Get platform badge style matching sync badge gradients
+  const getPlatformBadgeStyle = (platform: string) => {
+    const lowerPlatform = platform.toLowerCase();
+    if (lowerPlatform.includes('steam')) {
+      return {
+        gradient: 'bg-gradient-to-br from-[#1b2838] via-[#2a475e] to-[#1b2838]',
+        border: 'border-[#66c0f4]/30',
+        text: 'text-[#66c0f4]',
+        shadow: '0 0 8px rgba(102, 192, 244, 0.2)',
+      };
+    }
+    if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps5') || lowerPlatform.includes('ps4') || lowerPlatform.includes('ps3') || lowerPlatform.includes('vita') || lowerPlatform.includes('psp')) {
+      return {
+        gradient: 'bg-gradient-to-br from-[#003087] via-[#0070d1] to-[#003087]',
+        border: 'border-[#0070d1]/40',
+        text: 'text-white',
+        shadow: '0 0 8px rgba(0, 112, 209, 0.25)',
+      };
+    }
+    if (lowerPlatform.includes('xbox')) {
+      return {
+        gradient: 'bg-gradient-to-br from-[#0e7a0d] via-[#107c10] to-[#0e7a0d]',
+        border: 'border-[#52b043]/40',
+        text: 'text-white',
+        shadow: '0 0 8px rgba(16, 124, 16, 0.3)',
+      };
+    }
+    if (lowerPlatform.includes('epic')) {
+      return {
+        gradient: 'bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1a1a1a]',
+        border: 'border-white/20',
+        text: 'text-white',
+        shadow: '0 0 8px rgba(255, 255, 255, 0.06)',
+      };
+    }
+    if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii') || lowerPlatform.includes('3ds')) {
+      return {
+        gradient: 'bg-gradient-to-br from-[#e60012] via-[#ff1a1a] to-[#e60012]',
+        border: 'border-[#ff4444]/40',
+        text: 'text-white',
+        shadow: '0 0 8px rgba(230, 0, 18, 0.3)',
+      };
+    }
+    // Default/manual
+    return {
+      gradient: 'bg-gradient-to-br from-[var(--theme-bg-secondary)] via-[var(--theme-hover-bg)] to-[var(--theme-bg-secondary)]',
+      border: 'border-[var(--theme-border)]',
+      text: 'text-[var(--theme-text-secondary)]',
+      shadow: 'none',
+    };
   };
 
   return (
@@ -56,7 +107,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
       onClick={handleClick}
     >
       {/* Main card */}
-      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-white/[0.02] border border-white/[0.06] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.03]">
+      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] transition-all duration-300 hover:border-[var(--theme-border-hover)] hover:bg-[var(--theme-bg-tertiary)]">
         {/* Cover image */}
         {game.game?.cover_url && !imageError ? (
           <img
@@ -67,27 +118,27 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className={`absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent flex items-center justify-center ${shouldCensor ? 'blur-xl' : ''}`}>
-            <Gamepad2 className="w-12 h-12 text-white/10" />
+          <div className={`absolute inset-0 bg-gradient-to-br from-[var(--theme-text-primary)]/[0.03] to-transparent flex items-center justify-center ${shouldCensor ? 'blur-xl' : ''}`}>
+            <Gamepad2 className="w-12 h-12 text-[var(--theme-text-primary)]/10" />
           </div>
         )}
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030304] via-[#030304]/20 to-transparent opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg-primary)] via-[var(--theme-bg-primary)]/20 to-transparent opacity-90" />
 
         {/* Censorship Overlay */}
         {shouldCensor && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/40 backdrop-blur-sm">
-            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-3">
-              <EyeOff className="w-5 h-5 text-white/50" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[var(--theme-bg-primary)]/60 backdrop-blur-sm">
+            <div className="w-12 h-12 rounded-full border border-[var(--theme-border)] flex items-center justify-center mb-3">
+              <EyeOff className="w-5 h-5 text-[var(--theme-text-subtle)]" />
             </div>
-            <span className="text-[10px] font-medium tracking-[0.2em] text-white/40 uppercase mb-3">Private</span>
+            <span className="text-[10px] font-medium tracking-[0.2em] text-[var(--theme-text-subtle)] uppercase mb-3">Private</span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsRevealed(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-medium text-white/60 hover:text-white transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-full text-[10px] font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all"
             >
               <Eye className="w-3 h-3" />
               Reveal
@@ -102,10 +153,10 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
               e.stopPropagation();
               setIsRevealed(false);
             }}
-            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-all"
+            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-[var(--theme-hover-bg)] backdrop-blur-sm border border-[var(--theme-border)] hover:bg-[var(--theme-bg-tertiary)] transition-all"
             title="Hide content"
           >
-            <EyeOff className="w-3 h-3 text-white/60" />
+            <EyeOff className="w-3 h-3 text-[var(--theme-text-muted)]" />
           </button>
         )}
 
@@ -117,9 +168,12 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
               {(() => {
                 const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
                 const displayPlatform = match ? match[2] : game.platform;
-                const brandStyle = getPlatformBrandStyle(game.platform);
+                const badgeStyle = getPlatformBadgeStyle(game.platform);
                 return (
-                  <span className={`px-2.5 py-1.5 backdrop-blur-sm text-[10px] font-medium rounded-lg border uppercase tracking-wide ${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`}>
+                  <span
+                    className={`px-2.5 py-1.5 backdrop-blur-sm text-[10px] font-medium rounded-lg border uppercase tracking-wide ${badgeStyle.gradient} ${badgeStyle.text} ${badgeStyle.border}`}
+                    style={{ boxShadow: badgeStyle.shadow }}
+                  >
                     {displayPlatform}
                   </span>
                 );
@@ -198,7 +252,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
         {/* Bottom info */}
         <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
           <h3
-            className={`font-semibold text-base leading-tight line-clamp-2 mb-2 transition-colors ${shouldCensor ? 'text-white/10 blur-sm' : 'text-white group-hover:text-cyan-400'}`}
+            className={`font-semibold text-base leading-tight line-clamp-2 mb-2 transition-colors ${shouldCensor ? 'text-[var(--theme-text-primary)]/10 blur-sm' : 'text-[var(--theme-text-primary)] group-hover:text-cyan-400'}`}
           >
             {game.game?.title || 'Untitled'}
           </h3>
@@ -206,12 +260,12 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
           {!shouldCensor && (
             <div className="flex items-center gap-2">
               {hasPlaytime && (
-                <div className="flex items-center gap-1 text-white/40">
+                <div className="flex items-center gap-1 text-[var(--theme-text-subtle)]">
                   <Clock className="w-2.5 h-2.5" />
                   <span className="text-[10px]">{formatPlaytime(game.playtime_hours)}</span>
                 </div>
               )}
-              <div className="flex-1 h-1 bg-white/[0.06] rounded-full overflow-hidden">
+              <div className="flex-1 h-1 bg-[var(--theme-text-primary)]/[0.06] rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${getStatusColor()} transition-all duration-500`}
                   style={{
@@ -234,7 +288,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                 e.stopPropagation();
                 onEdit();
               }}
-              className="p-2 bg-white/10 backdrop-blur-sm rounded-lg text-white/70 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/20 transition-all"
+              className="p-2 bg-[var(--theme-hover-bg)] backdrop-blur-sm rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] hover:bg-[var(--theme-bg-tertiary)] transition-all"
               title="Edit"
             >
               <Edit3 className="w-3.5 h-3.5" />

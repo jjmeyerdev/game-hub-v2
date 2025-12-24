@@ -16,7 +16,10 @@ import {
   ChevronRight,
   ChevronDown,
   Cpu,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { signOut } from '@/lib/actions/auth/auth';
 
 interface DashboardSidebarProps {
@@ -33,8 +36,14 @@ export function DashboardSidebar({
   onToggleCollapse,
 }: DashboardSidebarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,13 +83,13 @@ export function DashboardSidebar({
   return (
     <aside
       className={`
-        fixed h-screen bg-abyss/95 backdrop-blur-xl border-r border-white/[0.04]
+        fixed h-screen bg-[var(--theme-bg-secondary)]/95 backdrop-blur-xl border-r border-[var(--theme-border)]
         flex flex-col transition-all duration-500 ease-out z-40
         ${collapsed ? 'w-20' : 'w-72'}
       `}
     >
       {/* Subtle gradient at top */}
-      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-cyan-500/[0.03] to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[var(--theme-accent-cyan)]/[0.03] to-transparent pointer-events-none" />
 
       {/* Toggle Button */}
       <button
@@ -88,11 +97,11 @@ export function DashboardSidebar({
         className="absolute -right-3 top-8 z-50 group"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        <div className="w-6 h-6 rounded-full bg-abyss border border-white/[0.12] flex items-center justify-center transition-all hover:border-cyan-400/40 hover:bg-cyan-400/10">
+        <div className="w-6 h-6 rounded-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] flex items-center justify-center transition-all hover:border-[var(--theme-accent-cyan)]/40 hover:bg-[var(--theme-accent-cyan)]/10">
           {collapsed ? (
-            <ChevronRight className="w-3 h-3 text-white/50 group-hover:text-cyan-400" />
+            <ChevronRight className="w-3 h-3 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent-cyan)]" />
           ) : (
-            <ChevronLeft className="w-3 h-3 text-white/50 group-hover:text-cyan-400" />
+            <ChevronLeft className="w-3 h-3 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent-cyan)]" />
           )}
         </div>
       </button>
@@ -115,10 +124,10 @@ export function DashboardSidebar({
               collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
             }`}
           >
-            <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+            <span className="text-lg font-semibold tracking-wide text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">
               GAMEHUB
             </span>
-            <span className="text-[9px] text-cyan-400/60 tracking-[0.2em] uppercase">
+            <span className="text-[9px] text-[var(--theme-accent-cyan)]/60 tracking-[0.2em] uppercase">
               Command Center
             </span>
           </div>
@@ -126,7 +135,7 @@ export function DashboardSidebar({
       </div>
 
       {/* Divider */}
-      <div className="mx-6 h-px bg-gradient-to-r from-cyan-400/20 via-white/[0.06] to-transparent" />
+      <div className="mx-6 h-px bg-gradient-to-r from-[var(--theme-accent-cyan)]/20 via-[var(--theme-border)] to-transparent" />
 
       {/* Navigation */}
       <nav className={`flex-1 py-6 overflow-y-auto transition-all duration-500 ${collapsed ? 'px-3' : 'px-4'}`}>
@@ -200,13 +209,13 @@ export function DashboardSidebar({
       {/* User Profile Section */}
       <div className={`relative p-4 transition-all duration-500 ${collapsed ? 'px-3' : 'px-4'}`} ref={userMenuRef}>
         {/* Top divider */}
-        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent" />
 
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
           className={`
             w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group
-            hover:bg-white/[0.03] border border-transparent hover:border-cyan-400/20
+            hover:bg-[var(--theme-hover-bg)] border border-transparent hover:border-[var(--theme-accent-cyan)]/20
             ${collapsed ? 'justify-center' : ''}
           `}
         >
@@ -216,7 +225,7 @@ export function DashboardSidebar({
               {userName.substring(0, 2).toUpperCase()}
             </div>
             {/* Online indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-abyss">
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[var(--theme-bg-secondary)]">
               <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-50" />
             </div>
           </div>
@@ -229,7 +238,7 @@ export function DashboardSidebar({
           >
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-white/90 truncate font-[family-name:var(--font-family-display)]">
+                <div className="text-sm font-medium text-[var(--theme-text-primary)]/90 truncate font-[family-name:var(--font-family-display)]">
                   {userName}
                 </div>
                 <div className="text-[10px] text-emerald-400/80 font-mono uppercase tracking-wider">
@@ -237,7 +246,7 @@ export function DashboardSidebar({
                 </div>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-white/30 transition-all duration-300 flex-shrink-0 ${
+                className={`w-4 h-4 text-[var(--theme-text-subtle)] transition-all duration-300 flex-shrink-0 ${
                   userMenuOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -246,8 +255,8 @@ export function DashboardSidebar({
 
           {/* Tooltip for collapsed state */}
           {collapsed && (
-            <div className="absolute left-full ml-3 px-3 py-2 bg-abyss border border-white/[0.08] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
-              <div className="text-sm font-medium text-white whitespace-nowrap font-[family-name:var(--font-family-display)]">
+            <div className="absolute left-full ml-3 px-3 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
+              <div className="text-sm font-medium text-[var(--theme-text-primary)] whitespace-nowrap font-[family-name:var(--font-family-display)]">
                 {userName}
               </div>
               <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">ONLINE</div>
@@ -261,38 +270,57 @@ export function DashboardSidebar({
             className={`
               absolute z-50 overflow-hidden
               ${collapsed ? 'left-full ml-2 bottom-4 w-56' : 'bottom-full mb-2 left-4 right-4'}
-              bg-abyss border border-white/[0.08] rounded-xl shadow-2xl
+              bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-2xl
             `}
           >
             {/* Menu header */}
-            <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.01]">
+            <div className="px-4 py-3 border-b border-[var(--theme-border)] bg-[var(--theme-hover-bg)]">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-[family-name:var(--font-family-display)]">
                   {userName.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-white truncate font-[family-name:var(--font-family-display)]">{userName}</div>
-                  <div className="text-[10px] text-white/40 truncate font-mono">{userEmail}</div>
+                  <div className="text-sm font-medium text-[var(--theme-text-primary)] truncate font-[family-name:var(--font-family-display)]">{userName}</div>
+                  <div className="text-[10px] text-[var(--theme-text-subtle)] truncate font-mono">{userEmail}</div>
                 </div>
               </div>
             </div>
 
             {/* Menu items */}
             <div className="py-2">
+              {/* Theme Toggle */}
+              <button
+                onClick={() => setTheme(mounted && theme === 'dark' ? 'light' : 'dark')}
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--theme-hover-bg)] transition-all duration-200 group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--theme-accent-cyan)]/30 group-hover:bg-[var(--theme-accent-cyan)]/10 transition-all">
+                  {mounted && theme === 'dark' ? (
+                    <Moon className="w-4 h-4 text-[var(--theme-accent-cyan)]" />
+                  ) : (
+                    <Sun className="w-4 h-4 text-amber-400" />
+                  )}
+                </div>
+                <span className="text-sm text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)] transition-colors">
+                  {mounted ? (theme === 'dark' ? 'Dark Mode' : 'Light Mode') : 'Theme'}
+                </span>
+              </button>
+
+              <div className="h-px bg-[var(--theme-border)] my-2 mx-4" />
+
               <Link
                 href="/settings"
                 onClick={() => setUserMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.03] transition-all duration-200 group"
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--theme-hover-bg)] transition-all duration-200 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center group-hover:border-cyan-400/30 group-hover:bg-cyan-400/10 transition-all">
-                  <Settings className="w-4 h-4 text-white/50 group-hover:text-cyan-400" />
+                <div className="w-8 h-8 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--theme-accent-cyan)]/30 group-hover:bg-[var(--theme-accent-cyan)]/10 transition-all">
+                  <Settings className="w-4 h-4 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent-cyan)]" />
                 </div>
-                <span className="text-sm text-white/60 group-hover:text-white/90 transition-colors">
+                <span className="text-sm text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)] transition-colors">
                   Settings
                 </span>
               </Link>
 
-              <div className="h-px bg-white/[0.04] my-2 mx-4" />
+              <div className="h-px bg-[var(--theme-border)] my-2 mx-4" />
 
               <button
                 onClick={() => {
@@ -332,18 +360,18 @@ function NavItem({ icon: Icon, label, href, collapsed, active }: NavItemProps) {
         relative flex items-center gap-3 px-3 py-2.5 rounded-xl
         transition-all duration-300 group
         ${active
-          ? 'bg-cyan-400/10 text-white border border-cyan-400/20'
-          : 'text-white/40 hover:text-white/80 hover:bg-white/[0.03] border border-transparent hover:border-white/[0.06]'
+          ? 'bg-[var(--theme-accent-cyan)]/10 text-[var(--theme-text-primary)] border border-[var(--theme-accent-cyan)]/20'
+          : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-secondary)] hover:bg-[var(--theme-hover-bg)] border border-transparent hover:border-[var(--theme-border)]'
         }
         ${collapsed ? 'justify-center' : ''}
       `}
     >
       {/* Active indicator */}
       {active && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-cyan-400 rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[var(--theme-accent-cyan)] rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
       )}
 
-      <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${active ? 'text-cyan-400' : ''}`} />
+      <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${active ? 'text-[var(--theme-accent-cyan)]' : ''}`} />
 
       <span
         className={`text-sm font-medium transition-all duration-500 ${
@@ -355,8 +383,8 @@ function NavItem({ icon: Icon, label, href, collapsed, active }: NavItemProps) {
 
       {/* Tooltip for collapsed state */}
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-1.5 bg-abyss border border-white/[0.08] rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
-          <span className="text-sm text-white whitespace-nowrap">{label}</span>
+        <div className="absolute left-full ml-3 px-3 py-1.5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
+          <span className="text-sm text-[var(--theme-text-primary)] whitespace-nowrap">{label}</span>
         </div>
       )}
     </Link>

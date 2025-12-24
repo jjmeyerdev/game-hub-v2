@@ -118,7 +118,7 @@ export default function LibraryManagement() {
       id: 'epic' as const,
       name: 'Epic',
       count: counts.epic,
-      color: 'text-gray-400',
+      color: 'text-[var(--theme-text-muted)]',
       icon: (
         <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
           <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3 4h6v1.5H6.5v2.25H10V9.25H6.5V12H11v1.5H5V4z"/>
@@ -152,8 +152,8 @@ export default function LibraryManagement() {
         <div className="flex items-center gap-3 min-w-0">
           <Sparkles className="w-4 h-4 text-cyan-400 flex-shrink-0" />
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-white truncate">IGDB Enrichment</p>
-            <p className="text-[10px] text-gray-500">Fetch cover art & metadata</p>
+            <p className="text-xs font-semibold text-[var(--theme-text-primary)] truncate">IGDB Enrichment</p>
+            <p className="text-[10px] text-[var(--theme-text-subtle)]">Fetch cover art & metadata</p>
           </div>
         </div>
         <button
@@ -170,16 +170,16 @@ export default function LibraryManagement() {
       <div className="space-y-2">
         <button
           onClick={() => setShowPlatforms(!showPlatforms)}
-          className="w-full flex items-center justify-between px-3 py-2 bg-abyss/50 border border-steel/20 rounded-lg text-xs hover:border-steel/40 transition-colors"
+          className="w-full flex items-center justify-between px-3 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs hover:border-[var(--theme-border-hover)] transition-colors"
         >
           <div className="flex items-center gap-2">
-            <RefreshCw className={`w-3 h-3 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-gray-400">
+            <RefreshCw className={`w-3 h-3 text-[var(--theme-text-subtle)] ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-[var(--theme-text-muted)]">
               Synced Games:{' '}
-              <span className="text-white font-semibold">{loading ? '...' : counts.total}</span>
+              <span className="text-[var(--theme-text-primary)] font-semibold">{loading ? '...' : counts.total}</span>
             </span>
           </div>
-          <ChevronDown className={`w-3 h-3 text-gray-500 transition-transform ${showPlatforms ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3 h-3 text-[var(--theme-text-subtle)] transition-transform ${showPlatforms ? 'rotate-180' : ''}`} />
         </button>
 
         {/* Platform Breakdown */}
@@ -188,12 +188,12 @@ export default function LibraryManagement() {
             {platforms.map((platform) => (
               <div
                 key={platform.id}
-                className="flex items-center justify-between px-3 py-2 bg-deep/50 border border-steel/20 rounded-lg"
+                className="flex items-center justify-between px-3 py-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg"
               >
                 <div className="flex items-center gap-2">
                   <span className={platform.color}>{platform.icon}</span>
                   <span className={`text-xs font-medium ${platform.color}`}>{platform.name}</span>
-                  <span className="text-[10px] text-gray-500">
+                  <span className="text-[10px] text-[var(--theme-text-subtle)]">
                     {loading ? '...' : platform.count}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export default function LibraryManagement() {
                   disabled={deleting !== null || platform.count === 0}
                   className={`px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 ${
                     confirmDelete === platform.id
-                      ? 'bg-red-500 text-white'
+                      ? 'bg-red-500 text-[var(--theme-text-primary)]'
                       : 'text-red-400 hover:bg-red-500/10'
                   }`}
                 >
@@ -226,7 +226,7 @@ export default function LibraryManagement() {
             <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-xs font-semibold text-red-400">Purge All Data</p>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-[var(--theme-text-subtle)]">
                 {loading ? 'Loading...' : `Remove ${counts.total} synced games`}
               </p>
             </div>
@@ -236,7 +236,7 @@ export default function LibraryManagement() {
             disabled={deleting !== null || counts.total === 0}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 flex-shrink-0 ${
               confirmDelete === 'all'
-                ? 'bg-red-500 text-white'
+                ? 'bg-red-500 text-[var(--theme-text-primary)]'
                 : 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30'
             }`}
           >

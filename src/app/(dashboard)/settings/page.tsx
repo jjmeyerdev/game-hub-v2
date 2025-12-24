@@ -22,7 +22,7 @@ export default async function SettingsPage() {
     .single();
 
   return (
-    <div className="relative min-h-screen bg-void">
+    <div className="relative min-h-screen bg-[var(--theme-bg-primary)]">
       {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-violet-500/[0.03] rounded-full blur-[120px] animate-breathe" />
@@ -30,7 +30,7 @@ export default async function SettingsPage() {
       </div>
 
       {/* Header */}
-      <header className="relative border-b border-white/[0.06]">
+      <header className="relative border-b border-[var(--theme-border)]">
         {/* Top accent line */}
         <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
 
@@ -51,9 +51,9 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// SYSTEM_CONFIG</span>
+                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// SYSTEM_CONFIG</span>
                 </div>
-                <h1 className="text-2xl font-bold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                <h1 className="text-2xl font-bold text-[var(--theme-text-primary)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
                   SETTINGS
                 </h1>
               </div>
@@ -68,21 +68,21 @@ export default async function SettingsPage() {
               </div>
 
               {/* User card */}
-              <div className="relative flex items-center gap-3 px-4 py-2 bg-abyss border border-white/[0.06] rounded-xl hover:border-white/[0.12] transition-colors">
+              <div className="relative flex items-center gap-3 px-4 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl hover:border-[var(--theme-border-hover)] transition-colors">
                 {profile?.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.full_name || 'User'}
-                    className="w-8 h-8 rounded-lg border border-white/[0.08] object-cover"
+                    className="w-8 h-8 rounded-lg border border-[var(--theme-border)] object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-white/[0.08] flex items-center justify-center">
-                    <User className="w-4 h-4 text-white/40" />
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-[var(--theme-border)] flex items-center justify-center">
+                    <User className="w-4 h-4 text-[var(--theme-text-muted)]" />
                   </div>
                 )}
                 <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-white">{profile?.full_name || 'Operator'}</p>
-                  <p className="text-[11px] font-mono text-white/30">{user.email}</p>
+                  <p className="text-sm font-medium text-[var(--theme-text-primary)]">{profile?.full_name || 'Operator'}</p>
+                  <p className="text-[11px] font-mono text-[var(--theme-text-subtle)]">{user.email}</p>
                 </div>
               </div>
             </div>
@@ -99,24 +99,24 @@ export default async function SettingsPage() {
         />
 
         {/* Footer */}
-        <footer className="relative mt-12 pt-6 border-t border-white/[0.06]">
+        <footer className="relative mt-12 pt-6 border-t border-[var(--theme-border)]">
           {/* HUD corners */}
-          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-white/[0.06]" />
-          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-white/[0.06]" />
+          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-[var(--theme-border)]" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-[var(--theme-border)]" />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Terminal className="w-3.5 h-3.5 text-white/20" />
+              <Terminal className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                <p className="text-[11px] font-mono text-white/30 uppercase tracking-wider">
-                  Game Hub v1.0 <span className="text-white/20">•</span> All systems operational
+                <p className="text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+                  Game Hub v2.0.0-pre-alpha <span className="text-[var(--theme-text-subtle)]">•</span> All systems operational
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Shield className="w-3 h-3 text-white/20" />
-              <p className="text-[10px] font-mono text-white/20 uppercase tracking-wider">
+              <Shield className="w-3 h-3 text-[var(--theme-text-subtle)]" />
+              <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
                 End-to-end encrypted
               </p>
             </div>

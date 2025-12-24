@@ -28,11 +28,11 @@ const accentBarStyles: Record<AccentColor, string> = {
 };
 
 const borderStyles: Record<AccentColor, string> = {
-  cyan: 'border-steel/50',
-  purple: 'border-steel/50',
-  emerald: 'border-steel/50',
+  cyan: 'border-[var(--theme-border)]',
+  purple: 'border-[var(--theme-border)]',
+  emerald: 'border-[var(--theme-border)]',
   red: 'border-red-500/20',
-  yellow: 'border-steel/50',
+  yellow: 'border-[var(--theme-border)]',
 };
 
 /**
@@ -51,7 +51,7 @@ export function SettingsPanel({ children, accent = 'cyan', className }: Settings
       />
       <div
         className={cn(
-          'relative bg-abyss/90 backdrop-blur-sm border rounded-2xl overflow-hidden',
+          'relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border rounded-2xl overflow-hidden',
           borderStyles[accent],
           className
         )}
@@ -116,7 +116,7 @@ export function SettingsPanelHeader({
   action,
 }: SettingsPanelHeaderProps) {
   const styles = headerIconStyles[accent];
-  const titleColor = accent === 'red' ? 'text-red-400' : 'text-white';
+  const titleColor = accent === 'red' ? 'text-red-400' : 'text-[var(--theme-text-primary)]';
 
   return (
     <div className="flex items-center justify-between">
@@ -132,7 +132,7 @@ export function SettingsPanelHeader({
         </div>
         <div>
           <h3 className={cn('text-lg font-bold', titleColor)}>{title}</h3>
-          {description && <p className="text-sm text-gray-500">{description}</p>}
+          {description && <p className="text-sm text-[var(--theme-text-subtle)]">{description}</p>}
         </div>
       </div>
       {action}

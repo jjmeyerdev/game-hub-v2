@@ -36,7 +36,104 @@
 }
 
 @layer base {
+  /* ========================================
+     LIGHT MODE (Default) - Refined Tech Aesthetic
+     A warm, readable theme with gaming DNA
+     ======================================== */
   :root {
+    /* shadcn CSS variables - light theme */
+    --background: 40 20% 98%;
+    --foreground: 220 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+
+    --primary: 195 85% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 265 70% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 40 15% 95%;
+    --muted-foreground: 220 10% 40%;
+
+    --accent: 195 85% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 195 85% 42%;
+
+    --radius: 0.75rem;
+
+    /* Theme-specific custom properties - Refined & Readable */
+    --theme-bg-primary: #faf9f7;
+    --theme-bg-secondary: #ffffff;
+    --theme-bg-tertiary: #f5f4f2;
+    --theme-bg-elevated: #ffffff;
+    --theme-bg-inset: #f0efed;
+
+    /* High contrast text for readability */
+    --theme-text-primary: #1a1a1a;
+    --theme-text-secondary: #404040;
+    --theme-text-muted: #6b6b6b;
+    --theme-text-subtle: #8a8a8a;
+
+    /* Refined borders with depth */
+    --theme-border: rgba(0, 0, 0, 0.1);
+    --theme-border-hover: rgba(0, 0, 0, 0.18);
+    --theme-border-strong: rgba(0, 0, 0, 0.15);
+
+    /* Accent colors tuned for light backgrounds */
+    --theme-accent-cyan: #0891b2;
+    --theme-accent-cyan-light: #06b6d4;
+    --theme-accent-violet: #7c3aed;
+    --theme-accent-violet-light: #8b5cf6;
+    --theme-accent-emerald: #059669;
+    --theme-accent-amber: #d97706;
+
+    /* Glows adjusted for light mode */
+    --theme-glow-cyan: rgba(8, 145, 178, 0.25);
+    --theme-glow-violet: rgba(124, 58, 237, 0.25);
+    --theme-glow-emerald: rgba(5, 150, 105, 0.25);
+
+    /* Shadows - Warm and soft */
+    --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+    --theme-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --theme-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04);
+    --theme-shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+
+    /* Effects */
+    --theme-noise-opacity: 0.015;
+    --theme-grid-opacity: 0.04;
+    --theme-overlay-bg: rgba(255, 255, 255, 0.9);
+
+    /* Scrollbar */
+    --theme-scrollbar-track: #f5f4f2;
+    --theme-scrollbar-thumb: rgba(0, 0, 0, 0.12);
+    --theme-scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
+
+    /* Card surfaces */
+    --theme-card-bg: #ffffff;
+    --theme-card-border: rgba(0, 0, 0, 0.08);
+    --theme-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+
+    /* Interactive states */
+    --theme-hover-bg: rgba(0, 0, 0, 0.03);
+    --theme-active-bg: rgba(0, 0, 0, 0.05);
+    --theme-focus-ring: rgba(8, 145, 178, 0.4);
+  }
+
+  /* ========================================
+     DARK MODE - Cyber Gaming Theme
+     ======================================== */
+  .dark {
     /* shadcn CSS variables - mapped to cyber gaming theme */
     --background: 220 10% 2%;
     --foreground: 0 0% 100%;
@@ -66,22 +163,96 @@
     --input: 0 0% 100% / 0.06;
     --ring: 189 100% 50%;
 
-    --radius: 0.75rem;
+    /* Theme-specific custom properties */
+    --theme-bg-primary: #030304;
+    --theme-bg-secondary: #0a0a0b;
+    --theme-bg-tertiary: #0f1011;
+    --theme-bg-elevated: #161719;
+    --theme-bg-inset: #050506;
+
+    /* Text colors */
+    --theme-text-primary: #ffffff;
+    --theme-text-secondary: rgba(255, 255, 255, 0.7);
+    --theme-text-muted: rgba(255, 255, 255, 0.4);
+    --theme-text-subtle: rgba(255, 255, 255, 0.25);
+
+    /* Borders */
+    --theme-border: rgba(255, 255, 255, 0.06);
+    --theme-border-hover: rgba(255, 255, 255, 0.12);
+    --theme-border-strong: rgba(255, 255, 255, 0.15);
+
+    /* Accent colors */
+    --theme-accent-cyan: #22d3ee;
+    --theme-accent-cyan-light: #67e8f9;
+    --theme-accent-violet: #a855f7;
+    --theme-accent-violet-light: #c084fc;
+    --theme-accent-emerald: #34d399;
+    --theme-accent-amber: #fbbf24;
+
+    /* Glows */
+    --theme-glow-cyan: rgba(34, 211, 238, 0.5);
+    --theme-glow-violet: rgba(168, 85, 247, 0.5);
+    --theme-glow-emerald: rgba(52, 211, 153, 0.5);
+
+    /* Shadows */
+    --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --theme-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --theme-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+    --theme-shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
+
+    /* Effects */
+    --theme-noise-opacity: 0.015;
+    --theme-grid-opacity: 0.015;
+    --theme-overlay-bg: rgba(0, 0, 0, 0.8);
+
+    /* Scrollbar */
+    --theme-scrollbar-track: #0a0a0b;
+    --theme-scrollbar-thumb: rgba(255, 255, 255, 0.1);
+    --theme-scrollbar-thumb-hover: rgba(255, 255, 255, 0.15);
+
+    /* Card surfaces */
+    --theme-card-bg: #0a0a0b;
+    --theme-card-border: rgba(255, 255, 255, 0.06);
+    --theme-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+    /* Interactive states */
+    --theme-hover-bg: rgba(255, 255, 255, 0.03);
+    --theme-active-bg: rgba(255, 255, 255, 0.05);
+    --theme-focus-ring: rgba(34, 211, 238, 0.4);
   }
 
   * {
-    border-color: rgba(255, 255, 255, 0.06);
+    border-color: var(--theme-border);
   }
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
+  /* Body styling - uses CSS variables that change with theme */
   body {
     @apply antialiased;
     font-family: var(--font-family-body);
-    background-color: #030304;
-    color: white;
+    background-color: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+    overflow-x: hidden;
+  }
+
+  /* Hide horizontal scrollbar globally */
+  *::-webkit-scrollbar:horizontal {
+    display: none !important;
+    height: 0 !important;
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  /* Light mode selection */
+  :root:not(.dark) ::selection {
+    background: rgba(8, 145, 178, 0.25);
+    color: #1a1a1a;
   }
 
   /* Typography Scale */
@@ -176,28 +347,128 @@
     filter: blur(80px);
     pointer-events: none;
   }
+
+  /* ========================================
+     LIGHT MODE UTILITIES
+     ======================================== */
+
+  /* Light mode card */
+  :root:not(.dark) .card-elevated {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(0, 0, 0, 0.02);
+  }
+
+  :root:not(.dark) .card-elevated-hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Light mode interactive glow */
+  :root:not(.dark) .interactive-glow:hover {
+    box-shadow: 0 0 30px rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.3);
+  }
+
+  /* Light mode gradient text */
+  :root:not(.dark) .gradient-text-cyber {
+    background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Light mode glow effects */
+  :root:not(.dark) .glow-cyan {
+    text-shadow: 0 0 20px rgba(14, 165, 233, 0.4), 0 0 40px rgba(14, 165, 233, 0.15);
+  }
+
+  :root:not(.dark) .glow-violet {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.15);
+  }
+
+  :root:not(.dark) .glow-emerald {
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.4), 0 0 40px rgba(16, 185, 129, 0.15);
+  }
+
+  /* Light mode ambient glows */
+  :root:not(.dark) .ambient-glow-cyan {
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+  }
+
+  :root:not(.dark) .ambient-glow-violet {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+  }
+
+  /* Light mode noise overlay */
+  :root:not(.dark) .noise-overlay {
+    opacity: 0.02;
+  }
+
+  /* Theme-aware background utilities */
+  .bg-theme-primary {
+    background-color: var(--theme-bg-primary);
+  }
+
+  .bg-theme-secondary {
+    background-color: var(--theme-bg-secondary);
+  }
+
+  .bg-theme-tertiary {
+    background-color: var(--theme-bg-tertiary);
+  }
+
+  .bg-theme-elevated {
+    background-color: var(--theme-bg-elevated);
+  }
+
+  /* Theme-aware text utilities */
+  .text-theme-primary {
+    color: var(--theme-text-primary);
+  }
+
+  .text-theme-secondary {
+    color: var(--theme-text-secondary);
+  }
+
+  .text-theme-muted {
+    color: var(--theme-text-muted);
+  }
+
+  /* Theme-aware border utilities */
+  .border-theme {
+    border-color: var(--theme-border);
+  }
+
+  .border-theme-hover {
+    border-color: var(--theme-border-hover);
+  }
 }
 
 /* ========================================
-   SCROLLBAR - Refined
+   SCROLLBAR - Refined (Theme-aware)
    ======================================== */
 ::-webkit-scrollbar {
   width: 10px;
-  height: 10px;
+  height: 0;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0b;
+  background: var(--theme-scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--theme-scrollbar-thumb);
   border-radius: 5px;
-  border: 2px solid #0a0a0b;
+  border: 2px solid var(--theme-scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--theme-scrollbar-thumb-hover);
 }
 
 /* Hide Scrollbar Utility */
@@ -400,54 +671,93 @@
 }
 
 /* ========================================
-   COMPONENT PRESETS
+   COMPONENT PRESETS (Theme-aware)
    ======================================== */
 
 /* Button - Primary CTA */
 .btn-primary {
-  @apply px-5 py-2.5 bg-white text-[#030304] font-semibold rounded-xl;
+  @apply px-5 py-2.5 font-semibold rounded-xl;
   @apply transition-all duration-200;
-  @apply hover:bg-cyan-400 hover:shadow-lg hover:shadow-cyan-400/20;
   @apply active:scale-[0.98];
-  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  background-color: var(--theme-text-primary);
+  color: var(--theme-bg-primary);
+}
+
+.dark .btn-primary:hover {
+  @apply bg-cyan-400 shadow-lg shadow-cyan-400/20;
+}
+
+:root:not(.dark) .btn-primary:hover {
+  @apply bg-sky-500 shadow-lg shadow-sky-500/20;
+  color: white;
 }
 
 /* Button - Secondary */
 .btn-secondary {
-  @apply px-5 py-2.5 bg-white/[0.03] border border-white/[0.06] text-white/60 font-medium rounded-xl;
+  @apply px-5 py-2.5 font-medium rounded-xl;
   @apply transition-all duration-200;
-  @apply hover:bg-white/[0.06] hover:text-white hover:border-white/[0.12];
   @apply active:scale-[0.98];
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  background-color: rgba(128, 128, 128, 0.03);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-muted);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(128, 128, 128, 0.06);
+  border-color: var(--theme-border-hover);
+  color: var(--theme-text-primary);
 }
 
 /* Button - Ghost */
 .btn-ghost {
-  @apply px-4 py-2 text-white/50 font-medium rounded-lg;
+  @apply px-4 py-2 font-medium rounded-lg;
   @apply transition-all duration-200;
-  @apply hover:text-white hover:bg-white/[0.04];
   @apply active:scale-[0.98];
+  color: var(--theme-text-muted);
+}
+
+.btn-ghost:hover {
+  color: var(--theme-text-primary);
+  background-color: rgba(128, 128, 128, 0.04);
 }
 
 /* Input - Default */
 .input-default {
-  @apply w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl;
-  @apply text-white text-sm placeholder:text-white/30;
+  @apply w-full px-4 py-3 text-sm rounded-xl;
   @apply transition-all duration-200;
-  @apply focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05];
+  @apply focus:outline-none;
+  background-color: rgba(128, 128, 128, 0.03);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+.input-default::placeholder {
+  color: var(--theme-text-muted);
+}
+
+.input-default:focus {
+  border-color: var(--theme-border-hover);
+  background-color: rgba(128, 128, 128, 0.05);
 }
 
 /* Card - Elevated */
 .card-default {
-  @apply bg-[#0a0a0b] border border-white/[0.06] rounded-xl;
+  @apply rounded-xl;
   @apply transition-all duration-200;
-  @apply hover:border-white/[0.1];
+  background-color: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+}
+
+.card-default:hover {
+  border-color: var(--theme-border-hover);
 }
 
 /* Page Container */
 .page-container {
   @apply relative min-h-screen;
-  background-color: #030304;
+  background-color: var(--theme-bg-primary);
 }
 
 /* ========================================

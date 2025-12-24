@@ -226,8 +226,8 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
             <div className="absolute -inset-1 bg-cyan-500/20 rounded-xl blur-lg -z-10 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white tracking-wide">Account Settings</h2>
-            <p className="text-gray-400 text-sm">Manage your personal information and preferences</p>
+            <h2 className="text-2xl font-bold text-[var(--theme-text-primary)] tracking-wide">Account Settings</h2>
+            <p className="text-[var(--theme-text-muted)] text-sm">Manage your personal information and preferences</p>
           </div>
         </div>
         {/* Decorative scanline */}
@@ -251,7 +251,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
       {/* Profile Card */}
       <div className="relative group">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 via-purple-500/10 to-cyan-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative bg-abyss/90 backdrop-blur-sm border border-steel/50 rounded-2xl overflow-hidden">
+        <div className="relative bg-[var(--theme-bg-secondary)]/90 backdrop-blur-sm border border-[var(--theme-border)] rounded-2xl overflow-hidden">
           {/* Header accent bar */}
           <div className="h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
 
@@ -261,7 +261,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
               <div className="relative group/avatar">
                 {/* Avatar ring animation */}
                 <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500 opacity-50 blur group-hover/avatar:opacity-75 transition-opacity animate-[spin_4s_linear_infinite]" />
-                <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-steel bg-deep">
+                <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[var(--theme-border)] bg-[var(--theme-hover-bg)]">
                   {avatarPreview ? (
                     <img
                       src={avatarPreview}
@@ -270,13 +270,13 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20">
-                      <User className="w-10 h-10 text-gray-500" />
+                      <User className="w-10 h-10 text-[var(--theme-text-muted)]" />
                     </div>
                   )}
                   {/* Hover overlay */}
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute inset-0 flex items-center justify-center bg-void/80 opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer"
+                    className="absolute inset-0 flex items-center justify-center bg-[var(--theme-bg-primary)]/80 opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer"
                   >
                     <Camera className="w-6 h-6 text-cyan-400" />
                   </button>
@@ -291,13 +291,13 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
               </div>
 
               <div className="flex-1 text-center sm:text-left">
-                <h3 className="text-lg font-bold text-white mb-1">Profile Picture</h3>
-                <p className="text-sm text-gray-500 mb-3">
+                <h3 className="text-lg font-bold text-[var(--theme-text-primary)] mb-1">Profile Picture</h3>
+                <p className="text-sm text-[var(--theme-text-muted)] mb-3">
                   JPG, PNG or GIF. Max 2MB.
                 </p>
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 bg-deep border border-steel/50 hover:border-cyan-500/50 hover:bg-cyan-500/10 rounded-lg text-sm font-medium text-gray-300 hover:text-cyan-400 transition-all"
+                  className="px-4 py-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-cyan-500/50 hover:bg-cyan-500/10 rounded-lg text-sm font-medium text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all"
                 >
                   Upload New Photo
                 </button>
@@ -307,14 +307,14 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
             {/* Divider with circuit pattern */}
             <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-steel/50 to-transparent" />
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent" />
               </div>
               <div className="relative flex justify-center">
-                <div className="flex gap-1 px-4 bg-abyss">
+                <div className="flex gap-1 px-4 bg-[var(--theme-bg-secondary)]">
                   {[...Array(5)].map((_, i) => (
                     <div
                       key={i}
-                      className="w-1.5 h-1.5 rounded-full bg-steel/50"
+                      className="w-1.5 h-1.5 rounded-full bg-[var(--theme-border)]"
                       style={{ animationDelay: `${i * 0.1}s` }}
                     />
                   ))}
@@ -326,7 +326,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
             <div className="grid gap-6">
               {/* Display Name */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-muted)]">
                   <User className="w-4 h-4 text-cyan-400" />
                   Display Name
                 </label>
@@ -336,7 +336,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your display name"
-                    className="w-full px-4 py-3 bg-deep/50 border border-steel/30 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                    className="w-full px-4 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
                   />
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 group-focus-within/input:w-full transition-all duration-300" />
                 </div>
@@ -344,7 +344,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
 
               {/* Email */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-muted)]">
                   <Mail className="w-4 h-4 text-cyan-400" />
                   Email Address
                 </label>
@@ -354,7 +354,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-3 pr-24 bg-deep/50 border border-steel/30 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                    className="w-full px-4 py-3 pr-24 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {email === userEmail ? (
@@ -388,10 +388,10 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
               <button
                 onClick={handleSaveProfile}
                 disabled={saving || !hasChanges}
-                className="relative px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-xl font-semibold text-void transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 overflow-hidden group/btn"
+                className="relative px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-xl font-semibold text-[var(--theme-bg-primary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 overflow-hidden group/btn"
               >
                 {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--theme-text-primary)]/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
                 {saving ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -412,7 +412,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
       {/* Password Section */}
       <div className="relative group">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 via-cyan-500/10 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative bg-abyss/90 backdrop-blur-sm border border-steel/50 rounded-2xl overflow-hidden">
+        <div className="relative bg-[var(--theme-bg-secondary)]/90 backdrop-blur-sm border border-[var(--theme-border)] rounded-2xl overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
           <div className="p-6">
             <div className="flex items-center justify-between">
@@ -421,13 +421,13 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
                   <Key className="w-6 h-6 text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Password & Security</h3>
-                  <p className="text-sm text-gray-500">Last changed 30 days ago</p>
+                  <h3 className="text-lg font-bold text-[var(--theme-text-primary)]">Password & Security</h3>
+                  <p className="text-sm text-[var(--theme-text-muted)]">Last changed 30 days ago</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowPasswordModal(true)}
-                className="px-5 py-2.5 bg-deep border border-steel/50 hover:border-purple-500/50 hover:bg-purple-500/10 rounded-xl font-medium text-gray-300 hover:text-purple-400 transition-all flex items-center gap-2"
+                className="px-5 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-purple-500/50 hover:bg-purple-500/10 rounded-xl font-medium text-[var(--theme-text-muted)] hover:text-purple-400 transition-all flex items-center gap-2"
               >
                 <Key className="w-4 h-4" />
                 Change Password
@@ -440,7 +440,7 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
       {/* Danger Zone */}
       <div className="relative group">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500/20 via-red-600/10 to-red-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative bg-abyss/90 backdrop-blur-sm border border-red-500/20 rounded-2xl overflow-hidden">
+        <div className="relative bg-[var(--theme-bg-secondary)]/90 backdrop-blur-sm border border-red-500/20 rounded-2xl overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
           <div className="p-6">
             <div className="flex items-center gap-4 mb-4">
@@ -449,15 +449,15 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
               </div>
               <div>
                 <h3 className="text-lg font-bold text-red-400">Danger Zone</h3>
-                <p className="text-sm text-gray-500">Irreversible and destructive actions</p>
+                <p className="text-sm text-[var(--theme-text-muted)]">Irreversible and destructive actions</p>
               </div>
             </div>
 
             <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h4 className="font-semibold text-white mb-1">Delete Account</h4>
-                  <p className="text-sm text-gray-500">
+                  <h4 className="font-semibold text-[var(--theme-text-primary)] mb-1">Delete Account</h4>
+                  <p className="text-sm text-[var(--theme-text-muted)]">
                     Permanently delete your account and all associated data. This cannot be undone.
                   </p>
                 </div>
@@ -477,28 +477,28 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="absolute inset-0 bg-void/80 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative bg-abyss border border-red-500/30 rounded-2xl p-6 max-w-md w-full animate-modal-slide-in">
+          <div className="absolute inset-0 bg-[var(--theme-bg-primary)]/80 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-[var(--theme-bg-secondary)] border border-red-500/30 rounded-2xl p-6 max-w-md w-full animate-modal-slide-in">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-red-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Confirm Deletion</h3>
-                <p className="text-sm text-gray-500">This action is permanent</p>
+                <h3 className="text-xl font-bold text-[var(--theme-text-primary)]">Confirm Deletion</h3>
+                <p className="text-sm text-[var(--theme-text-muted)]">This action is permanent</p>
               </div>
             </div>
-            <p className="text-gray-400 mb-6">
+            <p className="text-[var(--theme-text-muted)] mb-6">
               Are you sure you want to delete your account? All your games, progress, and data will be permanently removed.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-5 py-2.5 bg-deep border border-steel/50 hover:border-steel rounded-xl font-medium text-gray-300 hover:text-white transition-all"
+                className="flex-1 px-5 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] rounded-xl font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all"
               >
                 Cancel
               </button>
-              <button className="flex-1 px-5 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2">
+              <button className="flex-1 px-5 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl font-semibold text-[var(--theme-text-primary)] transition-all flex items-center justify-center gap-2">
                 <Trash2 className="w-4 h-4" />
                 Delete Forever
               </button>
@@ -510,15 +510,15 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
       {/* Password Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="absolute inset-0 bg-void/80 backdrop-blur-sm" onClick={resetPasswordModal} />
-          <div className="relative bg-abyss border border-purple-500/30 rounded-2xl p-6 max-w-md w-full animate-modal-slide-in">
+          <div className="absolute inset-0 bg-[var(--theme-bg-primary)]/80 backdrop-blur-sm" onClick={resetPasswordModal} />
+          <div className="relative bg-[var(--theme-bg-secondary)] border border-purple-500/30 rounded-2xl p-6 max-w-md w-full animate-modal-slide-in">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center">
                 <Key className="w-6 h-6 text-purple-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Change Password</h3>
-                <p className="text-sm text-gray-500">Update your security credentials</p>
+                <h3 className="text-xl font-bold text-[var(--theme-text-primary)]">Change Password</h3>
+                <p className="text-sm text-[var(--theme-text-muted)]">Update your security credentials</p>
               </div>
             </div>
 
@@ -538,58 +538,58 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
 
             <div className="space-y-4 mb-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-300">Current Password</label>
+                <label className="text-sm font-semibold text-[var(--theme-text-muted)]">Current Password</label>
                 <div className="relative">
                   <input
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 pr-12 bg-deep/50 border border-steel/30 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full px-4 py-3 pr-12 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] transition-colors"
                   >
                     {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-300">New Password</label>
+                <label className="text-sm font-semibold text-[var(--theme-text-muted)]">New Password</label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 pr-12 bg-deep/50 border border-steel/30 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full px-4 py-3 pr-12 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] transition-colors"
                   >
                     {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500">Minimum 6 characters</p>
+                <p className="text-xs text-[var(--theme-text-muted)]">Minimum 6 characters</p>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-300">Confirm New Password</label>
+                <label className="text-sm font-semibold text-[var(--theme-text-muted)]">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 pr-12 bg-deep/50 border border-steel/30 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full px-4 py-3 pr-12 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] transition-colors"
                   >
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -600,14 +600,14 @@ export default function AccountSettings({ profile, userEmail }: AccountSettingsP
               <button
                 onClick={resetPasswordModal}
                 disabled={changingPassword}
-                className="flex-1 px-5 py-2.5 bg-deep border border-steel/50 hover:border-steel rounded-xl font-medium text-gray-300 hover:text-white transition-all disabled:opacity-50"
+                className="flex-1 px-5 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] rounded-xl font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleChangePassword}
                 disabled={changingPassword}
-                className="flex-1 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 rounded-xl font-semibold text-[var(--theme-text-primary)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {changingPassword ? (
                   <>

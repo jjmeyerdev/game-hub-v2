@@ -27,10 +27,10 @@ export default function LogoutPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-void flex items-center justify-center">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] flex items-center justify-center">
       <div className="text-center">
-        <div className="text-2xl font-bold text-white mb-4">Signing out...</div>
-        <div className="text-gray-400">Please wait</div>
+        <div className="text-2xl font-bold text-[var(--theme-text-primary)] mb-4">Signing out...</div>
+        <div className="text-[var(--theme-text-muted)]">Please wait</div>
       </div>
     </div>
   );

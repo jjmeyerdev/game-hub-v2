@@ -20,10 +20,10 @@ export function StatsSection({ stats }: StatsSectionProps) {
         <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
           <Target className="w-3.5 h-3.5 text-cyan-400" />
         </div>
-        <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+        <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
           // STATS_OVERVIEW
         </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-[var(--theme-border)] to-transparent" />
       </div>
 
       {/* Stats grid */}

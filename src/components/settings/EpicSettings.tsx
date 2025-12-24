@@ -147,7 +147,7 @@ export default function EpicSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-6">
-        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+        <Loader2 className="w-5 h-5 text-[var(--theme-text-muted)] animate-spin" />
       </div>
     );
   }
@@ -174,17 +174,17 @@ export default function EpicSettings() {
         <div className="space-y-3">
           {/* User Row */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg border border-gray-500/30 bg-gray-700/50 flex items-center justify-center">
-              <span className="text-lg font-bold text-gray-400">
+            <div className="w-10 h-10 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-hover-bg)] flex items-center justify-center">
+              <span className="text-lg font-bold text-[var(--theme-text-muted)]">
                 {profile.epic_display_name?.charAt(0).toUpperCase() || 'E'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{profile.epic_display_name}</p>
-              <p className="text-[10px] text-gray-500">Epic Games Account</p>
+              <p className="text-sm font-semibold text-[var(--theme-text-primary)] truncate">{profile.epic_display_name}</p>
+              <p className="text-[10px] text-[var(--theme-text-subtle)]">Epic Games Account</p>
             </div>
             {profile.epic_last_sync && (
-              <p className="text-[10px] text-gray-500 hidden sm:block">
+              <p className="text-[10px] text-[var(--theme-text-subtle)] hidden sm:block">
                 {new Date(profile.epic_last_sync).toLocaleDateString()}
               </p>
             )}
@@ -195,7 +195,7 @@ export default function EpicSettings() {
             <button
               onClick={handleSyncLibrary}
               disabled={syncing}
-              className="flex-1 px-3 py-1.5 bg-gray-600/20 hover:bg-gray-600/30 border border-gray-500/30 rounded-lg text-xs font-semibold text-gray-400 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-1 px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs font-semibold text-[var(--theme-text-muted)] transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
               {syncing ? 'Syncing...' : 'Sync'}
@@ -203,7 +203,7 @@ export default function EpicSettings() {
             <button
               onClick={handleUnlinkAccount}
               disabled={unlinking}
-              className="px-3 py-1.5 bg-steel/20 hover:bg-red-500/10 border border-steel/30 hover:border-red-500/30 rounded-lg text-xs font-medium text-gray-400 hover:text-red-400 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-red-500/10 border border-[var(--theme-border)] hover:border-red-500/30 rounded-lg text-xs font-medium text-[var(--theme-text-muted)] hover:text-red-400 transition-all disabled:opacity-50 flex items-center gap-1.5"
             >
               {unlinking ? <Loader2 className="w-3 h-3 animate-spin" /> : <Unlink className="w-3 h-3" />}
               <span className="hidden sm:inline">Unlink</span>
@@ -214,29 +214,29 @@ export default function EpicSettings() {
           {syncResult && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="w-full flex items-center justify-between px-3 py-2 bg-abyss/50 border border-steel/20 rounded-lg text-xs"
+              className="w-full flex items-center justify-between px-3 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs"
             >
-              <span className="text-gray-400">
+              <span className="text-[var(--theme-text-muted)]">
                 <span className="text-emerald-400 font-semibold">+{syncResult.gamesAdded}</span> added,{' '}
                 <span className="text-purple-400 font-semibold">{syncResult.gamesUpdated}</span> updated
               </span>
-              <ChevronDown className={`w-3 h-3 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3 h-3 text-[var(--theme-text-subtle)] transition-transform ${expanded ? 'rotate-180' : ''}`} />
             </button>
           )}
 
           {syncResult && expanded && (
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2 bg-gray-500/5 border border-gray-500/10 rounded">
-                <div className="text-sm font-bold text-gray-400">{syncResult.totalGames}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Total</div>
+              <div className="p-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded">
+                <div className="text-sm font-bold text-[var(--theme-text-muted)]">{syncResult.totalGames}</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Total</div>
               </div>
               <div className="p-2 bg-emerald-500/5 border border-emerald-500/10 rounded">
                 <div className="text-sm font-bold text-emerald-400">{syncResult.gamesAdded}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Added</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Added</div>
               </div>
               <div className="p-2 bg-purple-500/5 border border-purple-500/10 rounded">
                 <div className="text-sm font-bold text-purple-400">{syncResult.gamesUpdated}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Updated</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Updated</div>
               </div>
             </div>
           )}
@@ -247,7 +247,7 @@ export default function EpicSettings() {
           {/* Sign in Button */}
           <button
             onClick={handleOpenAuthUrl}
-            className="w-full px-3 py-2 bg-gray-600/20 hover:bg-gray-600/30 border border-gray-500/30 rounded-lg text-xs font-semibold text-gray-300 transition-all flex items-center justify-center gap-2"
+            className="w-full px-3 py-2 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs font-semibold text-[var(--theme-text-secondary)] transition-all flex items-center justify-center gap-2"
           >
             <LinkIcon className="w-3 h-3" />
             Sign in with Epic Games
@@ -256,22 +256,22 @@ export default function EpicSettings() {
 
           {/* Auth Code Input - Shows after clicking sign in */}
           {showAuthInput && (
-            <div className="space-y-2 p-3 bg-deep/50 border border-steel/20 rounded-lg">
-              <p className="text-[10px] text-gray-400">
-                After signing in, paste the <code className="text-gray-300 bg-steel/30 px-1 rounded">authorizationCode</code> from the JSON response:
+            <div className="space-y-2 p-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg">
+              <p className="text-[10px] text-[var(--theme-text-muted)]">
+                After signing in, paste the <code className="text-[var(--theme-text-secondary)] bg-[var(--theme-hover-bg)] px-1 rounded">authorizationCode</code> from the JSON response:
               </p>
               <input
                 type="text"
                 value={authCodeInput}
                 onChange={(e) => setAuthCodeInput(e.target.value)}
                 placeholder="Paste authorization code..."
-                className="w-full px-3 py-1.5 bg-deep/50 border border-steel/30 rounded-lg text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-gray-500/50 font-mono"
+                className="w-full px-3 py-1.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-xs text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-[var(--theme-border-hover)] font-mono"
               />
               <div className="flex justify-end">
                 <button
                   onClick={handleLinkAccount}
                   disabled={linking || !authCodeInput.trim()}
-                  className="px-3 py-1 bg-gray-600/20 hover:bg-gray-600/30 border border-gray-500/30 rounded text-[10px] font-semibold text-gray-300 disabled:opacity-50 flex items-center gap-1"
+                  className="px-3 py-1 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded text-[10px] font-semibold text-[var(--theme-text-secondary)] disabled:opacity-50 flex items-center gap-1"
                 >
                   {linking && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
                   Link Account

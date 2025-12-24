@@ -21,7 +21,7 @@ export default function SignUpPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-void text-white overflow-hidden">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)] overflow-hidden">
       {/* Noise texture */}
       <div className="noise-overlay" />
 
@@ -71,7 +71,7 @@ export default function SignUpPage() {
       </div>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/[0.04]">
+      <header className="fixed top-0 left-0 right-0 z-40 border-b border-[var(--theme-border)] bg-[var(--theme-bg-primary)]/80 backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3 group">
@@ -86,10 +86,10 @@ export default function SignUpPage() {
                 <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+                <span className="text-lg font-semibold tracking-wide text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">
                   GAMEHUB
                 </span>
-                <span className="text-[9px] font-mono text-white/30 tracking-wider uppercase">
+                <span className="text-[9px] font-mono text-[var(--theme-text-muted)] tracking-wider uppercase">
                   // REGISTRATION
                 </span>
               </div>
@@ -97,7 +97,7 @@ export default function SignUpPage() {
 
             <Link
               href="/"
-              className="group relative flex items-center gap-2 px-5 py-2.5 text-sm text-white/70 hover:text-cyan-400 transition-all uppercase tracking-wide border border-white/20 hover:border-cyan-400/50 rounded-lg bg-white/[0.03] hover:bg-cyan-400/10"
+              className="group relative flex items-center gap-2 px-5 py-2.5 text-sm text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-all uppercase tracking-wide border border-[var(--theme-border)] hover:border-[var(--theme-accent-cyan)]/50 rounded-lg bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-accent-cyan)]/10"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span className="hidden sm:inline font-[family-name:var(--font-family-display)] font-medium">Return</span>
@@ -126,9 +126,9 @@ export default function SignUpPage() {
             {/* Glow effect behind card */}
             <div className="absolute -inset-px bg-gradient-to-b from-cyan-400/10 to-violet-400/5 rounded-2xl blur-sm" />
 
-            <div className="relative bg-abyss/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
+            <div className="relative bg-[var(--theme-bg-secondary)]/80 backdrop-blur-xl border border-[var(--theme-border)] rounded-2xl overflow-hidden">
               {/* Card header */}
-              <div className="px-8 py-4 border-b border-white/[0.06] bg-white/[0.01]">
+              <div className="px-8 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-hover-bg)]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Cpu className="w-4 h-4 text-cyan-400" />
@@ -146,13 +146,13 @@ export default function SignUpPage() {
               <div className="p-8">
                 {/* Header */}
                 <div className="text-center mb-8">
-                  <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-[0.3em] mb-3">
+                  <span className="inline-block text-[10px] font-mono text-[var(--theme-accent-cyan)] opacity-60 uppercase tracking-[0.3em] mb-3">
                     // CREATE ACCOUNT
                   </span>
-                  <h1 className="text-3xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-2">
+                  <h1 className="text-3xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-2 text-[var(--theme-text-primary)]">
                     JOIN THE NETWORK
                   </h1>
-                  <p className="text-white/40 text-sm">
+                  <p className="text-[var(--theme-text-muted)] text-sm">
                     Initialize your gaming command center
                   </p>
                 </div>
@@ -171,8 +171,8 @@ export default function SignUpPage() {
 
                   {/* Email Field */}
                   <div className="space-y-2">
-                    <label htmlFor="email" className="flex items-center gap-2 text-[10px] font-mono text-white/50 uppercase tracking-wider">
-                      <span className="text-cyan-400/60">&gt;</span>
+                    <label htmlFor="email" className="flex items-center gap-2 text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
+                      <span className="text-[var(--theme-accent-cyan)] opacity-60">&gt;</span>
                       Email Address
                     </label>
                     <input
@@ -182,14 +182,14 @@ export default function SignUpPage() {
                       placeholder="operator@example.com"
                       required
                       autoComplete="email"
-                      className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-400/30 focus:bg-white/[0.04] focus:ring-1 focus:ring-cyan-400/20 transition-all font-mono text-sm"
+                      className="w-full bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3.5 text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-[var(--theme-accent-cyan)]/30 focus:bg-[var(--theme-active-bg)] focus:ring-1 focus:ring-[var(--theme-accent-cyan)]/20 transition-all font-mono text-sm"
                     />
                   </div>
 
                   {/* Password Field */}
                   <div className="space-y-2">
-                    <label htmlFor="password" className="flex items-center gap-2 text-[10px] font-mono text-white/50 uppercase tracking-wider">
-                      <span className="text-cyan-400/60">&gt;</span>
+                    <label htmlFor="password" className="flex items-center gap-2 text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
+                      <span className="text-[var(--theme-accent-cyan)] opacity-60">&gt;</span>
                       Password
                     </label>
                     <input
@@ -200,10 +200,10 @@ export default function SignUpPage() {
                       required
                       minLength={6}
                       autoComplete="new-password"
-                      className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-400/30 focus:bg-white/[0.04] focus:ring-1 focus:ring-cyan-400/20 transition-all font-mono text-sm"
+                      className="w-full bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3.5 text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-[var(--theme-accent-cyan)]/30 focus:bg-[var(--theme-active-bg)] focus:ring-1 focus:ring-[var(--theme-accent-cyan)]/20 transition-all font-mono text-sm"
                     />
-                    <p className="text-[10px] font-mono text-white/30 flex items-center gap-2">
-                      <span className="text-cyan-400/60">!</span>
+                    <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] flex items-center gap-2">
+                      <span className="text-[var(--theme-accent-cyan)] opacity-60">!</span>
                       Minimum 6 characters required
                     </p>
                   </div>
@@ -215,17 +215,17 @@ export default function SignUpPage() {
                 {/* Divider */}
                 <div className="relative my-8">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/[0.06]" />
+                    <div className="w-full border-t border-[var(--theme-border)]" />
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="bg-abyss px-4 text-[10px] font-mono text-white/30">OR</span>
+                    <span className="bg-[var(--theme-bg-secondary)] px-4 text-[10px] font-mono text-[var(--theme-text-subtle)]">OR</span>
                   </div>
                 </div>
 
                 {/* Sign In Link */}
-                <p className="text-center text-sm text-white/40">
+                <p className="text-center text-sm text-[var(--theme-text-muted)]">
                   Already registered?{' '}
-                  <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+                  <Link href="/login" className="text-[var(--theme-accent-cyan)] hover:opacity-80 font-medium transition-colors">
                     Sign In
                   </Link>
                 </p>
@@ -240,9 +240,9 @@ export default function SignUpPage() {
             }`}
           >
             <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/[0.06]" />
-              <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider">System Benefits</span>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/[0.06]" />
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--theme-border)]" />
+              <span className="text-[9px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">System Benefits</span>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--theme-border)]" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <FeatureChip icon={<Check className="w-3 h-3" />} text="Free Forever" />
@@ -257,7 +257,7 @@ export default function SignUpPage() {
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            <span className="text-[9px] font-mono text-white/20 uppercase tracking-wider">Connect</span>
+            <span className="text-[9px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">Connect</span>
             <div className="flex items-center gap-3">
               {[
                 { Logo: SteamLogo, name: 'Steam' },
@@ -267,14 +267,14 @@ export default function SignUpPage() {
               ].map(({ Logo, name }) => (
                 <div
                   key={name}
-                  className="group relative w-9 h-9 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center justify-center hover:border-cyan-400/30 hover:bg-white/[0.04] transition-all overflow-hidden"
+                  className="group relative w-9 h-9 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center hover:border-[var(--theme-accent-cyan)]/30 hover:bg-[var(--theme-active-bg)] transition-all overflow-hidden"
                 >
                   {/* Hover HUD corners */}
                   <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <Logo size="sm" className="relative text-white/30 group-hover:text-cyan-400/60 transition-colors" />
+                  <Logo size="sm" className="relative text-[var(--theme-text-subtle)] group-hover:text-[var(--theme-accent-cyan)] transition-colors" />
                 </div>
               ))}
             </div>
@@ -282,18 +282,18 @@ export default function SignUpPage() {
 
           {/* Terms */}
           <p
-            className={`mt-8 text-center text-[10px] font-mono text-white/20 leading-relaxed transition-all duration-1000 delay-400 ${
+            className={`mt-8 text-center text-[10px] font-mono text-[var(--theme-text-subtle)] leading-relaxed transition-all duration-1000 delay-400 ${
               mounted ? 'opacity-100' : 'opacity-0'
             }`}
           >
             BY REGISTERING, YOU ACCEPT OUR{' '}
-            <a href="#" className="text-white/40 hover:text-cyan-400 transition-colors">
+            <Link href="/terms" className="text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors">
               TERMS
-            </a>{' '}
+            </Link>{' '}
             AND{' '}
-            <a href="#" className="text-white/40 hover:text-cyan-400 transition-colors">
+            <Link href="/privacy" className="text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors">
               PRIVACY PROTOCOL
-            </a>
+            </Link>
           </p>
         </div>
       </main>
@@ -335,14 +335,14 @@ function SubmitButton() {
 
 function FeatureChip({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="group relative flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] hover:border-emerald-400/30 transition-all overflow-hidden">
+    <div className="group relative flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-emerald-400/30 transition-all overflow-hidden">
       {/* Hover HUD corners */}
       <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <span className="relative text-emerald-400">{icon}</span>
-      <span className="relative text-[10px] font-mono text-white/50 uppercase tracking-wide">{text}</span>
+      <span className="relative text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wide">{text}</span>
     </div>
   );
 }
@@ -364,7 +364,7 @@ function FloatingLogo({ Logo, x, y, delay }: FloatingLogoProps) {
         animationDelay: `${delay}s`,
       }}
     >
-      <Logo size="lg" className="w-12 h-12 text-white/[0.03]" />
+      <Logo size="lg" className="w-12 h-12 text-[var(--theme-text-primary)] opacity-[0.03]" />
     </div>
   );
 }

@@ -40,7 +40,7 @@ export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGam
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-void/80 backdrop-blur-md z-50 transition-opacity duration-300"
+        className="fixed inset-0 bg-[var(--theme-overlay-bg)] backdrop-blur-md z-50 transition-opacity duration-300"
         style={{ animation: 'fadeIn 0.3s ease-out' }}
         onClick={onClose}
       />
@@ -48,8 +48,11 @@ export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGam
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="bg-abyss border-2 border-red-500/30 rounded-2xl w-full max-w-md pointer-events-auto relative shadow-2xl"
-          style={{ animation: 'modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+          className="bg-[var(--theme-bg-secondary)] border-2 border-red-500/30 rounded-2xl w-full max-w-md pointer-events-auto relative"
+          style={{
+            animation: 'modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            boxShadow: 'var(--theme-shadow-xl)'
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Animated background effects */}
@@ -63,9 +66,9 @@ export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGam
           <button
             onClick={onClose}
             disabled={loading}
-            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-lg bg-deep/80 backdrop-blur-sm border border-steel hover:border-gray-400 hover:bg-gray-500/10 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-lg bg-[var(--theme-bg-tertiary)] backdrop-blur-sm border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] hover:bg-[var(--theme-hover-bg)] transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <X className="w-5 h-5 text-gray-400 group-hover:text-gray-300 mx-auto transition-colors" />
+            <X className="w-5 h-5 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)] mx-auto transition-colors" />
           </button>
 
           {/* Content */}
@@ -82,40 +85,40 @@ export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGam
 
             {/* Title & Message */}
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Delete Game?</h2>
-              <p className="text-gray-400">
-                Are you sure you want to remove <span className="text-white font-semibold">"{userGame.game?.title}"</span> from your library?
+              <h2 className="text-2xl font-bold text-[var(--theme-text-primary)]">Delete Game?</h2>
+              <p className="text-[var(--theme-text-muted)]">
+                Are you sure you want to remove <span className="text-[var(--theme-text-primary)] font-semibold">"{userGame.game?.title}"</span> from your library?
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-[var(--theme-text-subtle)]">
                 This action cannot be undone. All progress and stats will be lost.
               </p>
             </div>
 
             {/* Game Info Card */}
-            <div className="bg-deep border border-steel rounded-xl p-4 flex items-center gap-4">
+            <div className="bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl p-4 flex items-center gap-4">
               {userGame.game?.cover_url ? (
                 <img
                   src={userGame.game.cover_url}
                   alt={userGame.game.title}
-                  className="w-16 h-20 rounded-lg object-cover border border-steel"
+                  className="w-16 h-20 rounded-lg object-cover border border-[var(--theme-border)]"
                 />
               ) : (
-                <div className="w-16 h-20 rounded-lg bg-slate border border-steel flex items-center justify-center">
-                  <Trash2 className="w-6 h-6 text-gray-700" />
+                <div className="w-16 h-20 rounded-lg bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] flex items-center justify-center">
+                  <Trash2 className="w-6 h-6 text-[var(--theme-text-subtle)]" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-white truncate">{userGame.game?.title}</h3>
+                <h3 className="font-bold text-[var(--theme-text-primary)] truncate">{userGame.game?.title}</h3>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  <span className="text-xs px-2 py-0.5 bg-slate border border-steel rounded text-gray-400">
+                  <span className="text-xs px-2 py-0.5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded text-[var(--theme-text-muted)]">
                     {userGame.platform}
                   </span>
-                  <span className="text-xs px-2 py-0.5 bg-slate border border-steel rounded text-gray-400">
+                  <span className="text-xs px-2 py-0.5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded text-[var(--theme-text-muted)]">
                     {userGame.status}
                   </span>
                 </div>
                 {userGame.playtime_hours > 0 && (
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-[var(--theme-text-subtle)] mt-2">
                     {userGame.playtime_hours}h played • {userGame.completion_percentage}% complete
                   </p>
                 )}
@@ -135,7 +138,7 @@ export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGam
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-deep border border-steel rounded-xl font-semibold text-gray-300 hover:text-white hover:border-gray-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl font-semibold text-[var(--theme-text-secondary)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -181,4 +184,3 @@ export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGam
     </>
   );
 }
-

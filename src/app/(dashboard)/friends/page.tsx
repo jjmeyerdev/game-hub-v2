@@ -70,7 +70,7 @@ export default function FriendsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-void relative">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] relative">
       {/* Subtle ambient glow */}
       <div className="fixed top-0 left-1/3 w-[500px] h-[500px] bg-violet-500/[0.03] rounded-full blur-[120px] pointer-events-none animate-breathe" />
       <div className="fixed bottom-0 right-1/4 w-[400px] h-[400px] bg-cyan-500/[0.02] rounded-full blur-[100px] pointer-events-none animate-breathe" style={{ animationDelay: '2s' }} />
@@ -78,7 +78,7 @@ export default function FriendsPage() {
       <div className="relative max-w-6xl mx-auto px-6 py-12">
         {/* Hero Section */}
         <div className="mb-16">
-          <div className="relative bg-abyss border border-white/[0.06] rounded-2xl p-10 overflow-hidden">
+          <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl p-10 overflow-hidden">
             {/* Decorative connection pattern */}
             <div className="absolute top-8 right-8 opacity-[0.03]">
               <svg width="200" height="200" viewBox="0 0 200 200">
@@ -97,18 +97,18 @@ export default function FriendsPage() {
 
             <div className="relative">
               {/* Status badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] border border-white/[0.08] rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-full mb-6">
                 <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
-                <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider">Coming Q4 2026</span>
+                <span className="text-[11px] font-medium text-[var(--theme-text-muted)] uppercase tracking-wider">Coming Q4 2026</span>
               </div>
 
               <div className="flex items-start justify-between">
                 <div className="max-w-2xl">
-                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-2 block">// SOCIAL_NETWORK</span>
+                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2 block">// SOCIAL_NETWORK</span>
                   <h1 className="text-5xl font-bold text-white mb-4 tracking-tight font-[family-name:var(--font-family-display)]">
                     FRIENDS
                   </h1>
-                  <p className="text-lg text-white/40 leading-relaxed mb-8">
+                  <p className="text-lg text-[var(--theme-text-muted)] leading-relaxed mb-8">
                     Connect with your gaming community. Share achievements, discover games together,
                     and never game alone again.
                   </p>
@@ -125,19 +125,19 @@ export default function FriendsPage() {
                           {letter}
                         </div>
                       ))}
-                      <div className="w-9 h-9 rounded-full bg-white/[0.03] border-2 border-[#0a0a0b] flex items-center justify-center">
-                        <UserPlus className="w-4 h-4 text-white/30" />
+                      <div className="w-9 h-9 rounded-full bg-[var(--theme-hover-bg)] border-2 border-[#0a0a0b] flex items-center justify-center">
+                        <UserPlus className="w-4 h-4 text-[var(--theme-text-subtle)]" />
                       </div>
                     </div>
                     <div className="h-6 w-px bg-white/[0.06]" />
-                    <span className="text-sm text-white/30">Join the community</span>
+                    <span className="text-sm text-[var(--theme-text-subtle)]">Join the community</span>
                   </div>
                 </div>
 
                 {/* Icon */}
                 <div className="hidden md:block">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500/10 to-cyan-500/5 border border-white/[0.08] flex items-center justify-center">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-500/10 to-cyan-500/5 border border-[var(--theme-border)] flex items-center justify-center">
                       <Users className="w-12 h-12 text-violet-400" />
                     </div>
                     {/* HUD corners */}
@@ -161,8 +161,8 @@ export default function FriendsPage() {
         {/* Quick Stats */}
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-4">
-            <Radio className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// NETWORK_STATUS</span>
+            <Radio className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// NETWORK_STATUS</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -171,7 +171,7 @@ export default function FriendsPage() {
               return (
                 <div
                   key={index}
-                  className="group relative bg-abyss border border-white/[0.06] rounded-xl p-4 text-center hover:border-white/[0.1] transition-all overflow-hidden"
+                  className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 text-center hover:border-white/[0.1] transition-all overflow-hidden"
                   style={{ animation: `fadeIn 0.4s ease-out ${index * 0.1}s both` }}
                 >
                   {/* Hover HUD corners */}
@@ -181,7 +181,7 @@ export default function FriendsPage() {
                   <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-violet-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                   <Icon className="relative w-5 h-5 text-violet-400 mx-auto mb-2" />
-                  <div className="relative text-[10px] font-mono text-white/30 mb-1 uppercase tracking-wider">{stat.label}</div>
+                  <div className="relative text-[10px] font-mono text-[var(--theme-text-subtle)] mb-1 uppercase tracking-wider">{stat.label}</div>
                   <div className="relative text-sm font-bold font-mono text-white">{stat.value}</div>
                 </div>
               );
@@ -192,8 +192,8 @@ export default function FriendsPage() {
         {/* Features Grid */}
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-8">
-            <Heart className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// SOCIAL_FEATURES</span>
+            <Heart className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// SOCIAL_FEATURES</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
@@ -205,7 +205,7 @@ export default function FriendsPage() {
               return (
                 <div
                   key={index}
-                  className="group relative bg-abyss border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
+                  className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
                   style={{ animation: `fadeIn 0.4s ease-out ${index * 0.06}s both` }}
                 >
                   {/* Hover HUD corners */}
@@ -227,11 +227,11 @@ export default function FriendsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-3 mb-1">
                           <h3 className="font-semibold text-white font-[family-name:var(--font-family-display)]">{feature.title}</h3>
-                          <span className="px-2 py-0.5 bg-white/[0.03] border border-white/[0.06] rounded text-[10px] font-mono text-white/30 uppercase tracking-wider">
+                          <span className="px-2 py-0.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
                             {feature.phase}
                           </span>
                         </div>
-                        <p className="text-sm text-white/30 leading-relaxed">{feature.description}</p>
+                        <p className="text-sm text-[var(--theme-text-subtle)] leading-relaxed">{feature.description}</p>
                       </div>
                     </div>
 
@@ -240,7 +240,7 @@ export default function FriendsPage() {
                       {feature.highlights.map((highlight, i) => (
                         <span
                           key={i}
-                          className="inline-flex items-center gap-1.5 text-xs text-white/20"
+                          className="inline-flex items-center gap-1.5 text-xs text-[var(--theme-text-subtle)]"
                         >
                           <div className={`w-1 h-1 rounded-full ${colors.dot}`} />
                           {highlight}
@@ -260,8 +260,8 @@ export default function FriendsPage() {
         {/* Benefits Section */}
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-6">
-            <Crown className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// KEY_BENEFITS</span>
+            <Crown className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// KEY_BENEFITS</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -276,7 +276,7 @@ export default function FriendsPage() {
               return (
                 <div
                   key={index}
-                  className="group relative bg-abyss border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
+                  className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
                   style={{ animation: `fadeIn 0.4s ease-out ${index * 0.1 + 0.3}s both` }}
                 >
                   {/* Hover HUD corners */}
@@ -289,7 +289,7 @@ export default function FriendsPage() {
                     <Icon className={`w-5 h-5 ${colors.text}`} />
                   </div>
                   <h3 className="relative font-semibold text-white mb-2 font-[family-name:var(--font-family-display)]">{item.title}</h3>
-                  <p className="relative text-sm text-white/30">{item.description}</p>
+                  <p className="relative text-sm text-[var(--theme-text-subtle)]">{item.description}</p>
                 </div>
               );
             })}
@@ -297,19 +297,19 @@ export default function FriendsPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="relative bg-abyss border border-white/[0.06] rounded-xl p-8 text-center overflow-hidden">
+        <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-8 text-center overflow-hidden">
           {/* HUD corners */}
           <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-violet-400/30" />
           <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-violet-400/30" />
           <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-violet-400/30" />
           <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-violet-400/30" />
 
-          <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-4 block">// STATUS_UPDATE</span>
+          <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-4 block">// STATUS_UPDATE</span>
           <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-4">
             <Users className="w-6 h-6 text-violet-400" />
           </div>
           <h3 className="text-xl font-bold text-white mb-2 font-[family-name:var(--font-family-display)]">BUILDING THE NETWORK</h3>
-          <p className="text-sm text-white/30 mb-6 max-w-md mx-auto">
+          <p className="text-sm text-[var(--theme-text-subtle)] mb-6 max-w-md mx-auto">
             Social features are in development. We're building a unified gaming social experience
             that connects you with friends across all platforms.
           </p>

@@ -34,13 +34,13 @@ export default function AchievementsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-void flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--theme-bg-primary)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <Trophy className="w-12 h-12 text-emerald-400/60 animate-pulse" />
             <div className="absolute inset-0 w-12 h-12 border-2 border-emerald-400/20 rounded-full animate-ping" />
           </div>
-          <p className="text-[11px] font-mono text-white/30 uppercase tracking-wider">
+          <p className="text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
             // Loading achievement data...
           </p>
         </div>
@@ -51,19 +51,19 @@ export default function AchievementsPage() {
   // Empty state - no achievements tracked yet
   if (!stats || stats.gamesWithAchievements === 0) {
     return (
-      <div className="min-h-screen bg-void relative">
+      <div className="min-h-screen bg-[var(--theme-bg-primary)] relative">
         {/* Ambient glow */}
         <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/[0.03] rounded-full blur-[120px] pointer-events-none animate-breathe" />
 
         <div className="relative max-w-4xl mx-auto px-6 py-20">
-          <div className="relative bg-abyss border border-white/[0.06] rounded-2xl p-12 text-center overflow-hidden">
+          <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl p-12 text-center overflow-hidden">
             {/* HUD corners */}
             <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-emerald-400/30" />
             <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-emerald-400/30" />
             <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-emerald-400/30" />
             <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-emerald-400/30" />
 
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-6 block">
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-6 block">
               // NO_DATA
             </span>
 
@@ -75,7 +75,7 @@ export default function AchievementsPage() {
               NO ACHIEVEMENTS YET
             </h1>
 
-            <p className="text-white/40 mb-8 max-w-md mx-auto">
+            <p className="text-[var(--theme-text-muted)] mb-8 max-w-md mx-auto">
               Sync your Steam, PlayStation, or Xbox library to start tracking your achievements.
               Your trophy hunting journey begins here.
             </p>
@@ -96,7 +96,7 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-void relative">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] relative">
       {/* Ambient glow orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div
@@ -121,7 +121,7 @@ export default function AchievementsPage() {
         <div className="mb-10">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/10 to-amber-500/10 border border-white/[0.06] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/10 to-amber-500/10 border border-[var(--theme-border)] flex items-center justify-center">
                 <Trophy className="w-7 h-7 text-emerald-400" />
               </div>
               {/* HUD corners */}
@@ -131,7 +131,7 @@ export default function AchievementsPage() {
               <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-emerald-400/50" />
             </div>
             <div>
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider block mb-1">
                 // TROPHY_HUNTER
               </span>
               <h1 className="text-3xl font-bold text-white font-[family-name:var(--font-family-display)]">
@@ -144,8 +144,8 @@ export default function AchievementsPage() {
         {/* Hero Stats */}
         <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-4 mb-5">
-            <Target className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+            <Target className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
               // OVERALL_STATS
             </span>
             <div className="flex-1 h-px bg-white/[0.06]" />
@@ -197,8 +197,8 @@ export default function AchievementsPage() {
         {/* Platform Breakdown */}
         <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center gap-4 mb-5">
-            <Gamepad2 className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+            <Gamepad2 className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
               // PLATFORM_BREAKDOWN
             </span>
             <div className="flex-1 h-px bg-white/[0.06]" />
@@ -244,8 +244,8 @@ export default function AchievementsPage() {
         {stats.almostComplete.length > 0 && (
           <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-4 mb-5">
-              <Zap className="w-4 h-4 text-white/20" />
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+              <Zap className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
                 // ALMOST_THERE
               </span>
               <div className="flex-1 h-px bg-white/[0.06]" />
@@ -272,8 +272,8 @@ export default function AchievementsPage() {
         {stats.topCompletedGames.length > 0 && (
           <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <div className="flex items-center gap-4 mb-5">
-              <Medal className="w-4 h-4 text-white/20" />
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+              <Medal className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
                 // IN_PROGRESS
               </span>
               <div className="flex-1 h-px bg-white/[0.06]" />
@@ -302,7 +302,7 @@ export default function AchievementsPage() {
         {/* Perfect Games Section */}
         {stats.perfectGames > 0 && (
           <section className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-            <div className="relative bg-abyss border border-amber-500/20 rounded-xl p-6 overflow-hidden">
+            <div className="relative bg-[var(--theme-bg-secondary)] border border-amber-500/20 rounded-xl p-6 overflow-hidden">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-amber-400/40" />
               <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-amber-400/40" />
@@ -326,7 +326,7 @@ export default function AchievementsPage() {
                       {stats.perfectGames} games
                     </span>
                   </div>
-                  <p className="text-sm text-white/40">
+                  <p className="text-sm text-[var(--theme-text-muted)]">
                     You've achieved 100% completion on {stats.perfectGames} game
                     {stats.perfectGames !== 1 ? 's' : ''}. That's dedication!
                   </p>
@@ -402,7 +402,7 @@ function HeroStatCard({
 
   return (
     <div
-      className={`group relative bg-abyss border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden ${styles.glow} hover:shadow-lg`}
+      className={`group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden ${styles.glow} hover:shadow-lg`}
       style={{ animation: `fadeIn 0.4s ease-out ${delay}s both` }}
     >
       {/* HUD corners */}
@@ -420,8 +420,8 @@ function HeroStatCard({
           <div className={`text-2xl font-bold font-mono ${styles.text} tabular-nums`}>
             {value}
           </div>
-          <div className="text-sm text-white/60 font-medium truncate">{label}</div>
-          <div className="text-[11px] font-mono text-white/30">{sublabel}</div>
+          <div className="text-sm text-[var(--theme-text-muted)] font-medium truncate">{label}</div>
+          <div className="text-[11px] font-mono text-[var(--theme-text-subtle)]">{sublabel}</div>
         </div>
       </div>
     </div>
@@ -450,7 +450,7 @@ function PlatformCard({
 
   return (
     <div
-      className={`group relative bg-abyss border ${borderColor} rounded-xl p-5 transition-all duration-300 overflow-hidden hover:border-opacity-60`}
+      className={`group relative bg-[var(--theme-bg-secondary)] border ${borderColor} rounded-xl p-5 transition-all duration-300 overflow-hidden hover:border-opacity-60`}
       style={{ animation: `fadeIn 0.4s ease-out ${delay}s both` }}
     >
       {/* HUD corners */}
@@ -475,7 +475,7 @@ function PlatformCard({
             <h3 className="font-semibold text-white font-[family-name:var(--font-family-display)]">
               {name}
             </h3>
-            <p className="text-[10px] font-mono text-white/30 uppercase">
+            <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase">
               {stats.games} games
             </p>
           </div>
@@ -488,7 +488,7 @@ function PlatformCard({
               <span className="text-2xl font-bold font-mono text-white tabular-nums">
                 {stats.earned.toLocaleString()}
               </span>
-              <span className="text-sm text-white/30">
+              <span className="text-sm text-[var(--theme-text-subtle)]">
                 / {stats.total.toLocaleString()}
               </span>
             </div>
@@ -512,7 +512,7 @@ function PlatformCard({
           </>
         ) : (
           <div className="text-center py-4">
-            <p className="text-sm text-white/30">No achievements synced</p>
+            <p className="text-sm text-[var(--theme-text-subtle)]">No achievements synced</p>
             <Link
               href="/settings"
               className="text-xs font-mono uppercase tracking-wider hover:opacity-80 transition-opacity mt-2 inline-block"
@@ -546,7 +546,7 @@ function AlmostCompleteCard({
   return (
     <Link href={`/game/${userGame.id}`}>
       <div
-        className="group relative bg-abyss border border-violet-500/20 rounded-xl p-4 hover:border-violet-500/40 transition-all duration-300 overflow-hidden cursor-pointer"
+        className="group relative bg-[var(--theme-bg-secondary)] border border-violet-500/20 rounded-xl p-4 hover:border-violet-500/40 transition-all duration-300 overflow-hidden cursor-pointer"
         style={{ animation: `fadeIn 0.4s ease-out ${index * 0.05}s both` }}
       >
         {/* HUD corners */}
@@ -560,12 +560,12 @@ function AlmostCompleteCard({
 
         <div className="relative flex items-center gap-4">
           {/* Cover */}
-          <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.08] group-hover:border-violet-400/30 transition-colors">
+          <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-[var(--theme-border)] group-hover:border-violet-400/30 transition-colors">
             {coverUrl ? (
               <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-white/[0.03] flex items-center justify-center">
-                <Gamepad2 className="w-6 h-6 text-white/20" />
+              <div className="w-full h-full bg-[var(--theme-hover-bg)] flex items-center justify-center">
+                <Gamepad2 className="w-6 h-6 text-[var(--theme-text-subtle)]" />
               </div>
             )}
           </div>
@@ -579,7 +579,7 @@ function AlmostCompleteCard({
               <span className="text-lg font-bold font-mono text-violet-400">
                 {percentage}%
               </span>
-              <span className="text-xs text-white/30">
+              <span className="text-xs text-[var(--theme-text-subtle)]">
                 {remaining} left
               </span>
             </div>
@@ -612,7 +612,7 @@ function GameProgressCard({
   return (
     <Link href={`/game/${userGame.id}`}>
       <div
-        className="group relative bg-abyss border border-white/[0.06] rounded-xl overflow-hidden hover:border-cyan-400/30 transition-all duration-300 cursor-pointer"
+        className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden hover:border-cyan-400/30 transition-all duration-300 cursor-pointer"
         style={{ animation: `fadeIn 0.4s ease-out ${index * 0.03}s both` }}
       >
         {/* Cover */}
@@ -624,8 +624,8 @@ function GameProgressCard({
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full bg-white/[0.03] flex items-center justify-center">
-              <Gamepad2 className="w-10 h-10 text-white/20" />
+            <div className="w-full h-full bg-[var(--theme-hover-bg)] flex items-center justify-center">
+              <Gamepad2 className="w-10 h-10 text-[var(--theme-text-subtle)]" />
             </div>
           )}
 
@@ -638,7 +638,7 @@ function GameProgressCard({
               <span className="text-sm font-bold font-mono text-white">
                 {percentage}%
               </span>
-              <span className="text-[10px] font-mono text-white/50">
+              <span className="text-[10px] font-mono text-[var(--theme-text-muted)]">
                 {earned}/{total}
               </span>
             </div>
@@ -653,7 +653,7 @@ function GameProgressCard({
 
         {/* Title */}
         <div className="p-3 pt-2">
-          <h4 className="text-xs font-medium text-white/80 truncate group-hover:text-white transition-colors">
+          <h4 className="text-xs font-medium text-[var(--theme-text-primary)] truncate group-hover:text-white transition-colors">
             {title}
           </h4>
         </div>

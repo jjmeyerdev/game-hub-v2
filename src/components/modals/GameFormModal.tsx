@@ -371,7 +371,7 @@ export default function GameFormModal({
       onClose={onClose}
       title={isEditMode ? 'Edit Game' : 'Add Game'}
       subtitle={isEditMode ? 'Update game details' : 'Add a new game to your library'}
-      icon={isEditMode ? <Edit3 className="w-5 h-5 text-white/60" /> : <Gamepad2 className="w-5 h-5 text-white/60" />}
+      icon={isEditMode ? <Edit3 className="w-5 h-5 text-[var(--theme-text-muted)]" /> : <Gamepad2 className="w-5 h-5 text-[var(--theme-text-muted)]" />}
       maxWidth="4xl"
     >
       <div className="relative">
@@ -465,19 +465,19 @@ export default function GameFormModal({
               </div>
             )}
 
-            <div className="flex items-center gap-3 mt-6 pt-5 border-t border-white/[0.04]">
+            <div className="flex items-center gap-3 mt-6 pt-5 border-t border-[var(--theme-border)]">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1 px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl font-medium text-white/50 hover:text-white hover:border-white/[0.12] transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading || !title.trim()}
-                className="flex-1 px-4 py-3 bg-white hover:bg-cyan-400 rounded-xl font-semibold text-[#030304] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 bg-[var(--theme-accent-cyan)] hover:brightness-110 rounded-xl font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

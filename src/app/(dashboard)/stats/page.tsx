@@ -64,7 +64,7 @@ export default function StatsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-void relative">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] relative">
       {/* Subtle ambient glow */}
       <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/[0.03] rounded-full blur-[120px] pointer-events-none animate-breathe" />
       <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-violet-500/[0.02] rounded-full blur-[100px] pointer-events-none animate-breathe" style={{ animationDelay: '2s' }} />
@@ -72,7 +72,7 @@ export default function StatsPage() {
       <div className="relative max-w-6xl mx-auto px-6 py-12">
         {/* Hero Section */}
         <div className="mb-16">
-          <div className="relative bg-abyss border border-white/[0.06] rounded-2xl p-10 overflow-hidden">
+          <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl p-10 overflow-hidden">
             {/* Subtle grid pattern */}
             <div className="absolute inset-0 opacity-[0.02]">
               <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:60px_60px]" />
@@ -83,18 +83,18 @@ export default function StatsPage() {
 
             <div className="relative">
               {/* Status badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] border border-white/[0.08] rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-full mb-6">
                 <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider">In Development</span>
+                <span className="text-[11px] font-medium text-[var(--theme-text-muted)] uppercase tracking-wider">In Development</span>
               </div>
 
               <div className="flex items-start justify-between">
                 <div className="max-w-2xl">
-                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-2 block">// DATA_ANALYTICS</span>
+                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2 block">// DATA_ANALYTICS</span>
                   <h1 className="text-5xl font-bold text-white mb-4 tracking-tight font-[family-name:var(--font-family-display)]">
                     STATISTICS
                   </h1>
-                  <p className="text-lg text-white/40 leading-relaxed mb-8">
+                  <p className="text-lg text-[var(--theme-text-muted)] leading-relaxed mb-8">
                     Deep analytics and insights into your gaming journey. Visualize progress,
                     track habits, and discover patterns in your play style.
                   </p>
@@ -104,7 +104,7 @@ export default function StatsPage() {
                     {['Analytics', 'Visualizations', 'AI Insights'].map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-xs font-medium text-white/40"
+                        className="px-3 py-1.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-xs font-medium text-[var(--theme-text-muted)]"
                       >
                         {tag}
                       </span>
@@ -115,7 +115,7 @@ export default function StatsPage() {
                 {/* Icon */}
                 <div className="hidden md:block">
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-white/[0.08] flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-[var(--theme-border)] flex items-center justify-center">
                       <TrendingUp className="w-10 h-10 text-cyan-400" />
                     </div>
                     {/* HUD corners */}
@@ -136,8 +136,8 @@ export default function StatsPage() {
         {/* Features Grid */}
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-8">
-            <BarChart3 className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// PLANNED_FEATURES</span>
+            <BarChart3 className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// PLANNED_FEATURES</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
@@ -149,7 +149,7 @@ export default function StatsPage() {
               return (
                 <div
                   key={index}
-                  className="group relative bg-abyss border border-white/[0.06] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
+                  className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
                   style={{
                     animation: `fadeIn 0.4s ease-out ${index * 0.05}s both`,
                   }}
@@ -173,14 +173,14 @@ export default function StatsPage() {
                       {feature.title}
                     </h3>
 
-                    <p className="text-sm text-white/30 mb-4 leading-relaxed">
+                    <p className="text-sm text-[var(--theme-text-subtle)] mb-4 leading-relaxed">
                       {feature.description}
                     </p>
 
                     {/* Metrics */}
                     <div className="space-y-1.5">
                       {feature.metrics.map((metric, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-white/20">
+                        <div key={i} className="flex items-center gap-2 text-xs text-[var(--theme-text-subtle)]">
                           <div className={`w-1 h-1 rounded-full ${colors.text.replace('text-', 'bg-')}`} />
                           {metric}
                         </div>
@@ -196,12 +196,12 @@ export default function StatsPage() {
         {/* Timeline Section */}
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-8">
-            <Clock className="w-4 h-4 text-white/20" />
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">// DEV_TIMELINE</span>
+            <Clock className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// DEV_TIMELINE</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
-          <div className="relative bg-abyss border border-white/[0.06] rounded-xl overflow-hidden">
+          <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden">
             {/* HUD corners */}
             <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/30" />
             <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/30" />
@@ -230,11 +230,11 @@ export default function StatsPage() {
                         <span className={`text-[10px] font-mono font-medium ${colors.text} uppercase tracking-wider`}>
                           {item.phase}
                         </span>
-                        <span className="text-[10px] text-white/20">•</span>
-                        <span className="text-[10px] font-mono text-white/30">{item.quarter}</span>
+                        <span className="text-[10px] text-[var(--theme-text-subtle)]">•</span>
+                        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">{item.quarter}</span>
                       </div>
                       <h4 className="font-semibold text-white mb-1 font-[family-name:var(--font-family-display)]">{item.title}</h4>
-                      <p className="text-sm text-white/30">{item.description}</p>
+                      <p className="text-sm text-[var(--theme-text-subtle)]">{item.description}</p>
 
                       {/* Progress bar */}
                       {item.progress > 0 && (
@@ -245,7 +245,7 @@ export default function StatsPage() {
                               style={{ width: `${item.progress}%` }}
                             />
                           </div>
-                          <span className="text-[10px] font-mono text-white/20 tabular-nums">{item.progress}%</span>
+                          <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] tabular-nums">{item.progress}%</span>
                         </div>
                       )}
                     </div>
@@ -257,19 +257,19 @@ export default function StatsPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="relative bg-abyss border border-white/[0.06] rounded-xl p-8 text-center overflow-hidden">
+        <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-8 text-center overflow-hidden">
           {/* HUD corners */}
           <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-cyan-400/30" />
           <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-cyan-400/30" />
           <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-cyan-400/30" />
           <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-cyan-400/30" />
 
-          <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-4 block">// STATUS_UPDATE</span>
+          <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-4 block">// STATUS_UPDATE</span>
           <div className="w-12 h-12 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center mx-auto mb-4">
             <BarChart3 className="w-6 h-6 text-cyan-400" />
           </div>
           <h3 className="text-xl font-bold text-white mb-2 font-[family-name:var(--font-family-display)]">COMING SOON</h3>
-          <p className="text-sm text-white/30 mb-6 max-w-md mx-auto">
+          <p className="text-sm text-[var(--theme-text-subtle)] mb-6 max-w-md mx-auto">
             Advanced statistics and analytics are in active development. Your gaming data will be ready when this launches.
           </p>
           <Link href="/dashboard">

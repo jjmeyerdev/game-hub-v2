@@ -58,7 +58,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[90] bg-void/60 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[90] bg-[var(--theme-bg-primary)]/60 backdrop-blur-sm transition-opacity duration-300 ${
           isAnimatingOut ? 'opacity-0' : 'opacity-100'
         }`}
         onClick={handleClose}
@@ -76,12 +76,12 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
         }}
       >
         <div
-          className="relative overflow-hidden rounded-2xl"
+          className={`relative overflow-hidden rounded-2xl bg-[var(--theme-bg-secondary)] ${
+            result.success ? 'border border-emerald-500/20' : 'border border-red-500/20'
+          }`}
           style={{
-            background: 'linear-gradient(180deg, #0f1011 0%, #0a0a0b 100%)',
-            border: `1px solid ${result.success ? 'rgba(52, 211, 153, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
             boxShadow: `
-              0 0 0 1px rgba(255, 255, 255, 0.02),
+              0 0 0 1px var(--theme-border),
               0 4px 60px ${result.success ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)'},
               0 25px 50px -12px rgba(0, 0, 0, 0.6)
             `,
@@ -119,7 +119,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:border-white/[0.12] transition-all z-10"
+            className="absolute top-4 right-4 p-2 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all z-10"
           >
             <X className="w-4 h-4" />
           </button>
@@ -157,12 +157,12 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
 
               <div className="flex-1">
                 <h3
-                  className="text-xl font-bold text-white mb-1"
+                  className="text-xl font-bold text-[var(--theme-text-primary)] mb-1"
                   style={{ fontFamily: 'var(--font-family-display)' }}
                 >
                   {result.success ? `${platformName} Sync Complete!` : `${platformName} Sync Failed`}
                 </h3>
-                <p className="text-sm text-white/50 flex items-center gap-2">
+                <p className="text-sm text-[var(--theme-text-muted)] flex items-center gap-2">
                   {isPsn ? (
                     <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.181.76.814.76 1.505v5.876c2.441 1.193 4.362-.002 4.362-3.153 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.391-1.502h-.002z" />
@@ -187,29 +187,25 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
             {result.success && (
               <div className={`grid ${isEpic ? 'grid-cols-3' : 'grid-cols-4'} gap-3 mb-5`}>
                 <div
-                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all"
+                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
                     animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards',
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <Gamepad2 className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
                   <div
-                    className="text-2xl font-black text-white tabular-nums"
+                    className="text-2xl font-black text-[var(--theme-text-primary)] tabular-nums"
                     style={{ fontFamily: 'var(--font-family-display)' }}
                   >
                     {result.totalGames}
                   </div>
-                  <div className="text-[9px] uppercase tracking-wider text-white/40 font-semibold">Total</div>
+                  <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">Total</div>
                 </div>
 
                 <div
-                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all"
+                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
                     animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards',
                   }}
                 >
@@ -221,14 +217,12 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                   >
                     {result.gamesAdded}
                   </div>
-                  <div className="text-[9px] uppercase tracking-wider text-white/40 font-semibold">Added</div>
+                  <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">Added</div>
                 </div>
 
                 <div
-                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all"
+                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
                     animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards',
                   }}
                 >
@@ -240,15 +234,13 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                   >
                     {result.gamesUpdated}
                   </div>
-                  <div className="text-[9px] uppercase tracking-wider text-white/40 font-semibold">Updated</div>
+                  <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">Updated</div>
                 </div>
 
                 {!isEpic && (
                   <div
-                    className="relative overflow-hidden p-3 rounded-xl text-center group transition-all"
+                    className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      border: '1px solid rgba(255, 255, 255, 0.04)',
                       animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards',
                     }}
                   >
@@ -260,7 +252,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                     >
                       {achievementCount || 0}
                     </div>
-                    <div className="text-[9px] uppercase tracking-wider text-white/40 font-semibold">{achievementLabel}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">{achievementLabel}</div>
                   </div>
                 )}
               </div>
@@ -295,7 +287,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
               className="btn-primary w-full py-3.5 flex items-center justify-center gap-2 group"
             >
               <span>Continue</span>
-              <span className="text-void group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-[var(--theme-bg-primary)] group-hover:translate-x-1 transition-transform">→</span>
             </button>
           </div>
 

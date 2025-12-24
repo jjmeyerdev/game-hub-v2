@@ -62,46 +62,50 @@ export function BaseModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-[var(--theme-overlay-bg)] backdrop-blur-sm"
         onClick={onClose}
         style={{ animation: 'modalFadeIn 0.2s ease-out' }}
       />
 
       {/* Modal */}
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-[#0a0a0b] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/50 overflow-hidden`}
-        style={{ animation: 'modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl overflow-hidden`}
+        style={{
+          animation: 'modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          boxShadow: 'var(--theme-shadow-xl)'
+        }}
       >
         {/* Noise texture overlay */}
         <div
-          className="absolute inset-0 pointer-events-none z-0 opacity-[0.015]"
+          className="absolute inset-0 pointer-events-none z-0"
           style={{
+            opacity: 'var(--theme-noise-opacity)',
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
           }}
         />
 
         {/* Subtle gradient glow at top */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-[var(--theme-accent-cyan)]/20 to-transparent" />
 
         {/* Header */}
-        <div className="relative px-6 py-5 border-b border-white/[0.06]">
+        <div className="relative px-6 py-5 border-b border-[var(--theme-border)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {icon && (
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
                   {icon}
                 </div>
               )}
               <div>
-                <h2 className="text-lg font-semibold text-white">{title}</h2>
+                <h2 className="text-lg font-semibold text-[var(--theme-text-primary)]">{title}</h2>
                 {subtitle && (
-                  <p className="text-xs text-white/40 mt-0.5">{subtitle}</p>
+                  <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">{subtitle}</p>
                 )}
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-white/40 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.1] transition-all"
+              className="w-9 h-9 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-active-bg)] hover:border-[var(--theme-border-hover)] transition-all"
             >
               <X className="w-4 h-4" />
             </button>

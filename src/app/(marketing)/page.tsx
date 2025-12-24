@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { Gamepad2, ArrowRight, ChevronDown, Zap, Shield, Target, Trophy, Clock, Users } from 'lucide-react';
+import { Gamepad2, Zap, Shield, Target, Trophy, Clock, Users } from 'lucide-react';
 import {
   SteamLogo,
   PlayStationLogo,
@@ -11,6 +11,7 @@ import {
   NintendoLogo,
   GOGLogo,
 } from '@/components/icons/PlatformLogos';
+import { ModeToggle } from '@/components/theme';
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
@@ -45,7 +46,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-void text-white overflow-hidden">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)] overflow-hidden">
       {/* Noise texture */}
       <div className="noise-overlay" />
 
@@ -79,9 +80,9 @@ export default function HomePage() {
       </div>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-40">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--theme-bg-primary)]/80 backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto px-8">
-          <div className="flex items-center justify-between h-20 border-b border-white/[0.04]">
+          <div className="flex items-center justify-between h-20 border-b border-[var(--theme-border)]">
             <Link href="/" className="flex items-center gap-3 group">
               {/* HUD-style logo container */}
               <div className="relative">
@@ -95,34 +96,33 @@ export default function HomePage() {
                 <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+                <span className="text-lg font-semibold tracking-wide text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">
                   GAMEHUB
                 </span>
-                <span className="text-[9px] font-mono text-white/30 tracking-wider uppercase">
+                <span className="text-[9px] font-mono text-[var(--theme-text-muted)] tracking-wider uppercase">
                   // COMMAND_CENTER
                 </span>
               </div>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-8">
-              <Link href="/features" className="text-sm text-white/40 hover:text-cyan-400 transition-colors tracking-wide uppercase">
+            <nav className="hidden md:flex items-center gap-6">
+              <Link href="/features" className="text-sm text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors tracking-wide uppercase">
                 Features
               </Link>
-              <Link href="/login" className="text-sm text-white/40 hover:text-cyan-400 transition-colors tracking-wide uppercase">
+              <Link href="/login" className="text-sm text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors tracking-wide uppercase">
                 Sign in
               </Link>
-              <Link
+              <ModeToggle />
+              {/* <Link
                 href="/signup"
                 className="group relative px-6 py-2.5 overflow-hidden"
               >
-                {/* Button background */}
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-lg opacity-90 group-hover:opacity-100 transition-opacity" />
-                {/* Scan effect on hover */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="relative text-sm font-semibold text-white tracking-wide uppercase">
                   Get Started
                 </span>
-              </Link>
+              </Link> */}
             </nav>
           </div>
         </div>
@@ -189,20 +189,20 @@ export default function HomePage() {
                   mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
               >
-                <span className="block text-white">
+                <span className="block text-[var(--theme-text-primary)]">
                   UNIFIED
                 </span>
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-300 to-violet-400 glow-cyan">
                   COMMAND
                 </span>
-                <span className="block text-white/80">
+                <span className="block text-[var(--theme-text-secondary)]">
                   CENTER
                 </span>
               </h1>
 
               {/* Subtitle with typing effect styling */}
               <p
-                className={`text-base md:text-lg text-white/40 max-w-lg mb-10 leading-relaxed transition-all duration-1000 delay-200 ${
+                className={`text-base md:text-lg text-[var(--theme-text-muted)] max-w-lg mb-10 leading-relaxed transition-all duration-1000 delay-200 ${
                   mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
               >
@@ -230,15 +230,15 @@ export default function HomePage() {
                     <span className="font-semibold text-white tracking-wide uppercase font-[family-name:var(--font-family-display)]">
                       Get Started
                     </span>
-                    <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                    {/* <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" /> */}
                   </div>
                 </Link>
                 <Link
                   href="/features"
-                  className="group flex items-center gap-3 px-6 py-4 text-white/50 hover:text-white font-medium transition-all border border-white/[0.06] hover:border-white/[0.15] rounded-xl hover:bg-white/[0.02]"
+                  className="group flex items-center gap-3 px-6 py-4 text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] font-medium transition-all border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] rounded-xl hover:bg-[var(--theme-hover-bg)]"
                 >
                   <span className="tracking-wide">Learn More</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {/* <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /> */}
                 </Link>
               </div>
             </div>
@@ -258,9 +258,9 @@ export default function HomePage() {
                   <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-cyan-400/30" />
                 </div>
 
-                <div className="bg-abyss/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 space-y-4">
+                <div className="bg-[var(--theme-bg-secondary)]/80 backdrop-blur-xl border border-[var(--theme-border)] rounded-2xl p-6 space-y-4">
                   {/* Header */}
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+                  <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-4">
                     <span className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider">// SYSTEM_STATUS</span>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -280,8 +280,8 @@ export default function HomePage() {
                         key={stat.label}
                         className={`group relative flex items-center gap-4 p-3 rounded-lg transition-all duration-500 overflow-hidden ${
                           activeStatIndex === index
-                            ? 'bg-white/[0.04] border border-white/[0.08]'
-                            : 'hover:bg-white/[0.02]'
+                            ? 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]'
+                            : 'hover:bg-[var(--theme-hover-bg)]'
                         }`}
                       >
                         {/* Hover HUD corners */}
@@ -294,8 +294,8 @@ export default function HomePage() {
                           <stat.icon className={`w-4 h-4 text-${stat.color}-400`} />
                         </div>
                         <div className="relative flex-1">
-                          <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono">{stat.label}</div>
-                          <div className="text-lg font-bold font-[family-name:var(--font-family-display)] text-white tabular-nums">
+                          <div className="text-[10px] text-[var(--theme-text-muted)] uppercase tracking-wider font-mono">{stat.label}</div>
+                          <div className="text-lg font-bold font-[family-name:var(--font-family-display)] text-[var(--theme-text-primary)] tabular-nums">
                             {stat.value}
                           </div>
                         </div>
@@ -307,8 +307,8 @@ export default function HomePage() {
                   </div>
 
                   {/* Footer */}
-                  <div className="pt-4 border-t border-white/[0.06]">
-                    <div className="flex items-center justify-between text-[10px] font-mono text-white/30">
+                  <div className="pt-4 border-t border-[var(--theme-border)]">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-[var(--theme-text-subtle)]">
                       <span>Last Update: NOW</span>
                       <span>v2.0.0</span>
                     </div>
@@ -337,37 +337,37 @@ export default function HomePage() {
       </section>
 
       {/* Platform Logos Section */}
-      <section className="relative py-20 border-t border-white/[0.04]">
+      <section className="relative py-20 border-t border-[var(--theme-border)]">
         <div className="max-w-[1400px] mx-auto px-8">
           <div className="flex items-center justify-center gap-4 mb-12">
-            <div className="h-px flex-1 max-w-32 bg-gradient-to-r from-transparent to-white/[0.06]" />
-            <span className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider">
+            <div className="h-px flex-1 max-w-32 bg-gradient-to-r from-transparent to-[var(--theme-border)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-accent-cyan)] opacity-60 uppercase tracking-wider">
               // INTEGRATED_PLATFORMS
             </span>
-            <div className="h-px flex-1 max-w-32 bg-gradient-to-l from-transparent to-white/[0.06]" />
+            <div className="h-px flex-1 max-w-32 bg-gradient-to-l from-transparent to-[var(--theme-border)]" />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
             {[
-              { Logo: SteamLogo, name: 'Steam' },
-              { Logo: PlayStationLogo, name: 'PlayStation' },
-              { Logo: XboxLogo, name: 'Xbox' },
-              { Logo: EpicLogo, name: 'Epic' },
-              { Logo: NintendoLogo, name: 'Nintendo' },
-              { Logo: GOGLogo, name: 'GOG' },
-            ].map(({ Logo, name }) => (
+              { Logo: SteamLogo, name: 'Steam', hoverColor: 'group-hover:text-[#66c0f4]', borderColor: 'border-[#66c0f4]/50', glowColor: 'group-hover:bg-[#66c0f4]/10' },
+              { Logo: PlayStationLogo, name: 'PlayStation', hoverColor: 'group-hover:text-[#003087]', borderColor: 'border-[#003087]/50', glowColor: 'group-hover:bg-[#003087]/10' },
+              { Logo: XboxLogo, name: 'Xbox', hoverColor: 'group-hover:text-[#107C10]', borderColor: 'border-[#107C10]/50', glowColor: 'group-hover:bg-[#107C10]/10' },
+              { Logo: EpicLogo, name: 'Epic', hoverColor: 'group-hover:text-black', borderColor: 'border-black/50', glowColor: 'group-hover:bg-[#333333]/30' },
+              { Logo: NintendoLogo, name: 'Nintendo', hoverColor: 'group-hover:text-[#E60012]', borderColor: 'border-[#E60012]/50', glowColor: 'group-hover:bg-[#E60012]/10' },
+              { Logo: GOGLogo, name: 'GOG', hoverColor: 'group-hover:text-[#86328A]', borderColor: 'border-[#86328A]/50', glowColor: 'group-hover:bg-[#86328A]/10' },
+            ].map(({ Logo, name, hoverColor, borderColor, glowColor }) => (
               <div key={name} className="group relative">
                 <div className="relative p-4 overflow-hidden">
                   {/* Hover HUD corners */}
-                  <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className={`absolute top-0 left-0 w-2 h-2 border-l border-t ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className={`absolute top-0 right-0 w-2 h-2 border-r border-t ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className={`absolute bottom-0 left-0 w-2 h-2 border-l border-b ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className={`absolute bottom-0 right-0 w-2 h-2 border-r border-b ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity`} />
 
-                  <Logo size="lg" className="relative text-white/20 group-hover:text-cyan-400/60 transition-all duration-500" />
+                  <Logo size="lg" className={`relative text-[var(--theme-text-subtle)] ${hoverColor} opacity-60 group-hover:opacity-100 transition-all duration-500`} />
                   {/* Glow on hover */}
-                  <div className="absolute inset-0 bg-cyan-400/0 group-hover:bg-cyan-400/5 rounded-full blur-xl transition-all duration-500" />
+                  <div className={`absolute inset-0 bg-transparent ${glowColor} rounded-full blur-xl transition-all duration-500`} />
                 </div>
-                <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] font-mono uppercase tracking-wider text-white/0 group-hover:text-white/30 transition-all duration-300 whitespace-nowrap">
+                <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] font-mono uppercase tracking-wider text-transparent group-hover:text-[var(--theme-text-muted)] transition-all duration-300 whitespace-nowrap">
                   {name}
                 </span>
               </div>
@@ -381,11 +381,11 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-8">
           {/* Section header */}
           <div className="text-center mb-20">
-            <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider mb-4">
+            <span className="inline-block text-[10px] font-mono text-[var(--theme-accent-cyan)] opacity-60 uppercase tracking-wider mb-4">
               // SYSTEM_CAPABILITIES
             </span>
             <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight">
-              <span className="text-white">MISSION </span>
+              <span className="text-[var(--theme-text-primary)]">MISSION </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
                 CONTROL
               </span>
@@ -429,11 +429,11 @@ export default function HomePage() {
         <div className="relative max-w-[1400px] mx-auto px-8">
           {/* Section header */}
           <div className="flex items-center justify-center gap-4 mb-12">
-            <div className="h-px flex-1 max-w-32 bg-gradient-to-r from-transparent to-white/[0.06]" />
-            <span className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider">
+            <div className="h-px flex-1 max-w-32 bg-gradient-to-r from-transparent to-[var(--theme-border)]" />
+            <span className="text-[10px] font-mono text-[var(--theme-accent-cyan)] opacity-60 uppercase tracking-wider">
               // PERFORMANCE_METRICS
             </span>
-            <div className="h-px flex-1 max-w-32 bg-gradient-to-l from-transparent to-white/[0.06]" />
+            <div className="h-px flex-1 max-w-32 bg-gradient-to-l from-transparent to-[var(--theme-border)]" />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -460,19 +460,19 @@ export default function HomePage() {
             <div className="absolute -bottom-8 -left-8 w-16 h-16 border-l-2 border-b-2 border-cyan-400/30" />
             <div className="absolute -bottom-8 -right-8 w-16 h-16 border-r-2 border-b-2 border-cyan-400/30" />
 
-            <span className="inline-block text-[10px] font-mono text-cyan-400/60 uppercase tracking-wider mb-6">
+            <span className="inline-block text-[10px] font-mono text-[var(--theme-accent-cyan)] opacity-60 uppercase tracking-wider mb-6">
               // INITIATE_SEQUENCE
             </span>
 
             <h2 className="relative text-4xl md:text-6xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-6">
-              <span className="text-white">Ready to </span>
+              <span className="text-[var(--theme-text-primary)]">Ready to </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 glow-cyan">
                 Unify
               </span>
-              <span className="text-white">?</span>
+              <span className="text-[var(--theme-text-primary)]">?</span>
             </h2>
 
-            <p className="relative text-white/40 text-lg mb-12 max-w-md mx-auto">
+            <p className="relative text-[var(--theme-text-muted)] text-lg mb-12 max-w-md mx-auto">
               Join the commanders who&apos;ve brought order to their gaming chaos.
             </p>
 
@@ -485,11 +485,11 @@ export default function HomePage() {
                 <span className="font-semibold text-white text-lg tracking-wide uppercase font-[family-name:var(--font-family-display)]">
                   Create Free Account
                 </span>
-                <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                {/* <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" /> */}
               </div>
             </Link>
 
-            <p className="relative mt-8 text-xs text-white/20 font-mono">
+            <p className="relative mt-8 text-xs text-[var(--theme-text-subtle)] font-mono">
               NO CREDIT CARD REQUIRED • INSTANT ACCESS
             </p>
           </div>
@@ -497,7 +497,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 border-t border-white/[0.04]">
+      <footer className="relative py-12 border-t border-[var(--theme-border)]">
         <div className="max-w-[1400px] mx-auto px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -505,23 +505,23 @@ export default function HomePage() {
                 <Gamepad2 className="w-4 h-4 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <span className="text-sm font-semibold text-white/60 font-[family-name:var(--font-family-display)] tracking-wide">
+                <span className="text-sm font-semibold text-[var(--theme-text-secondary)] font-[family-name:var(--font-family-display)] tracking-wide">
                   GAMEHUB
                 </span>
-                <span className="hidden sm:inline text-[10px] text-white/30 ml-3 font-mono">
+                <span className="hidden sm:inline text-[10px] text-[var(--theme-text-muted)] ml-3 font-mono">
                   v2.0.0-beta
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-8">
-              <Link href="/features" className="text-xs text-white/30 hover:text-cyan-400 transition-colors uppercase tracking-wider">
+            {/* <div className="flex items-center gap-8">
+              <Link href="/features" className="text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors uppercase tracking-wider">
                 Features
               </Link>
-              <Link href="/login" className="text-xs text-white/30 hover:text-cyan-400 transition-colors uppercase tracking-wider">
+              <Link href="/login" className="text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors uppercase tracking-wider">
                 Sign in
               </Link>
-            </div>
-            <div className="text-[10px] text-white/20 font-mono">
+            </div> */}
+            <div className="text-[10px] text-[var(--theme-text-subtle)] font-mono">
               &copy; {new Date().getFullYear()} GAMEHUB • ALL SYSTEMS OPERATIONAL
             </div>
           </div>
@@ -550,7 +550,7 @@ function FloatingPlatform({ Logo, delay, x, y }: FloatingPlatformProps) {
       }}
     >
       <div className="relative group">
-        <Logo size="xl" className="text-white/[0.03] group-hover:text-white/[0.08] transition-all duration-1000" />
+        <Logo size="xl" className="text-[var(--theme-text-primary)] opacity-[0.03] group-hover:opacity-[0.08] transition-all duration-1000" />
         {/* Glow effect */}
         <div className="absolute inset-0 bg-cyan-400/0 blur-xl group-hover:bg-cyan-400/10 transition-all duration-1000" />
       </div>
@@ -587,7 +587,7 @@ function FeatureCard({ number, icon: Icon, title, description, color }: FeatureC
   };
 
   return (
-    <div className={`group relative p-8 rounded-2xl border bg-white/[0.01] transition-all duration-500 hover:bg-white/[0.02] hover:shadow-2xl overflow-hidden ${colorClasses[color]}`}>
+    <div className={`group relative p-8 rounded-2xl border bg-[var(--theme-bg-secondary)] transition-all duration-500 hover:bg-[var(--theme-hover-bg)] hover:shadow-2xl overflow-hidden ${colorClasses[color]}`}>
       {/* Hover HUD corners */}
       <div className={`absolute top-0 left-0 w-5 h-5 border-l-2 border-t-2 ${hudColorClasses[color]} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
       <div className={`absolute top-0 right-0 w-5 h-5 border-r-2 border-t-2 ${hudColorClasses[color]} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
@@ -595,7 +595,7 @@ function FeatureCard({ number, icon: Icon, title, description, color }: FeatureC
       <div className={`absolute bottom-0 right-0 w-5 h-5 border-r-2 border-b-2 ${hudColorClasses[color]} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
 
       {/* Number */}
-      <div className="relative text-[10px] text-white/20 font-mono mb-6 tracking-wider">
+      <div className="relative text-[10px] text-[var(--theme-text-subtle)] font-mono mb-6 tracking-wider">
         // {number}
       </div>
 
@@ -605,10 +605,10 @@ function FeatureCard({ number, icon: Icon, title, description, color }: FeatureC
       </div>
 
       {/* Content */}
-      <h3 className="relative text-xl font-bold font-[family-name:var(--font-family-display)] text-white mb-3 tracking-wide">
+      <h3 className="relative text-xl font-bold font-[family-name:var(--font-family-display)] text-[var(--theme-text-primary)] mb-3 tracking-wide">
         {title}
       </h3>
-      <p className="relative text-sm text-white/40 leading-relaxed">
+      <p className="relative text-sm text-[var(--theme-text-muted)] leading-relaxed">
         {description}
       </p>
 
@@ -642,12 +642,12 @@ function StatCard({ value, label, highlight = false }: StatCardProps) {
         className={`relative text-4xl md:text-6xl font-bold font-[family-name:var(--font-family-display)] mb-2 transition-all duration-500 tabular-nums ${
           highlight
             ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 glow-cyan'
-            : 'text-white group-hover:text-cyan-400'
+            : 'text-[var(--theme-text-primary)] group-hover:text-[var(--theme-accent-cyan)]'
         }`}
       >
         {value}
       </div>
-      <div className="relative text-[10px] text-white/30 uppercase tracking-wider font-mono">
+      <div className="relative text-[10px] text-[var(--theme-text-muted)] uppercase tracking-wider font-mono">
         {label}
       </div>
     </div>

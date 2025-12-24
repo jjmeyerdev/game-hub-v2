@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Rajdhani } from 'next/font/google';
+import { ThemeProvider } from '@/components/theme';
 import './globals.css';
 
 const inter = Inter({
@@ -30,8 +31,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${rajdhani.variable}`}>
-      <body>{children}</body>
+    <html lang="en" className={`${inter.variable} ${rajdhani.variable} overflow-x-hidden`} suppressHydrationWarning>
+      <head />
+      <body className="overflow-x-hidden">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

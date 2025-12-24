@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Gamepad2,
-  ArrowRight,
   Layers,
   BarChart3,
   Trophy,
@@ -14,7 +13,6 @@ import {
   Monitor,
   Smartphone,
   Globe,
-  Shield,
   Radio,
   Hand,
   Target,
@@ -36,6 +34,7 @@ import {
   BattleNetLogo,
   UbisoftLogo,
 } from '@/components/icons/PlatformLogos';
+import { ModeToggle } from '@/components/theme';
 
 export default function FeaturesPage() {
   const [mounted, setMounted] = useState(false);
@@ -71,7 +70,7 @@ export default function FeaturesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-void text-white overflow-x-hidden selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)] overflow-x-hidden selection:bg-cyan-500/30">
       {/* Noise texture overlay */}
       <div className="noise-overlay" />
 
@@ -103,7 +102,7 @@ export default function FeaturesPage() {
       </div>
 
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-void/90 backdrop-blur-2xl border-b border-white/[0.04]">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--theme-bg-primary)]/90 backdrop-blur-2xl border-b border-[var(--theme-border)]">
         <div className="max-w-[1400px] mx-auto px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3 group">
@@ -118,28 +117,20 @@ export default function FeaturesPage() {
                 <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-wide text-white font-[family-name:var(--font-family-display)]">
+                <span className="text-lg font-semibold tracking-wide text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">
                   GAMEHUB
                 </span>
-                <span className="text-[9px] font-mono text-white/30 tracking-wider uppercase">
+                <span className="text-[9px] font-mono text-[var(--theme-text-muted)] tracking-wider uppercase">
                   // SYSTEM_SPECS
                 </span>
               </div>
             </Link>
 
             <div className="flex items-center gap-4">
-              <Link href="/login" className="px-5 py-2.5 text-white/50 hover:text-cyan-400 text-sm font-medium transition-colors uppercase tracking-wide">
-                Sign in
+            <Link href="/" className="text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors uppercase tracking-wider">
+                Home
               </Link>
-              <Link
-                href="/signup"
-                className="group relative px-6 py-2.5 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-lg opacity-90 group-hover:opacity-100 transition-opacity" />
-                <span className="relative text-sm font-semibold text-white tracking-wide uppercase">
-                  Get Started
-                </span>
-              </Link>
+              <ModeToggle />
             </div>
           </div>
         </div>
@@ -204,7 +195,7 @@ export default function FeaturesPage() {
                   mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
               >
-                <span className="block text-white">SYSTEM</span>
+                <span className="block text-[var(--theme-text-primary)]">SYSTEM</span>
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-300 to-violet-400 glow-cyan">
                   CAPABILITIES
                 </span>
@@ -212,7 +203,7 @@ export default function FeaturesPage() {
 
               {/* Subtitle */}
               <p
-                className={`text-base md:text-lg text-white/40 max-w-lg mb-10 leading-relaxed transition-all duration-1000 delay-200 ${
+                className={`text-base md:text-lg text-[var(--theme-text-muted)] max-w-lg mb-10 leading-relaxed transition-all duration-1000 delay-200 ${
                   mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
               >
@@ -236,15 +227,15 @@ export default function FeaturesPage() {
                     <span className="font-semibold text-white tracking-wide uppercase font-[family-name:var(--font-family-display)]">
                       Get Started
                     </span>
-                    <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                    {/* <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" /> */}
                   </div>
                 </Link>
                 <a
                   href="#platforms"
-                  className="group flex items-center gap-3 px-6 py-4 text-white/50 hover:text-white font-medium transition-all border border-white/[0.06] hover:border-white/[0.15] rounded-xl hover:bg-white/[0.02]"
+                  className="group flex items-center gap-3 px-6 py-4 text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] font-medium transition-all border border-[var(--theme-border)] hover:border-[var(--theme-text-muted)] rounded-xl hover:bg-[var(--theme-hover-bg)]"
                 >
                   <span className="tracking-wide">View Integrations</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {/* <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /> */}
                 </a>
               </div>
             </div>
@@ -279,18 +270,18 @@ export default function FeaturesPage() {
                 </span>
               </div>
               <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/30 to-transparent" />
-              <span className="text-[10px] font-mono text-white/20">// 01</span>
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// 01</span>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8 mb-12">
               <div>
                 <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4">
-                  <span className="text-white">CONNECTED </span>
+                  <span className="text-[var(--theme-text-primary)]">CONNECTED </span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
                     PLATFORMS
                   </span>
                 </h2>
-                <p className="text-white/40 text-lg leading-relaxed max-w-md">
+                <p className="text-[var(--theme-text-muted)] text-lg leading-relaxed max-w-md">
                   <span className="text-cyan-400/60 font-mono text-sm">&gt;</span> Establish link once. Automatic synchronization forever.
                   Real-time data stream for games, achievements, and playtime.
                 </p>
@@ -327,7 +318,7 @@ export default function FeaturesPage() {
                 name="Epic Games"
                 description="Library sync including weekly free game claims"
                 icon={<EpicLogo size="lg" />}
-                color="#ffffff"
+                color="#000000"
                 stats={{ games: '500+', sync: '30 min' }}
                 status="online"
               />
@@ -337,22 +328,22 @@ export default function FeaturesPage() {
           {/* Manual Platforms */}
           <div>
             <div className="flex items-center gap-4 mb-12">
-              <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                <Hand className="w-4 h-4 text-white/40" />
-                <span className="text-[10px] font-semibold text-white/40 uppercase tracking-[0.2em] font-[family-name:var(--font-family-display)]">
+              <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]">
+                <Hand className="w-4 h-4 text-[var(--theme-text-muted)]" />
+                <span className="text-[10px] font-semibold text-[var(--theme-text-muted)] uppercase tracking-[0.2em] font-[family-name:var(--font-family-display)]">
                   Manual Entry Protocol
                 </span>
               </div>
-              <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
-              <span className="text-[10px] font-mono text-white/20">// 02</span>
+              <div className="h-px flex-1 bg-gradient-to-r from-[var(--theme-border)] to-transparent" />
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// 02</span>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8 mb-8">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4 text-white/80">
+                <h2 className="text-3xl md:text-4xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4 text-[var(--theme-text-secondary)]">
                   EXTENDED PLATFORM SUPPORT
                 </h2>
-                <p className="text-white/30 leading-relaxed max-w-md">
+                <p className="text-[var(--theme-text-muted)] leading-relaxed max-w-md">
                   No public API access? Manual tracking enables full feature support
                   for any gaming platform in the ecosystem.
                 </p>
@@ -361,14 +352,14 @@ export default function FeaturesPage() {
 
             {/* Manual Platform Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              <ManualPlatformCard name="Nintendo" icon={<NintendoLogo size="md" />} />
-              <ManualPlatformCard name="GOG Galaxy" icon={<GOGLogo size="md" />} />
-              <ManualPlatformCard name="EA App" icon={<EALogo size="md" />} />
-              <ManualPlatformCard name="Battle.net" icon={<BattleNetLogo size="md" />} />
-              <ManualPlatformCard name="Ubisoft" icon={<UbisoftLogo size="md" />} />
+              <ManualPlatformCard name="Nintendo" icon={<NintendoLogo size="md" />} brandColor="#E60012" />
+              <ManualPlatformCard name="GOG Galaxy" icon={<GOGLogo size="md" />} brandColor="#86328A" />
+              <ManualPlatformCard name="EA App" icon={<EALogo size="md" />} brandColor="#ff4747" />
+              <ManualPlatformCard name="Battle.net" icon={<BattleNetLogo size="md" />} brandColor="#00AEFF" />
+              <ManualPlatformCard name="Ubisoft" icon={<UbisoftLogo size="md" />} brandColor="#0070ff" />
             </div>
 
-            <p className="text-white/20 text-xs mt-6 font-mono">
+            <p className="text-[var(--theme-text-subtle)] text-xs mt-6 font-mono">
               + ADDITIONAL: Physical media, retro consoles, indie platforms, and custom entries supported
             </p>
           </div>
@@ -392,13 +383,13 @@ export default function FeaturesPage() {
               // CORE_SYSTEMS_ARRAY
             </span>
             <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4">
-              <span className="text-white">MISSION </span>
+              <span className="text-[var(--theme-text-primary)]">MISSION </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
                 CRITICAL
               </span>
-              <span className="text-white"> MODULES</span>
+              <span className="text-[var(--theme-text-primary)]"> MODULES</span>
             </h2>
-            <p className="text-white/40 text-lg max-w-xl mx-auto">
+            <p className="text-[var(--theme-text-muted)] text-lg max-w-xl mx-auto">
               Six integrated subsystems engineered for total gaming dominance.
             </p>
           </div>
@@ -457,7 +448,7 @@ export default function FeaturesPage() {
         className="relative py-24"
       >
         <div className="max-w-[1400px] mx-auto px-8">
-          <div className="relative rounded-2xl border border-white/[0.06] bg-abyss/50 overflow-hidden">
+          <div className="relative rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]/50 overflow-hidden">
             {/* HUD corners */}
             <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-cyan-400/30" />
             <div className="absolute top-0 right-0 w-12 h-12 border-r-2 border-t-2 border-cyan-400/30" />
@@ -499,12 +490,12 @@ export default function FeaturesPage() {
                 // DEPLOYMENT_OPTIONS
               </span>
               <h2 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-6">
-                <span className="text-white">UNIVERSAL </span>
+                <span className="text-[var(--theme-text-primary)]">UNIVERSAL </span>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
                   ACCESS
                 </span>
               </h2>
-              <p className="text-white/40 text-lg leading-relaxed mb-10 max-w-md">
+              <p className="text-[var(--theme-text-muted)] text-lg leading-relaxed mb-10 max-w-md">
                 Command center synchronized across all endpoints. Check your backlog
                 from the couch, plan sessions on the move.
               </p>
@@ -548,14 +539,14 @@ export default function FeaturesPage() {
             </span>
 
             <h2 className="relative text-4xl md:text-6xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-6">
-              <span className="text-white">Ready to </span>
+              <span className="text-[var(--theme-text-primary)]">Ready to </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 glow-cyan">
                 Get Started
               </span>
-              <span className="text-white">?</span>
+              <span className="text-[var(--theme-text-primary)]">?</span>
             </h2>
 
-            <p className="relative text-white/40 text-lg mb-12 max-w-md mx-auto">
+            <p className="relative text-[var(--theme-text-muted)] text-lg mb-12 max-w-md mx-auto">
               Initialize your command center. Free forever for personal operations.
             </p>
 
@@ -568,11 +559,11 @@ export default function FeaturesPage() {
                 <span className="font-semibold text-white text-lg tracking-wide uppercase font-[family-name:var(--font-family-display)]">
                   Create Free Account
                 </span>
-                <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+                {/* <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" /> */}
               </div>
             </Link>
 
-            <p className="relative mt-8 text-xs text-white/20 font-mono">
+            <p className="relative mt-8 text-xs text-[var(--theme-text-subtle)] font-mono">
               NO CREDIT CARD REQUIRED • INSTANT ACCESS • UNLIMITED GAMES
             </p>
           </div>
@@ -580,7 +571,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 border-t border-white/[0.04]">
+      <footer className="relative py-12 border-t border-[var(--theme-border)]">
         <div className="max-w-[1400px] mx-auto px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -588,23 +579,23 @@ export default function FeaturesPage() {
                 <Gamepad2 className="w-4 h-4 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <span className="text-sm font-semibold text-white/60 font-[family-name:var(--font-family-display)] tracking-wide">
+                <span className="text-sm font-semibold text-[var(--theme-text-muted)] font-[family-name:var(--font-family-display)] tracking-wide">
                   GAMEHUB
                 </span>
-                <span className="hidden sm:inline text-[10px] text-white/30 ml-3 font-mono">
+                <span className="hidden sm:inline text-[10px] text-[var(--theme-text-subtle)] ml-3 font-mono">
                   v2.0.0-beta
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-8">
-              <Link href="/" className="text-xs text-white/30 hover:text-cyan-400 transition-colors uppercase tracking-wider">
+            {/* <div className="flex items-center gap-8">
+              <Link href="/" className="text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors uppercase tracking-wider">
                 Home
               </Link>
-              <Link href="/login" className="text-xs text-white/30 hover:text-cyan-400 transition-colors uppercase tracking-wider">
+              <Link href="/login" className="text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-cyan)] transition-colors uppercase tracking-wider">
                 Sign in
               </Link>
-            </div>
-            <div className="text-[10px] text-white/20 font-mono">
+            </div> */}
+            <div className="text-[10px] text-[var(--theme-text-subtle)] font-mono">
               &copy; {new Date().getFullYear()} GAMEHUB • ALL SYSTEMS OPERATIONAL
             </div>
           </div>
@@ -613,7 +604,7 @@ export default function FeaturesPage() {
 
       {/* Progress indicator */}
       <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-3">
-        <div className="text-[8px] font-mono text-white/20 uppercase tracking-wider -rotate-90 origin-center mb-4">
+        <div className="text-[8px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider -rotate-90 origin-center mb-4">
           Section
         </div>
         {[0, 1, 2, 3, 4, 5].map((index) => (
@@ -622,7 +613,7 @@ export default function FeaturesPage() {
             className={`relative w-2 h-2 rounded-full transition-all duration-500 ${
               activeSection === index
                 ? 'bg-cyan-400 scale-150'
-                : 'bg-white/20 hover:bg-white/40'
+                : 'bg-[var(--theme-text-subtle)] hover:bg-[var(--theme-text-muted)]'
             }`}
           >
             {activeSection === index && (
@@ -658,9 +649,9 @@ function SystemStatusPanel() {
         <div className="absolute bottom-0 right-0 w-10 h-10 border-r-2 border-b-2 border-cyan-400/40" />
       </div>
 
-      <div className="bg-abyss/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
+      <div className="bg-[var(--theme-bg-secondary)]/80 backdrop-blur-xl border border-[var(--theme-border)] rounded-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-white/[0.01]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-hover-bg)]">
           <div className="flex items-center gap-3">
             <Server className="w-4 h-4 text-cyan-400" />
             <span className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-wider">
@@ -681,8 +672,8 @@ function SystemStatusPanel() {
           </div>
 
           {/* Metrics */}
-          <div className="pt-4 border-t border-white/[0.06]">
-            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider mb-3">
+          <div className="pt-4 border-t border-[var(--theme-border)]">
+            <div className="text-[9px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider mb-3">
               Platform Connections
             </div>
             <div className="space-y-2">
@@ -694,8 +685,8 @@ function SystemStatusPanel() {
           </div>
 
           {/* Footer */}
-          <div className="pt-4 border-t border-white/[0.06]">
-            <div className="flex items-center justify-between text-[9px] font-mono text-white/30">
+          <div className="pt-4 border-t border-[var(--theme-border)]">
+            <div className="flex items-center justify-between text-[9px] font-mono text-[var(--theme-text-muted)]">
               <span>Latency: 12ms</span>
               <span>Build: 2.0.0-b47</span>
             </div>
@@ -714,7 +705,7 @@ function StatusIndicator({ label, status }: { label: string; status: 'online' | 
   };
 
   return (
-    <div className="group relative flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-colors overflow-hidden">
+    <div className="group relative flex items-center gap-2 p-2 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-text-subtle)] transition-colors overflow-hidden">
       {/* Hover HUD corners */}
       <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -722,7 +713,7 @@ function StatusIndicator({ label, status }: { label: string; status: 'online' | 
       <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <div className={`relative w-1.5 h-1.5 rounded-full ${statusColors[status]}`} />
-      <span className="relative text-[10px] text-white/50 font-mono">{label}</span>
+      <span className="relative text-[10px] text-[var(--theme-text-muted)] font-mono">{label}</span>
     </div>
   );
 }
@@ -738,10 +729,10 @@ function MetricBar({ label, value, color }: { label: string; value: number; colo
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-[10px]">
-        <span className="text-white/40 font-mono">{label}</span>
-        <span className="font-mono text-white/60 tabular-nums">{value}%</span>
+        <span className="text-[var(--theme-text-muted)] font-mono">{label}</span>
+        <span className="font-mono text-[var(--theme-text-secondary)] tabular-nums">{value}%</span>
       </div>
-      <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+      <div className="h-1 bg-[var(--theme-border)] rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full ${colorClasses[color]} transition-all duration-1000`}
           style={{ width: `${value}%` }}
@@ -763,7 +754,7 @@ interface ConnectedPlatformCardProps {
 
 function ConnectedPlatformCard({ name, description, icon, color, stats, status }: ConnectedPlatformCardProps) {
   return (
-    <div className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.01] overflow-hidden transition-all duration-500 hover:border-cyan-400/30 hover:bg-white/[0.02]">
+    <div className="group relative rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-hover-bg)] overflow-hidden transition-all duration-500 hover:border-cyan-400/30 hover:bg-[var(--theme-active-bg)]">
       {/* Hover HUD corners */}
       <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
       <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
@@ -798,19 +789,19 @@ function ConnectedPlatformCard({ name, description, icon, color, stats, status }
         >
           {icon}
         </div>
-        <h3 className="text-lg font-bold font-[family-name:var(--font-family-display)] text-white mb-2 tracking-wide">
+        <h3 className="text-lg font-bold font-[family-name:var(--font-family-display)] text-[var(--theme-text-primary)] mb-2 tracking-wide">
           {name}
         </h3>
-        <p className="text-xs text-white/30 mb-4 leading-relaxed">{description}</p>
+        <p className="text-xs text-[var(--theme-text-muted)] mb-4 leading-relaxed">{description}</p>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 pt-4 border-t border-white/[0.06]">
+        <div className="flex items-center gap-4 pt-4 border-t border-[var(--theme-border)]">
           <div>
-            <div className="text-[9px] text-white/30 uppercase tracking-wider">Games</div>
-            <div className="text-sm font-bold text-white font-mono">{stats.games}</div>
+            <div className="text-[9px] text-[var(--theme-text-muted)] uppercase tracking-wider">Games</div>
+            <div className="text-sm font-bold text-[var(--theme-text-primary)] font-mono">{stats.games}</div>
           </div>
           <div>
-            <div className="text-[9px] text-white/30 uppercase tracking-wider">Sync</div>
+            <div className="text-[9px] text-[var(--theme-text-muted)] uppercase tracking-wider">Sync</div>
             <div className="text-sm font-bold text-cyan-400 font-mono">{stats.sync}</div>
           </div>
         </div>
@@ -823,22 +814,32 @@ function ConnectedPlatformCard({ name, description, icon, color, stats, status }
 interface ManualPlatformCardProps {
   name: string;
   icon: React.ReactNode;
+  brandColor: string;
 }
 
-function ManualPlatformCard({ name, icon }: ManualPlatformCardProps) {
+function ManualPlatformCard({ name, icon, brandColor }: ManualPlatformCardProps) {
   return (
-    <div className="group relative p-4 rounded-xl border border-white/[0.04] bg-white/[0.01] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.02] overflow-hidden">
+    <div className="group relative p-4 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-hover-bg)] transition-all duration-300 overflow-hidden hover:scale-[1.02]">
+      {/* Hover glow background */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ backgroundColor: `${brandColor}15` }}
+      />
+
       {/* Hover HUD corners */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderColor: `${brandColor}80` }} />
+      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderColor: `${brandColor}80` }} />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderColor: `${brandColor}80` }} />
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderColor: `${brandColor}80` }} />
 
       <div className="relative flex items-center gap-3">
-        <div className="text-white/30 group-hover:text-white/60 transition-colors">
+        <div
+          className="transition-all duration-300 group-hover:scale-110"
+          style={{ color: brandColor }}
+        >
           {icon}
         </div>
-        <span className="text-sm font-medium text-white/50 group-hover:text-white/80 transition-colors font-[family-name:var(--font-family-display)] tracking-wide">
+        <span className="text-sm font-medium text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)] transition-colors font-[family-name:var(--font-family-display)] tracking-wide">
           {name}
         </span>
       </div>
@@ -898,7 +899,7 @@ function FeatureCard({ number, icon: Icon, title, description, color }: FeatureC
   const colors = featureColors[color];
 
   return (
-    <div className={`group relative p-6 rounded-2xl border bg-white/[0.01] transition-all duration-500 hover:bg-white/[0.02] hover:shadow-2xl overflow-hidden ${colors.border} ${colors.glow}`}>
+    <div className={`group relative p-6 rounded-2xl border bg-[var(--theme-hover-bg)] transition-all duration-500 hover:bg-[var(--theme-active-bg)] hover:shadow-2xl overflow-hidden ${colors.border} ${colors.glow}`}>
       {/* Hover HUD corners */}
       <div className={`absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
       <div className={`absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
@@ -906,7 +907,7 @@ function FeatureCard({ number, icon: Icon, title, description, color }: FeatureC
       <div className={`absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 ${colors.hud} opacity-0 group-hover:opacity-100 transition-opacity z-10`} />
 
       {/* Number */}
-      <div className="relative text-[10px] text-white/20 font-mono mb-4 tracking-wider">// {number}</div>
+      <div className="relative text-[10px] text-[var(--theme-text-subtle)] font-mono mb-4 tracking-wider">// {number}</div>
 
       {/* Icon */}
       <div className={`relative inline-flex p-3 rounded-xl mb-4 ${colors.icon}`}>
@@ -914,10 +915,10 @@ function FeatureCard({ number, icon: Icon, title, description, color }: FeatureC
       </div>
 
       {/* Content */}
-      <h3 className="relative text-lg font-bold font-[family-name:var(--font-family-display)] text-white mb-2 tracking-wide">
+      <h3 className="relative text-lg font-bold font-[family-name:var(--font-family-display)] text-[var(--theme-text-primary)] mb-2 tracking-wide">
         {title}
       </h3>
-      <p className="relative text-sm text-white/40 leading-relaxed">{description}</p>
+      <p className="relative text-sm text-[var(--theme-text-muted)] leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -932,13 +933,13 @@ function TechSpec({ value, label, icon: Icon }: { value: string; label: string; 
       <div className="absolute bottom-0 left-0 w-3 h-3 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 right-0 w-3 h-3 border-r border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      <div className="relative inline-flex p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] mb-4 group-hover:border-cyan-400/30 transition-colors">
+      <div className="relative inline-flex p-3 rounded-xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] mb-4 group-hover:border-cyan-400/30 transition-colors">
         <Icon className="w-5 h-5 text-cyan-400/60 group-hover:text-cyan-400 transition-colors" />
       </div>
-      <div className="relative text-3xl md:text-4xl font-bold font-[family-name:var(--font-family-display)] text-white mb-1 group-hover:text-cyan-400 transition-colors tabular-nums">
+      <div className="relative text-3xl md:text-4xl font-bold font-[family-name:var(--font-family-display)] text-[var(--theme-text-primary)] mb-1 group-hover:text-cyan-400 transition-colors tabular-nums">
         {value}
       </div>
-      <div className="relative text-[10px] text-white/30 uppercase tracking-[0.2em] font-mono">{label}</div>
+      <div className="relative text-[10px] text-[var(--theme-text-muted)] uppercase tracking-[0.2em] font-mono">{label}</div>
     </div>
   );
 }
@@ -946,7 +947,7 @@ function TechSpec({ value, label, icon: Icon }: { value: string; label: string; 
 // Device Card
 function DeviceCard({ icon: Icon, title, status }: { icon: React.ElementType; title: string; status: string }) {
   return (
-    <div className="group relative flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-cyan-400/20 transition-all overflow-hidden">
+    <div className="group relative flex items-center gap-4 p-4 rounded-xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-cyan-400/20 transition-all overflow-hidden">
       {/* Hover HUD corners */}
       <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -957,8 +958,8 @@ function DeviceCard({ icon: Icon, title, status }: { icon: React.ElementType; ti
         <Icon className="w-5 h-5 text-cyan-400" />
       </div>
       <div className="relative">
-        <div className="text-sm font-medium text-white">{title}</div>
-        <div className="text-[10px] text-white/40 font-mono uppercase">{status}</div>
+        <div className="text-sm font-medium text-[var(--theme-text-primary)]">{title}</div>
+        <div className="text-[10px] text-[var(--theme-text-muted)] font-mono uppercase">{status}</div>
       </div>
     </div>
   );
@@ -976,16 +977,16 @@ function TerminalMockup() {
         <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-cyan-400/30" />
       </div>
 
-      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/[0.06] bg-abyss">
+      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]">
         {/* Terminal header */}
-        <div className="absolute top-0 left-0 right-0 h-10 bg-white/[0.02] border-b border-white/[0.04] flex items-center px-4 gap-2">
+        <div className="absolute top-0 left-0 right-0 h-10 bg-[var(--theme-hover-bg)] border-b border-[var(--theme-border)] flex items-center px-4 gap-2">
           <div className="flex gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-amber-400/60" />
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/60" />
           </div>
           <div className="flex-1 text-center">
-            <span className="text-[10px] font-mono text-white/30">gamehub — bash</span>
+            <span className="text-[10px] font-mono text-[var(--theme-text-muted)]">gamehub — bash</span>
           </div>
         </div>
 
@@ -995,9 +996,9 @@ function TerminalMockup() {
             <div>
               <span className="text-emerald-400">➜</span>
               <span className="text-cyan-400"> ~/gamehub</span>
-              <span className="text-white/60"> gamehub status</span>
+              <span className="text-[var(--theme-text-muted)]"> gamehub status</span>
             </div>
-            <div className="text-white/40 pl-2">
+            <div className="text-[var(--theme-text-muted)] pl-2">
               <div className="text-emerald-400">✓ Steam connected (247 games)</div>
               <div className="text-emerald-400">✓ PlayStation connected (89 games)</div>
               <div className="text-emerald-400">✓ Xbox connected (156 games)</div>
@@ -1006,7 +1007,7 @@ function TerminalMockup() {
             <div className="pt-2">
               <span className="text-emerald-400">➜</span>
               <span className="text-cyan-400"> ~/gamehub</span>
-              <span className="text-white/60"> gamehub sync --all</span>
+              <span className="text-[var(--theme-text-muted)]"> gamehub sync --all</span>
             </div>
             <div className="text-cyan-400/80 pl-2 animate-pulse">
               Syncing all platforms...

@@ -82,9 +82,9 @@ export function SectionHeader({
           </div>
         )}
         <div>
-          <h2 className="text-2xl font-bold text-white tracking-wide">{title}</h2>
+          <h2 className="text-2xl font-bold text-[var(--theme-text-primary)] tracking-wide">{title}</h2>
           {description && (
-            <p className="text-gray-400 text-sm">{description}</p>
+            <p className="text-[var(--theme-text-muted)] text-sm">{description}</p>
           )}
         </div>
       </div>

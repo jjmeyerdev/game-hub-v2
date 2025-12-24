@@ -63,7 +63,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
       }}
     >
       {/* Main container with warning glow */}
-      <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-abyss/95 backdrop-blur-xl shadow-2xl shadow-amber-500/10">
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-[var(--theme-bg-secondary)] backdrop-blur-xl shadow-2xl shadow-amber-500/10">
 
         {/* Animated warning stripe pattern at top */}
         <div className="absolute top-0 left-0 right-0 h-1.5 overflow-hidden">
@@ -83,7 +83,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 p-1 rounded-lg bg-deep/60 border border-steel/30 text-gray-500 hover:text-white hover:border-amber-500/50 hover:bg-amber-500/10 transition-all z-10"
+          className="absolute top-3 right-3 p-1 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] hover:border-amber-500/50 hover:bg-amber-500/10 transition-all z-10"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -107,20 +107,20 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
             </div>
 
             <div className="flex-1 min-w-0 pr-6">
-              <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+              <h3 className="text-base font-bold text-[var(--theme-text-primary)] mb-1 flex items-center gap-2">
                 Steam API Rate Limited
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
               </h3>
-              <p className="text-xs text-gray-400 leading-relaxed">
+              <p className="text-xs text-[var(--theme-text-muted)] leading-relaxed">
                 Too many requests sent to Steam. Session tracking is paused to protect your account.
               </p>
             </div>
           </div>
 
           {/* Countdown display */}
-          <div className="relative mb-4 p-3 bg-deep/60 border border-steel/20 rounded-xl">
+          <div className="relative mb-4 p-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-xs text-gray-400">
+              <div className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)]">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
                 <span>Resuming in</span>
               </div>
@@ -133,7 +133,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
             </div>
 
             {/* Progress bar */}
-            <div className="h-1.5 bg-void rounded-full overflow-hidden">
+            <div className="h-1.5 bg-[var(--theme-bg-primary)] rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-1000 ease-linear"
                 style={{
@@ -146,7 +146,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
           </div>
 
           {/* Info footer */}
-          <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider">
             <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
             <span>Steam allows 200 requests per 5 minutes</span>
           </div>

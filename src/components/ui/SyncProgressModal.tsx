@@ -368,21 +368,16 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[100] bg-void/95 backdrop-blur-md"
-        style={{
-          background: `radial-gradient(ellipse at center, rgba(10, 10, 11, 0.98) 0%, rgba(3, 3, 4, 0.99) 100%)`,
-        }}
+        className="fixed inset-0 z-[100] bg-[var(--theme-bg-primary)]/95 backdrop-blur-md"
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
         <div
-          className="relative w-full max-w-lg overflow-hidden rounded-2xl animate-modal-slide-in"
+          className="relative w-full max-w-lg overflow-hidden rounded-2xl animate-modal-slide-in bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)]"
           style={{
-            background: 'linear-gradient(180deg, #0f1011 0%, #0a0a0b 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
             boxShadow: `
-              0 0 0 1px rgba(255, 255, 255, 0.02),
+              0 0 0 1px var(--theme-border),
               0 4px 60px ${config.glow},
               0 25px 50px -12px rgba(0, 0, 0, 0.6)
             `,
@@ -405,20 +400,20 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
           {/* Corner accents */}
           <div className="absolute top-0 left-0 w-8 h-8">
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-white/20 to-transparent" />
-            <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-white/20 to-transparent" />
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-[var(--theme-text-primary)]/20 to-transparent" />
+            <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-[var(--theme-text-primary)]/20 to-transparent" />
           </div>
           <div className="absolute top-0 right-0 w-8 h-8">
-            <div className="absolute top-0 right-0 w-full h-px bg-gradient-to-l from-white/20 to-transparent" />
-            <div className="absolute top-0 right-0 h-full w-px bg-gradient-to-b from-white/20 to-transparent" />
+            <div className="absolute top-0 right-0 w-full h-px bg-gradient-to-l from-[var(--theme-text-primary)]/20 to-transparent" />
+            <div className="absolute top-0 right-0 h-full w-px bg-gradient-to-b from-[var(--theme-text-primary)]/20 to-transparent" />
           </div>
           <div className="absolute bottom-0 left-0 w-8 h-8">
-            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-white/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 h-full w-px bg-gradient-to-t from-white/10 to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-[var(--theme-text-primary)]/10 to-transparent" />
+            <div className="absolute bottom-0 left-0 h-full w-px bg-gradient-to-t from-[var(--theme-text-primary)]/10 to-transparent" />
           </div>
           <div className="absolute bottom-0 right-0 w-8 h-8">
-            <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-l from-white/10 to-transparent" />
-            <div className="absolute bottom-0 right-0 h-full w-px bg-gradient-to-t from-white/10 to-transparent" />
+            <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-l from-[var(--theme-text-primary)]/10 to-transparent" />
+            <div className="absolute bottom-0 right-0 h-full w-px bg-gradient-to-t from-[var(--theme-text-primary)]/10 to-transparent" />
           </div>
 
           {/* Header */}
@@ -428,13 +423,11 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
                 {/* Platform indicator */}
                 <div className="relative">
                   <div
-                    className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300"
-                    style={{
-                      background: isCompleting
-                        ? 'rgba(52, 211, 153, 0.1)'
-                        : `rgba(255, 255, 255, 0.03)`,
-                      border: `1px solid ${isCompleting ? 'rgba(52, 211, 153, 0.3)' : 'rgba(255, 255, 255, 0.06)'}`,
-                    }}
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      isCompleting
+                        ? 'bg-emerald-500/10 border border-emerald-500/30'
+                        : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]'
+                    }`}
                   >
                     {isCompleting ? (
                       <CheckCircle2 className="w-7 h-7 text-emerald-400" />
@@ -465,7 +458,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
                   >
                     {isCompleting ? 'Sync Complete!' : `${config.name} Sync`}
                   </h3>
-                  <p className="text-[11px] text-white/40 font-medium tracking-wider uppercase">
+                  <p className="text-[11px] text-[var(--theme-text-subtle)] font-medium tracking-wider uppercase">
                     {isCompleting ? 'All data synchronized' : config.apiNote}
                   </p>
                 </div>
@@ -473,12 +466,12 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
               {/* Timer section */}
               <div className="text-right">
-                <div className="flex items-center gap-1.5 justify-end text-white/40">
+                <div className="flex items-center gap-1.5 justify-end text-[var(--theme-text-subtle)]">
                   <Clock className="w-3 h-3" />
                   <span className="text-[10px] uppercase tracking-wider font-medium">Elapsed</span>
                 </div>
                 <div
-                  className="text-2xl font-bold tabular-nums text-white"
+                  className="text-2xl font-bold tabular-nums text-[var(--theme-text-primary)]"
                   style={{ fontFamily: 'var(--font-family-display)' }}
                 >
                   {formatTime(elapsedTime)}
@@ -492,7 +485,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
             {/* Main progress bar */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
+                <span className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider font-medium">
                   {hasRealProgress
                     ? `${progress?.current?.toLocaleString()} / ${progress?.total?.toLocaleString()} items`
                     : currentPhase.description
@@ -511,10 +504,9 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
               {/* Progress bar */}
               <div
-                className="relative h-2.5 rounded-full overflow-hidden"
+                className="relative h-2.5 rounded-full overflow-hidden bg-[var(--theme-border)]"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.3)',
+                  boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.2)',
                 }}
               >
                 {/* Animated pattern */}
@@ -565,13 +557,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
             </div>
 
             {/* Phase timeline */}
-            <div
-              className="relative p-4 rounded-xl"
-              style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.04)',
-              }}
-            >
+            <div className="relative p-4 rounded-xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]">
               <div className="flex items-center gap-3">
                 {/* Current phase icon */}
                 <div
@@ -587,10 +573,10 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
                 {/* Phase info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">
+                  <p className="text-sm font-semibold text-[var(--theme-text-primary)] truncate">
                     {progress?.message || currentPhase.label}
                   </p>
-                  <p className="text-[11px] text-white/40 truncate">
+                  <p className="text-[11px] text-[var(--theme-text-subtle)] truncate">
                     {currentPhase.description}
                   </p>
                 </div>
@@ -606,12 +592,12 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
                   >
                     {displayPhaseIndex + 1}/{phases.length}
                   </div>
-                  <div className="text-[9px] text-white/30 uppercase tracking-wider">Phase</div>
+                  <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase tracking-wider">Phase</div>
                 </div>
               </div>
 
               {/* Phase progress dots */}
-              <div className="flex items-center gap-1 mt-3 pt-3 border-t border-white/[0.04]">
+              <div className="flex items-center gap-1 mt-3 pt-3 border-t border-[var(--theme-border)]">
                 {phases.map((phase, i) => (
                   <div key={phase.id} className="flex-1 flex items-center gap-1">
                     <div
@@ -645,13 +631,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
             {/* Activity waveform with stats */}
             <div className="grid grid-cols-3 gap-3">
               {/* Waveform */}
-              <div
-                className="col-span-2 relative min-h-[5.5rem] rounded-xl overflow-hidden"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)',
-                }}
-              >
+              <div className="col-span-2 relative min-h-[5.5rem] rounded-xl overflow-hidden bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]">
                 <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 88" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id={`waveGrad-${platform}`} x1="0%" y1="0%" x2="0%" y2="100%">
@@ -685,29 +665,23 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
                 </svg>
 
                 {processingRate > 0 && (
-                  <div className="absolute top-2 right-3 flex items-center gap-1.5 text-[10px] font-medium text-white/50">
+                  <div className="absolute top-2 right-3 flex items-center gap-1.5 text-[10px] font-medium text-[var(--theme-text-muted)]">
                     <Gauge className="w-3 h-3" style={{ color: config.accent }} />
                     <span className="tabular-nums">{processingRate.toFixed(1)}/s</span>
                   </div>
                 )}
 
-                <div className="absolute bottom-2 left-3 text-[9px] font-medium text-white/30 uppercase tracking-widest">
+                <div className="absolute bottom-2 left-3 text-[9px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-widest">
                   Activity
                 </div>
               </div>
 
               {/* Stats panel */}
-              <div
-                className="flex flex-col justify-center items-center p-3 rounded-xl min-h-[5.5rem]"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)',
-                }}
-              >
+              <div className="flex flex-col justify-center items-center p-3 rounded-xl min-h-[5.5rem] bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]">
                 <div className="mb-1" style={{ color: config.accent }}>
                   <StatIcon className="w-5 h-5" />
                 </div>
-                <div className="text-[9px] text-white/40 uppercase tracking-wider font-medium">
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase tracking-wider font-medium">
                   {config.statLabel}
                 </div>
                 {estimatedRemaining > 0 && !isCompleting && (
@@ -731,7 +705,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
             <div className="flex items-center justify-between">
               {/* Platform tip */}
               <div
-                className="flex-1 text-[10px] text-white/30 truncate pr-4 transition-opacity duration-500"
+                className="flex-1 text-[10px] text-[var(--theme-text-subtle)] truncate pr-4 transition-opacity duration-500"
                 style={{ opacity: isCompleting ? 0 : 1 }}
               >
                 {tips[tipIndex]}
@@ -749,7 +723,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
                     animation: isCompleting ? 'none' : 'pulseGlow 2s ease-in-out infinite',
                   }}
                 />
-                <span className="text-[10px] text-white/40 font-medium uppercase tracking-wider">
+                <span className="text-[10px] text-[var(--theme-text-subtle)] font-medium uppercase tracking-wider">
                   {isCompleting ? 'Complete' : 'Syncing'}
                 </span>
               </div>
@@ -758,13 +732,11 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
 
           {/* Footer */}
           <div
-            className="px-6 py-4 border-t transition-colors duration-300"
-            style={{
-              borderColor: isCompleting ? 'rgba(52, 211, 153, 0.1)' : 'rgba(255, 255, 255, 0.04)',
-              background: 'rgba(0, 0, 0, 0.2)',
-            }}
+            className={`px-6 py-4 border-t transition-colors duration-300 bg-[var(--theme-bg-primary)]/50 ${
+              isCompleting ? 'border-emerald-500/10' : 'border-[var(--theme-border)]'
+            }`}
           >
-            <p className="text-[11px] text-white/40 text-center font-medium">
+            <p className="text-[11px] text-[var(--theme-text-subtle)] text-center font-medium">
               {isCompleting
                 ? `Your ${config.name} library has been synchronized`
                 : `Syncing your ${config.name} library • Do not close this window`

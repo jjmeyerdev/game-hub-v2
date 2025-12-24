@@ -182,14 +182,14 @@ export default function XboxSettings() {
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{profile.xbox_gamertag}</p>
-              <div className="flex items-center gap-1 text-[10px] text-gray-400">
+              <p className="text-sm font-semibold text-[var(--theme-text-primary)] truncate">{profile.xbox_gamertag}</p>
+              <div className="flex items-center gap-1 text-[10px] text-[var(--theme-text-muted)]">
                 <span className="text-green-400 font-semibold">{profile.xbox_gamerscore?.toLocaleString() || 0}</span>
                 <span>Gamerscore</span>
               </div>
             </div>
             {profile.xbox_last_sync && (
-              <p className="text-[10px] text-gray-500 hidden sm:block">
+              <p className="text-[10px] text-[var(--theme-text-subtle)] hidden sm:block">
                 {new Date(profile.xbox_last_sync).toLocaleDateString()}
               </p>
             )}
@@ -208,7 +208,7 @@ export default function XboxSettings() {
             <button
               onClick={handleUnlinkAccount}
               disabled={unlinking}
-              className="px-3 py-1.5 bg-steel/20 hover:bg-red-500/10 border border-steel/30 hover:border-red-500/30 rounded-lg text-xs font-medium text-gray-400 hover:text-red-400 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-red-500/10 border border-[var(--theme-border)] hover:border-red-500/30 rounded-lg text-xs font-medium text-[var(--theme-text-muted)] hover:text-red-400 transition-all disabled:opacity-50 flex items-center gap-1.5"
             >
               {unlinking ? <Loader2 className="w-3 h-3 animate-spin" /> : <Unlink className="w-3 h-3" />}
               <span className="hidden sm:inline">Unlink</span>
@@ -219,13 +219,13 @@ export default function XboxSettings() {
           {syncResult && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="w-full flex items-center justify-between px-3 py-2 bg-abyss/50 border border-steel/20 rounded-lg text-xs"
+              className="w-full flex items-center justify-between px-3 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs"
             >
-              <span className="text-gray-400">
+              <span className="text-[var(--theme-text-muted)]">
                 <span className="text-emerald-400 font-semibold">+{syncResult.gamesAdded}</span> added,{' '}
                 <span className="text-purple-400 font-semibold">{syncResult.gamesUpdated}</span> updated
               </span>
-              <ChevronDown className={`w-3 h-3 text-gray-500 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3 h-3 text-[var(--theme-text-subtle)] transition-transform ${expanded ? 'rotate-180' : ''}`} />
             </button>
           )}
 
@@ -233,19 +233,19 @@ export default function XboxSettings() {
             <div className="grid grid-cols-4 gap-2 text-center">
               <div className="p-2 bg-green-500/5 border border-green-500/10 rounded">
                 <div className="text-sm font-bold text-green-400">{syncResult.totalGames}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Total</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Total</div>
               </div>
               <div className="p-2 bg-emerald-500/5 border border-emerald-500/10 rounded">
                 <div className="text-sm font-bold text-emerald-400">{syncResult.gamesAdded}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Added</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Added</div>
               </div>
               <div className="p-2 bg-purple-500/5 border border-purple-500/10 rounded">
                 <div className="text-sm font-bold text-purple-400">{syncResult.gamesUpdated}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Updated</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Updated</div>
               </div>
               <div className="p-2 bg-amber-500/5 border border-amber-500/10 rounded">
                 <div className="text-sm font-bold text-amber-400">{syncResult.achievementsUpdated}</div>
-                <div className="text-[9px] text-gray-600 uppercase">Achieves</div>
+                <div className="text-[9px] text-[var(--theme-text-subtle)] uppercase">Achieves</div>
               </div>
             </div>
           )}
@@ -260,7 +260,7 @@ export default function XboxSettings() {
               value={apiKeyInput}
               onChange={(e) => setApiKeyInput(e.target.value)}
               placeholder="Your OpenXBL API key..."
-              className="w-full px-3 py-1.5 bg-deep/50 border border-steel/30 rounded-lg text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 font-mono"
+              className="w-full px-3 py-1.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-xs text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-green-500/50 font-mono"
             />
             <div className="flex items-center justify-between">
               <a
@@ -285,11 +285,11 @@ export default function XboxSettings() {
 
           {/* Instructions */}
           <details className="group">
-            <summary className="text-[10px] text-gray-500 cursor-pointer hover:text-gray-400 list-none flex items-center gap-1">
+            <summary className="text-[10px] text-[var(--theme-text-subtle)] cursor-pointer hover:text-[var(--theme-text-muted)] list-none flex items-center gap-1">
               <ChevronDown className="w-3 h-3 group-open:rotate-180 transition-transform" />
               How to get your API key
             </summary>
-            <ol className="mt-2 text-[10px] text-gray-500 space-y-1 pl-4 list-decimal">
+            <ol className="mt-2 text-[10px] text-[var(--theme-text-subtle)] space-y-1 pl-4 list-decimal">
               <li>Go to xbl.io and click "Login"</li>
               <li>Sign in with your Xbox account</li>
               <li>Go to "API Console" or "Getting Started"</li>

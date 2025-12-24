@@ -206,7 +206,7 @@ function SteamAchievementIcon({
       {icons[variant % icons.length]}
       {!unlocked && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <Lock className="w-5 h-5 text-white/40" />
+          <Lock className="w-5 h-5 text-[var(--theme-text-muted)]" />
         </div>
       )}
     </div>
@@ -290,12 +290,12 @@ export default function GameDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-void">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--theme-bg-primary)]">
         <div className="relative">
           <Loader2 className="w-12 h-12 text-cyan-400/60 animate-spin" />
           <div className="absolute inset-0 w-12 h-12 border-2 border-cyan-400/20 rounded-full" />
         </div>
-        <p className="mt-4 text-[11px] font-mono text-white/30 uppercase tracking-wider">// Loading game data...</p>
+        <p className="mt-4 text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// Loading game data...</p>
       </div>
     );
   }
@@ -330,13 +330,13 @@ export default function GameDetailPage() {
     on_hold: { label: 'On Hold', color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
     paused: { label: 'Paused', color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
     dropped: { label: 'Dropped', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
-    unplayed: { label: 'Unplayed', color: 'text-white/50', bg: 'bg-white/[0.04]', border: 'border-white/[0.08]' },
+    unplayed: { label: 'Unplayed', color: 'text-[var(--theme-text-muted)]', bg: 'bg-[var(--theme-hover-bg)]', border: 'border-[var(--theme-border)]' },
   };
 
   const status = statusConfig[game.status] || statusConfig.unplayed;
 
   return (
-    <div className="relative min-h-screen bg-void">
+    <div className="relative min-h-screen bg-[var(--theme-bg-primary)]">
       {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-cyan-500/[0.03] rounded-full blur-[120px] animate-breathe" />
@@ -344,7 +344,7 @@ export default function GameDetailPage() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-void/80 border-b border-white/[0.06]">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[var(--theme-bg-primary)]/80 border-b border-[var(--theme-border)]">
         {/* Top accent line */}
         <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
 
@@ -352,7 +352,7 @@ export default function GameDetailPage() {
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <button
               onClick={() => router.back()}
-              className="group flex items-center gap-2 px-4 py-2 bg-white/[0.03] hover:bg-cyan-500/10 border border-white/[0.08] hover:border-cyan-500/30 rounded-xl text-sm text-white/50 hover:text-cyan-400 transition-all"
+              className="group flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/10 border border-[var(--theme-border)] hover:border-cyan-500/30 rounded-xl text-sm text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span className="font-mono text-xs uppercase tracking-wider">Back</span>
@@ -361,17 +361,17 @@ export default function GameDetailPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowEditModal(true)}
-                className="group p-2.5 bg-white/[0.03] hover:bg-cyan-500/10 border border-white/[0.08] hover:border-cyan-500/30 rounded-xl transition-all"
+                className="group p-2.5 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/10 border border-[var(--theme-border)] hover:border-cyan-500/30 rounded-xl transition-all"
                 title="Edit"
               >
-                <Edit className="w-4 h-4 text-white/50 group-hover:text-cyan-400" />
+                <Edit className="w-4 h-4 text-[var(--theme-text-muted)] group-hover:text-cyan-400" />
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="group p-2.5 bg-white/[0.03] hover:bg-red-500/10 border border-white/[0.08] hover:border-red-500/30 rounded-xl transition-all"
+                className="group p-2.5 bg-[var(--theme-hover-bg)] hover:bg-red-500/10 border border-[var(--theme-border)] hover:border-red-500/30 rounded-xl transition-all"
                 title="Delete"
               >
-                <Trash2 className="w-4 h-4 text-white/50 group-hover:text-red-400" />
+                <Trash2 className="w-4 h-4 text-[var(--theme-text-muted)] group-hover:text-red-400" />
               </button>
             </div>
           </div>
@@ -397,7 +397,7 @@ export default function GameDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-10">
               {/* Cover Art */}
               <div className="relative">
-                <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-abyss border border-white/[0.08]">
+                <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)]">
                   {/* HUD corners */}
                   <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-cyan-400/40 z-10" />
                   <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-cyan-400/40 z-10" />
@@ -412,7 +412,7 @@ export default function GameDetailPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Gamepad2 className="w-20 h-20 text-white/10" />
+                      <Gamepad2 className="w-20 h-20 text-[var(--theme-text-subtle)]" />
                     </div>
                   )}
                 </div>
@@ -447,7 +447,7 @@ export default function GameDetailPage() {
 
                 {/* Title */}
                 <div>
-                  <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider mb-2 block">// GAME_DATA</span>
+                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2 block">// GAME_DATA</span>
                   <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight uppercase tracking-wide font-[family-name:var(--font-family-display)]">
                     {game.game?.title}
                   </h1>
@@ -483,7 +483,7 @@ export default function GameDetailPage() {
 
                 {/* Progress Bars */}
                 {(game.completion_percentage > 0 || displayAchievementsTotal > 0) && (
-                  <div className="relative p-5 bg-abyss border border-white/[0.08] rounded-xl space-y-4 overflow-hidden">
+                  <div className="relative p-5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl space-y-4 overflow-hidden">
                     {/* HUD corners */}
                     <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-white/[0.12]" />
                     <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-white/[0.12]" />
@@ -492,17 +492,17 @@ export default function GameDetailPage() {
 
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-4 h-4 text-cyan-400" />
-                      <span className="text-sm font-semibold text-white/60 uppercase tracking-wide font-[family-name:var(--font-family-display)]">Progress</span>
-                      <span className="text-[10px] font-mono text-white/30">// STATS</span>
+                      <span className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">Progress</span>
+                      <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// STATS</span>
                     </div>
 
                     {game.completion_percentage > 0 && (
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">Completion</span>
+                          <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">Completion</span>
                           <span className="text-xs font-mono font-medium text-violet-400">{game.completion_percentage}%</span>
                         </div>
-                        <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
+                        <div className="h-2 bg-[var(--theme-hover-bg)] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all duration-500"
                             style={{ width: `${game.completion_percentage}%` }}
@@ -514,14 +514,14 @@ export default function GameDetailPage() {
                     {displayAchievementsTotal > 0 && (
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
+                          <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
                             {game.platform.includes('PlayStation') || game.platform.startsWith('PS') ? 'Trophies' : 'Achievements'}
                           </span>
                           <span className="text-xs font-mono font-medium text-amber-400">
                             {displayAchievementsEarned} / {displayAchievementsTotal}
                           </span>
                         </div>
-                        <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
+                        <div className="h-2 bg-[var(--theme-hover-bg)] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
                             style={{ width: `${achievementPercent}%` }}
@@ -542,25 +542,25 @@ export default function GameDetailPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Game Information */}
-            <div className="relative p-6 bg-abyss border border-cyan-500/20 rounded-xl space-y-5 overflow-hidden">
+            <div className="relative p-6 bg-[var(--theme-bg-secondary)] border border-cyan-500/20 rounded-xl space-y-5 overflow-hidden">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/30" />
               <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/30" />
               <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-400/30" />
               <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-400/30" />
 
-              <h3 className="text-sm font-semibold text-white/60 flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+              <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
                 <Zap className="w-4 h-4 text-cyan-400" />
                 Game Details
-                <span className="text-[10px] font-mono text-white/30 font-normal">// METADATA</span>
+                <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// METADATA</span>
               </h3>
 
               {game.game?.description ? (
-                <p className="text-sm text-white/50 leading-relaxed">
+                <p className="text-sm text-[var(--theme-text-muted)] leading-relaxed">
                   {game.game.description}
                 </p>
               ) : (
-                <p className="text-sm text-white/30 italic font-mono">
+                <p className="text-sm text-[var(--theme-text-subtle)] italic font-mono">
                   // No description available
                 </p>
               )}
@@ -587,8 +587,8 @@ export default function GameDetailPage() {
               </div>
 
               {game.game?.genres && game.game.genres.length > 0 && (
-                <div className="pt-4 border-t border-white/[0.06]">
-                  <div className="text-[10px] font-mono text-white/40 mb-3 uppercase tracking-wider">Genres</div>
+                <div className="pt-4 border-t border-[var(--theme-border)]">
+                  <div className="text-[10px] font-mono text-[var(--theme-text-muted)] mb-3 uppercase tracking-wider">Genres</div>
                   <div className="flex flex-wrap gap-2">
                     {game.game.genres.map((genre, index) => (
                       <span
@@ -606,17 +606,17 @@ export default function GameDetailPage() {
             {/* Activity & Tags */}
             <div className="space-y-6">
               {/* Activity */}
-              <div className="relative p-6 bg-abyss border border-violet-500/20 rounded-xl space-y-4 overflow-hidden">
+              <div className="relative p-6 bg-[var(--theme-bg-secondary)] border border-violet-500/20 rounded-xl space-y-4 overflow-hidden">
                 {/* HUD corners */}
                 <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-violet-400/30" />
                 <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-violet-400/30" />
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-violet-400/30" />
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-violet-400/30" />
 
-                <h3 className="text-sm font-semibold text-white/60 flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
                   <Activity className="w-4 h-4 text-violet-400" />
                   Activity
-                  <span className="text-[10px] font-mono text-white/30 font-normal">// TIMELINE</span>
+                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// TIMELINE</span>
                 </h3>
 
                 <div className="space-y-3">
@@ -658,17 +658,17 @@ export default function GameDetailPage() {
 
               {/* Tags */}
               {game.tags && game.tags.length > 0 && (
-                <div className="relative p-6 bg-abyss border border-amber-500/20 rounded-xl space-y-4 overflow-hidden">
+                <div className="relative p-6 bg-[var(--theme-bg-secondary)] border border-amber-500/20 rounded-xl space-y-4 overflow-hidden">
                   {/* HUD corners */}
                   <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-amber-400/30" />
                   <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-amber-400/30" />
                   <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-amber-400/30" />
                   <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-amber-400/30" />
 
-                  <h3 className="text-sm font-semibold text-white/60 flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                  <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
                     <Tag className="w-4 h-4 text-amber-400" />
                     Tags
-                    <span className="text-[10px] font-mono text-white/30 font-normal">// USER_TAGS</span>
+                    <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// USER_TAGS</span>
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {game.tags.map((tag, index) => (
@@ -687,19 +687,19 @@ export default function GameDetailPage() {
 
           {/* Personal Notes */}
           {game.notes && (
-            <div className="relative mt-6 p-6 bg-abyss border border-emerald-500/20 rounded-xl space-y-4 overflow-hidden">
+            <div className="relative mt-6 p-6 bg-[var(--theme-bg-secondary)] border border-emerald-500/20 rounded-xl space-y-4 overflow-hidden">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-emerald-400/30" />
               <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-emerald-400/30" />
               <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-emerald-400/30" />
               <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-emerald-400/30" />
 
-              <h3 className="text-sm font-semibold text-white/60 flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+              <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
                 <Terminal className="w-4 h-4 text-emerald-400" />
                 Notes
-                <span className="text-[10px] font-mono text-white/30 font-normal">// PERSONAL_LOG</span>
+                <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// PERSONAL_LOG</span>
               </h3>
-              <p className="text-sm text-white/50 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-[var(--theme-text-muted)] leading-relaxed whitespace-pre-wrap">
                 {game.notes}
               </p>
             </div>
@@ -771,7 +771,7 @@ function StatCard({
       <div className={`absolute bottom-0 right-0 w-2 h-2 border-r border-b ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
 
       <div className={`${c.text} mb-2`}>{icon}</div>
-      <div className="text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">{label}</div>
+      <div className="text-[10px] font-mono text-[var(--theme-text-muted)] mb-1 uppercase tracking-wider">{label}</div>
       <div className="text-lg font-bold text-white font-[family-name:var(--font-family-display)]">{value}</div>
     </div>
   );
@@ -801,7 +801,7 @@ function InfoRow({
     <div className={`flex items-center gap-3 p-3 ${c.bg} ${c.border} border rounded-lg`}>
       <span className={c.text}>{icon}</span>
       <div className="flex-1">
-        <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider">{label}</div>
+        <div className="text-[9px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">{label}</div>
         <div className="text-sm font-medium text-white">{value}</div>
       </div>
     </div>
@@ -868,7 +868,7 @@ function AchievementsSection({
       case 'uncommon':
         return { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', icon: Sparkles, label: 'Uncommon', glow: '' };
       default:
-        return { color: 'text-white/50', bg: 'bg-white/[0.04]', border: 'border-white/[0.08]', icon: Circle, label: 'Common', glow: '' };
+        return { color: 'text-[var(--theme-text-muted)]', bg: 'bg-[var(--theme-hover-bg)]', border: 'border-[var(--theme-border)]', icon: Circle, label: 'Common', glow: '' };
     }
   };
 
@@ -899,7 +899,7 @@ function AchievementsSection({
   const maxGamerscore = isXbox && hasRealData ? achievements.reduce((sum, a) => sum + (a.gamerscore || 0), 0) : null;
 
   return (
-    <div className="relative mt-8 p-6 bg-abyss border border-amber-500/20 rounded-2xl overflow-hidden">
+    <div className="relative mt-8 p-6 bg-[var(--theme-bg-secondary)] border border-amber-500/20 rounded-2xl overflow-hidden">
       {/* HUD corners */}
       <div className="absolute top-0 left-0 w-5 h-5 border-l-2 border-t-2 border-amber-400/40" />
       <div className="absolute top-0 right-0 w-5 h-5 border-r-2 border-t-2 border-amber-400/40" />
@@ -925,9 +925,9 @@ function AchievementsSection({
           <div>
             <h3 className="text-lg font-bold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)] flex items-center gap-2">
               {termLabel}
-              <span className="text-[10px] font-mono text-white/30 font-normal">// {isPlayStation ? 'PSN_TROPHIES' : isXbox ? 'XBOX_ACHIEVEMENTS' : 'PROGRESS_TRACKING'}</span>
+              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// {isPlayStation ? 'PSN_TROPHIES' : isXbox ? 'XBOX_ACHIEVEMENTS' : 'PROGRESS_TRACKING'}</span>
             </h3>
-            <p className="text-[11px] font-mono text-white/40">
+            <p className="text-[11px] font-mono text-[var(--theme-text-muted)]">
               {earnedAchievements} of {totalAchievements} unlocked
             </p>
           </div>
@@ -936,7 +936,7 @@ function AchievementsSection({
         {/* Platform-specific summary */}
         <div className="flex items-center gap-3">
           {isPlayStation && trophyCounts && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/[0.06] rounded-xl">
+            <div className="flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl">
               <div className="flex items-center gap-1.5">
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-sky-300 to-sky-500 flex items-center justify-center shadow-[0_0_10px_rgba(125,211,252,0.5)]">
                   <span className="text-[8px] font-bold text-white">P</span>
@@ -971,7 +971,7 @@ function AchievementsSection({
               </div>
               <div>
                 <span className="text-lg font-bold text-emerald-400 font-[family-name:var(--font-family-display)]">{totalGamerscore}</span>
-                <span className="text-xs font-mono text-white/30 ml-1">/ {maxGamerscore}</span>
+                <span className="text-xs font-mono text-[var(--theme-text-subtle)] ml-1">/ {maxGamerscore}</span>
               </div>
             </div>
           )}
@@ -982,7 +982,7 @@ function AchievementsSection({
             className={`p-2.5 rounded-xl border transition-all ${
               showHidden
                 ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                : 'bg-white/[0.02] border-white/[0.08] text-white/40 hover:text-white/60 hover:border-white/[0.15]'
+                : 'bg-[var(--theme-hover-bg)] border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] hover:border-white/[0.15]'
             }`}
             title={showHidden ? 'Hide locked descriptions' : 'Show locked descriptions'}
           >
@@ -994,10 +994,10 @@ function AchievementsSection({
       {/* Progress bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">Overall Progress</span>
+          <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">Overall Progress</span>
           <span className="text-sm font-mono font-bold text-amber-400">{progressPercent.toFixed(1)}%</span>
         </div>
-        <div className="relative h-3 bg-white/[0.04] rounded-full overflow-hidden">
+        <div className="relative h-3 bg-[var(--theme-hover-bg)] rounded-full overflow-hidden">
           {/* Striped background pattern */}
           <div
             className="absolute inset-0 opacity-20"
@@ -1024,7 +1024,7 @@ function AchievementsSection({
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-2 mb-6 p-1 bg-white/[0.02] border border-white/[0.06] rounded-xl w-fit">
+      <div className="flex items-center gap-2 mb-6 p-1 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl w-fit">
         {(['all', 'unlocked', 'locked'] as const).map(f => {
           const count = f === 'all'
             ? achievements.length
@@ -1039,7 +1039,7 @@ function AchievementsSection({
               className={`relative px-4 py-2 rounded-lg text-xs font-mono uppercase tracking-wider transition-all overflow-hidden ${
                 filter === f
                   ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                  : 'text-white/40 hover:text-white/60 border border-transparent hover:bg-white/[0.03]'
+                  : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] border border-transparent hover:bg-[var(--theme-hover-bg)]'
               }`}
             >
               {filter === f && (
@@ -1064,20 +1064,20 @@ function AchievementsSection({
             <Loader2 className="w-8 h-8 text-amber-400/60 animate-spin" />
             <div className="absolute inset-0 w-8 h-8 border-2 border-amber-400/20 rounded-full" />
           </div>
-          <p className="text-[11px] font-mono text-white/30 uppercase tracking-wider">// Fetching {termLabel.toLowerCase()}...</p>
+          <p className="text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// Fetching {termLabel.toLowerCase()}...</p>
         </div>
       )}
 
       {/* No real data - show counts only view */}
       {!achievementsLoading && !hasRealData && (
-        <div className="text-center py-12 border border-white/[0.06] rounded-xl bg-white/[0.01]">
+        <div className="text-center py-12 border border-[var(--theme-border)] rounded-xl bg-[var(--theme-hover-bg)]">
           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <Trophy className="w-10 h-10 text-amber-400/60" />
           </div>
-          <p className="text-sm font-mono text-white/40 mb-2">
+          <p className="text-sm font-mono text-[var(--theme-text-muted)] mb-2">
             {earnedAchievements} of {totalAchievements} {termLabel.toLowerCase()} unlocked
           </p>
-          <p className="text-[11px] font-mono text-white/20">
+          <p className="text-[11px] font-mono text-[var(--theme-text-subtle)]">
             {isXbox
               ? '// Xbox 360 games only provide summary counts via API'
               : `// Individual ${termLabel.toLowerCase()} data not available`
@@ -1100,7 +1100,7 @@ function AchievementsSection({
               className={`group relative p-4 rounded-xl border transition-all duration-300 overflow-hidden ${
                 achievement.unlocked
                   ? `${trophyConfig?.bg || rarityConfig.bg} ${trophyConfig?.border || rarityConfig.border} ${trophyConfig?.glow || rarityConfig.glow} hover:scale-[1.01]`
-                  : 'bg-white/[0.01] border-white/[0.06] hover:border-white/[0.12]'
+                  : 'bg-[var(--theme-hover-bg)] border-[var(--theme-border)] hover:border-white/[0.12]'
               }`}
               style={{ animationDelay: `${index * 50}ms` }}
             >
@@ -1136,12 +1136,12 @@ function AchievementsSection({
                       </div>
                     ) : (
                       <div className="w-full h-full bg-white/[0.05] flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-white/20" />
+                        <Lock className="w-5 h-5 text-[var(--theme-text-subtle)]" />
                       </div>
                     )}
                     {!achievement.unlocked && achievement.iconUrl && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <Lock className="w-4 h-4 text-white/40" />
+                        <Lock className="w-4 h-4 text-[var(--theme-text-muted)]" />
                       </div>
                     )}
                   </div>
@@ -1164,12 +1164,12 @@ function AchievementsSection({
                       </div>
                     ) : (
                       <div className="w-full h-full bg-white/[0.05] flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-white/20" />
+                        <Lock className="w-5 h-5 text-[var(--theme-text-subtle)]" />
                       </div>
                     )}
                     {!achievement.unlocked && achievement.iconUrl && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <Lock className="w-4 h-4 text-white/40" />
+                        <Lock className="w-4 h-4 text-[var(--theme-text-muted)]" />
                       </div>
                     )}
                   </div>
@@ -1195,7 +1195,7 @@ function AchievementsSection({
                     )}
                     {!achievement.unlocked && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <Lock className="w-4 h-4 text-white/40" />
+                        <Lock className="w-4 h-4 text-[var(--theme-text-muted)]" />
                       </div>
                     )}
                   </div>
@@ -1205,21 +1205,21 @@ function AchievementsSection({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h4 className={`font-semibold text-sm uppercase tracking-wide font-[family-name:var(--font-family-display)] ${
-                      achievement.unlocked ? 'text-white' : 'text-white/40'
+                      achievement.unlocked ? 'text-white' : 'text-[var(--theme-text-muted)]'
                     }`}>
                       {achievement.unlocked || showHidden ? achievement.name : '// CLASSIFIED'}
                     </h4>
 
                     {/* Rarity badge */}
                     <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider ${
-                      achievement.unlocked ? `${rarityConfig.bg} ${rarityConfig.color}` : 'bg-white/[0.02] text-white/30'
+                      achievement.unlocked ? `${rarityConfig.bg} ${rarityConfig.color}` : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-subtle)]'
                     }`}>
                       {achievement.rarityPercentage?.toFixed(1)}%
                     </div>
                   </div>
 
                   <p className={`text-xs leading-relaxed mb-2 ${
-                    achievement.unlocked ? 'text-white/60' : 'text-white/20'
+                    achievement.unlocked ? 'text-[var(--theme-text-muted)]' : 'text-[var(--theme-text-subtle)]'
                   }`}>
                     {achievement.unlocked || showHidden
                       ? achievement.description
@@ -1240,7 +1240,7 @@ function AchievementsSection({
                         </span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-white/20">
+                      <div className="flex items-center gap-1.5 text-[var(--theme-text-subtle)]">
                         <Lock className="w-3 h-3" />
                         <span className="text-[10px] font-mono uppercase">Locked</span>
                       </div>
@@ -1248,7 +1248,7 @@ function AchievementsSection({
 
                     {/* Rarity label */}
                     <div className={`text-[10px] font-mono uppercase tracking-wider ${
-                      achievement.unlocked ? rarityConfig.color : 'text-white/20'
+                      achievement.unlocked ? rarityConfig.color : 'text-[var(--theme-text-subtle)]'
                     }`}>
                       {rarityConfig.label}
                     </div>
@@ -1258,7 +1258,7 @@ function AchievementsSection({
                       <div className={`flex items-center gap-1 px-2 py-0.5 rounded ${
                         achievement.unlocked
                           ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-white/[0.02] text-white/20'
+                          : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-subtle)]'
                       }`}>
                         <span className="text-[10px] font-mono font-bold">{achievement.gamerscore}G</span>
                       </div>
@@ -1273,14 +1273,14 @@ function AchievementsSection({
         {/* Empty state for filtered results */}
         {filteredAchievements.length === 0 && (
           <div className="col-span-full text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
               {filter === 'unlocked' ? (
-                <Lock className="w-8 h-8 text-white/10" />
+                <Lock className="w-8 h-8 text-[var(--theme-text-subtle)]" />
               ) : (
-                <Unlock className="w-8 h-8 text-white/10" />
+                <Unlock className="w-8 h-8 text-[var(--theme-text-subtle)]" />
               )}
             </div>
-            <p className="text-sm font-mono text-white/30">
+            <p className="text-sm font-mono text-[var(--theme-text-subtle)]">
               // No {filter === 'unlocked' ? 'unlocked' : 'locked'} {termLabel.toLowerCase()} found
             </p>
           </div>
