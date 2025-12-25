@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Library, Grid3x3, List, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, X, ShieldOff, Shield, Plus, Copy, Link2, ChevronDown, Pencil, Disc, Monitor } from 'lucide-react';
+import { Library, Grid3x3, List, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, ShieldOff, Shield, Copy, Link2, ChevronDown, Pencil, Disc, Monitor } from 'lucide-react';
 import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, NintendoLogo, GOGLogo, EALogo, BattleNetLogo, UbisoftLogo, WindowsLogo } from '@/components/icons/PlatformLogos';
 import { useDashboardData } from '@/lib/hooks';
 import { GameCard } from '@/components/dashboard/cards/GameCard';
 import { GameListItem } from '@/components/dashboard/cards/GameListItem';
 import { GameFormModal, DeleteConfirmModal, DuplicateFinderModal } from '@/components/modals';
-import { SyncServiceDropdown } from '@/components/library/SyncServiceDropdown';
 import { ConsoleFilter } from '@/components/library/ConsoleFilter';
+import { LibraryHeader } from '@/components/library/LibraryHeader';
+import { StatBox } from '@/components/library/StatBox';
+import { FilterTag } from '@/components/library/FilterTag';
 import { filterAndSortGames, getGameSyncSource } from '@/lib/utils';
 import { LIBRARY_FILTER_PLATFORMS, SYNC_SOURCE_OPTIONS, CONSOLE_GENERATIONS, type SortOption, type SyncSourceId } from '@/lib/constants/platforms';
 import type { UserGame } from '@/lib/actions/games';
@@ -176,48 +178,7 @@ export default function LibraryPage() {
 
       <div className={`relative transition-all duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
         {/* Header */}
-        <header className="sticky top-0 z-30 border-b border-[var(--theme-border)] bg-[var(--theme-bg-secondary)]/80 backdrop-blur-xl">
-          <div className="px-8 py-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                    <Library className="w-6 h-6 text-cyan-400" />
-                  </div>
-                  {/* HUD corners */}
-                  <div className="absolute -top-1 -left-1 w-2 h-2 border-l-2 border-t-2 border-cyan-400/50" />
-                  <div className="absolute -top-1 -right-1 w-2 h-2 border-r-2 border-t-2 border-cyan-400/50" />
-                  <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l-2 border-b-2 border-cyan-400/50" />
-                  <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider block mb-1">
-                    // GAME_LIBRARY
-                  </span>
-                  <h1 className="text-2xl font-bold text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">LIBRARY</h1>
-                </div>
-                <span className="px-3 py-1.5 text-xs font-mono text-cyan-400/80 bg-cyan-400/10 border border-cyan-400/20 rounded-lg">
-                  {totalGames} games
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Add Game */}
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="group relative flex items-center gap-2 px-5 py-2.5 overflow-hidden rounded-xl"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600 opacity-90 group-hover:opacity-100 transition-opacity" />
-                  <Plus className="relative w-4 h-4 text-white" />
-                  <span className="relative text-sm font-semibold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">Add Game</span>
-                </button>
-
-                {/* Sync Dropdown */}
-                <SyncServiceDropdown />
-              </div>
-            </div>
-          </div>
-        </header>
+        <LibraryHeader totalGames={totalGames} onAddGame={() => setShowAddModal(true)} />
 
         {/* Main Content */}
         <div className="px-8 py-6">
@@ -773,40 +734,5 @@ export default function LibraryPage() {
         onSuccess={handleSuccess}
       />
     </div>
-  );
-}
-
-function StatBox({ label, value, color }: { label: string; value: string; color: 'cyan' | 'violet' | 'emerald' | 'amber' }) {
-  const colorMap = {
-    cyan: { text: 'text-cyan-400', border: 'border-cyan-400/50' },
-    violet: { text: 'text-violet-400', border: 'border-violet-400/50' },
-    emerald: { text: 'text-emerald-400', border: 'border-emerald-400/50' },
-    amber: { text: 'text-amber-400', border: 'border-amber-400/50' },
-  };
-
-  return (
-    <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-[var(--theme-border-hover)] transition-colors overflow-hidden">
-      {/* Hover HUD corners */}
-      <div className={`absolute top-0 left-0 w-2 h-2 border-l border-t ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
-      <div className={`absolute top-0 right-0 w-2 h-2 border-r border-t ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
-      <div className={`absolute bottom-0 left-0 w-2 h-2 border-l border-b ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
-      <div className={`absolute bottom-0 right-0 w-2 h-2 border-r border-b ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
-
-      <div className="relative">
-        <div className={`text-2xl font-bold font-mono ${colorMap[color].text} tabular-nums`}>{value}</div>
-        <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] mt-1 uppercase tracking-wider">{label}</div>
-      </div>
-    </div>
-  );
-}
-
-function FilterTag({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-mono font-medium rounded-md uppercase tracking-wider">
-      {label}
-      <button onClick={onRemove} className="hover:text-cyan-300 transition-colors">
-        <X className="w-3 h-3" />
-      </button>
-    </span>
   );
 }
