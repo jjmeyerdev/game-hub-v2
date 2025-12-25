@@ -61,15 +61,16 @@ export function validateXuid(xuid: string): string {
 
 /**
  * Validate gamertag format
- * Gamertags are 1-15 characters, alphanumeric with spaces
+ * Modern gamertags can be up to 12 characters + optional #1234 suffix
+ * Legacy gamertags are 1-15 characters, alphanumeric with spaces
  */
 export function validateGamertag(gamertag: string): string {
   const trimmed = gamertag.trim();
 
-  // Gamertag rules: 1-15 chars, alphanumeric, spaces allowed (but not at start/end)
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9 ]{0,13}[a-zA-Z0-9]?$/.test(trimmed) || trimmed.length > 15) {
+  // Basic validation - not empty and reasonable length (with potential suffix)
+  if (!trimmed || trimmed.length > 20) {
     throw new InvalidGamertagError(
-      'Invalid gamertag format. Gamertags are 1-15 characters, letters, numbers, and spaces.'
+      'Invalid gamertag. Please enter a valid Xbox gamertag.'
     );
   }
 
@@ -144,13 +145,13 @@ async function xboxApiRequest<T>(endpoint: string, apiKey: string): Promise<T> {
  * Get current user's profile (requires user's own API key)
  */
 export async function getMyProfile(apiKey: string): Promise<XboxPlayerSummary> {
-  const data = await xboxApiRequest<{ profileUsers: Array<{ id: string; settings: Array<{ id: string; value: string }> }> }>(
+  const data = await xboxApiRequest<{ profileUsers?: Array<{ id: string; settings: Array<{ id: string; value: string }> }> }>(
     '/account',
     apiKey
   );
 
   // Parse the settings array into a more usable format
-  const user = data.profileUsers[0];
+  const user = data.profileUsers?.[0];
   if (!user) {
     throw new XboxAPIError('No profile data returned', 'NO_DATA', 404);
   }
@@ -186,12 +187,12 @@ export async function getProfileByXuid(
   apiKey: string
 ): Promise<XboxPlayerSummary> {
   const validXuid = validateXuid(xuid);
-  const data = await xboxApiRequest<{ profileUsers: Array<{ id: string; settings: Array<{ id: string; value: string }> }> }>(
+  const data = await xboxApiRequest<{ profileUsers?: Array<{ id: string; settings: Array<{ id: string; value: string }> }> }>(
     `/account/${validXuid}`,
     apiKey
   );
 
-  const user = data.profileUsers[0];
+  const user = data.profileUsers?.[0];
   if (!user) {
     throw new XboxAPIError('Player not found', 'NOT_FOUND', 404);
   }
@@ -220,6 +221,29 @@ export async function getProfileByXuid(
 }
 
 /**
+ * Search response person from OpenXBL
+ */
+interface XboxSearchPerson {
+  xuid: string;
+  gamertag: string;
+  modernGamertag: string;
+  modernGamertagSuffix: string;
+  gamerScore: string;
+  displayPicRaw: string;
+  xboxOneRep: string;
+  presenceState: string | null;
+  presenceText: string | null;
+  preferredColor: {
+    primaryColor: string;
+    secondaryColor: string;
+    tertiaryColor: string;
+  };
+  detail?: {
+    accountTier: string;
+  };
+}
+
+/**
  * Search for a player by gamertag
  */
 export async function searchByGamertag(
@@ -229,36 +253,32 @@ export async function searchByGamertag(
   const validGamertag = validateGamertag(gamertag);
 
   try {
-    const data = await xboxApiRequest<{ profileUsers: Array<{ id: string; settings: Array<{ id: string; value: string }> }> }>(
+    // Search endpoint returns 'people' array, not 'profileUsers'
+    const data = await xboxApiRequest<{ people?: XboxSearchPerson[] }>(
       `/search/${encodeURIComponent(validGamertag)}`,
       apiKey
     );
 
-    const user = data.profileUsers[0];
-    if (!user) {
+    const person = data.people?.[0];
+    if (!person) {
       return null;
     }
 
-    const settings = user.settings.reduce((acc, setting) => {
-      acc[setting.id] = setting.value;
-      return acc;
-    }, {} as Record<string, string>);
-
     return {
-      xuid: user.id,
-      gamertag: settings['Gamertag'] || settings['GameDisplayName'] || '',
-      gamerscore: parseInt(settings['Gamerscore'] || '0', 10),
-      gamerPicture: settings['GameDisplayPicRaw'] || settings['PublicGamerpic'] || '',
-      accountTier: settings['AccountTier'] || '',
-      xboxOneRep: settings['XboxOneRep'] || '',
+      xuid: person.xuid,
+      gamertag: person.modernGamertag || person.gamertag || '',
+      gamerscore: parseInt(person.gamerScore || '0', 10),
+      gamerPicture: person.displayPicRaw || '',
+      accountTier: person.detail?.accountTier || '',
+      xboxOneRep: person.xboxOneRep || '',
       preferredColor: {
-        primaryColor: settings['PreferredColor']?.split('|')[0] || '',
-        secondaryColor: settings['PreferredColor']?.split('|')[1] || '',
-        tertiaryColor: settings['PreferredColor']?.split('|')[2] || '',
+        primaryColor: person.preferredColor?.primaryColor || '',
+        secondaryColor: person.preferredColor?.secondaryColor || '',
+        tertiaryColor: person.preferredColor?.tertiaryColor || '',
       },
-      presenceState: settings['PresenceState'] || 'Offline',
-      presenceText: settings['PresenceText'] || '',
-      isXbox360Gamertag: settings['Gamertag'] !== settings['GameDisplayName'],
+      presenceState: person.presenceState || 'Offline',
+      presenceText: person.presenceText || '',
+      isXbox360Gamertag: false,
     };
   } catch (error) {
     if (error instanceof XboxAPIError && error.statusCode === 404) {

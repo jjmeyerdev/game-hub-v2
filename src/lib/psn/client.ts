@@ -11,6 +11,7 @@ import {
   getTitleTrophies,
   getProfileFromAccountId,
   getUserPlayedGames,
+  makeUniversalSearch,
   type AuthorizationPayload,
   type TrophyTitle,
   type UserTrophiesEarnedForTitleResponse,
@@ -164,7 +165,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
 export async function getUserProfile(
   accessToken: string,
   accountId: string
-): Promise<{ onlineId: string; avatarUrl: string | null }> {
+): Promise<{ onlineId: string; avatarUrl: string | null; isPlus: boolean }> {
   checkRateLimit();
 
   try {
@@ -184,6 +185,7 @@ export async function getUserProfile(
     return {
       onlineId: profile.onlineId,
       avatarUrl,
+      isPlus: profile.isPlus || false,
     };
   } catch (error) {
     if (error instanceof PsnAPIError) {
@@ -194,7 +196,7 @@ export async function getUserProfile(
     console.error('Failed to get PSN profile:', message);
 
     // Return empty values if profile fetch fails (privacy settings, etc.)
-    return { onlineId: '', avatarUrl: null };
+    return { onlineId: '', avatarUrl: null, isPlus: false };
   }
 }
 
@@ -519,5 +521,76 @@ export async function getPlayedGamesWithPlaytime(
     // Return empty array on error - playtime is optional enhancement
     console.error('Failed to fetch played games:', message);
     return [];
+  }
+}
+
+/**
+ * Search result from PSN universal search
+ */
+export interface PsnUserSearchResult {
+  accountId: string;
+  onlineId: string;
+  avatarUrl: string | null;
+  isPsPlus: boolean;
+  isOfficiallyVerified: boolean;
+}
+
+/**
+ * Search for a PSN user by their online ID (username)
+ * Uses the universal search API to find users
+ */
+export async function searchPsnUser(
+  accessToken: string,
+  username: string
+): Promise<PsnUserSearchResult | null> {
+  checkRateLimit();
+
+  try {
+    rateLimiter.recordRequest();
+
+    const auth: AuthorizationPayload = { accessToken };
+    const response = await makeUniversalSearch(auth, username, 'SocialAllAccounts');
+
+    // Check if we got any results
+    const domainResponse = response.domainResponses?.[0];
+    if (!domainResponse?.results || domainResponse.results.length === 0) {
+      return null;
+    }
+
+    // Find exact match or best match
+    const exactMatch = domainResponse.results.find(
+      (result) => result.socialMetadata?.onlineId?.toLowerCase() === username.toLowerCase()
+    );
+    const bestMatch = exactMatch || domainResponse.results[0];
+
+    if (!bestMatch?.socialMetadata) {
+      return null;
+    }
+
+    const { socialMetadata } = bestMatch;
+
+    return {
+      accountId: socialMetadata.accountId,
+      onlineId: socialMetadata.onlineId,
+      avatarUrl: socialMetadata.avatarUrl || null,
+      isPsPlus: socialMetadata.isPsPlus || false,
+      isOfficiallyVerified: socialMetadata.isOfficiallyVerified || false,
+    };
+  } catch (error) {
+    if (error instanceof PsnAPIError) {
+      throw error;
+    }
+
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
+    if (message.includes('401') || message.includes('unauthorized')) {
+      throw new PsnAuthError();
+    }
+    if (message.includes('403') || message.includes('forbidden')) {
+      throw new PsnPrivacyError('Unable to search for users.');
+    }
+
+    console.error('Failed to search PSN user:', message);
+    return null;
   }
 }
