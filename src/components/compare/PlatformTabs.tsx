@@ -80,8 +80,8 @@ export function PlatformTabs({ selected, onSelect, disabledPlatforms = [] }: Pla
               ${isSelected
                 ? `${colors.active} ${colors.text}`
                 : isDisabled
-                  ? 'bg-[var(--theme-bg-secondary)] border-[var(--theme-border)] text-[var(--theme-text-subtle)] opacity-50 cursor-not-allowed'
-                  : `bg-[var(--theme-bg-secondary)] border-[var(--theme-border)] text-[var(--theme-text-muted)] ${colors.hover}`
+                  ? 'bg-theme-secondary border-theme text-theme-subtle opacity-50 cursor-not-allowed'
+                  : `bg-theme-secondary border-theme text-theme-muted ${colors.hover}`
               }
             `}
           >

@@ -18,7 +18,7 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
   return (
     <Link href={`/game/${userGame.id}`}>
       <div
-        className="group relative bg-[var(--theme-bg-secondary)] border border-violet-500/20 rounded-xl p-4 hover:border-violet-500/40 transition-all duration-300 overflow-hidden cursor-pointer"
+        className="group relative bg-theme-secondary border border-violet-500/20 rounded-xl p-4 hover:border-violet-500/40 transition-all duration-300 overflow-hidden cursor-pointer"
         style={{ animation: `fadeIn 0.4s ease-out ${index * 0.05}s both` }}
       >
         {/* HUD corners */}
@@ -28,11 +28,11 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
         <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-violet-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
         {/* Subtle background glow */}
-        <div className="absolute inset-0 bg-violet-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-violet-500/3 opacity-0 group-hover:opacity-100 transition-opacity" />
 
         <div className="relative flex items-center gap-4">
           {/* Cover */}
-          <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-[var(--theme-border)] group-hover:border-violet-400/30 transition-colors">
+          <div className="relative w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-theme group-hover:border-violet-400/30 transition-colors">
             {coverUrl ? (
               <Image
                 src={coverUrl}
@@ -42,8 +42,8 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
                 sizes="56px"
               />
             ) : (
-              <div className="w-full h-full bg-[var(--theme-hover-bg)] flex items-center justify-center">
-                <Gamepad2 className="w-6 h-6 text-[var(--theme-text-subtle)]" />
+              <div className="w-full h-full bg-theme-hover flex items-center justify-center">
+                <Gamepad2 className="w-6 h-6 text-theme-subtle" />
               </div>
             )}
           </div>
@@ -57,7 +57,7 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
               <span className="text-lg font-bold font-mono text-violet-400">
                 {percentage}%
               </span>
-              <span className="text-xs text-[var(--theme-text-subtle)]">
+              <span className="text-xs text-theme-subtle">
                 {remaining} left
               </span>
             </div>

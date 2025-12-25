@@ -58,7 +58,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[90] bg-[var(--theme-bg-primary)]/60 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-90 bg-theme-primary/60 backdrop-blur-sm transition-opacity duration-300 ${
           isAnimatingOut ? 'opacity-0' : 'opacity-100'
         }`}
         onClick={handleClose}
@@ -66,7 +66,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
 
       {/* Toast Container */}
       <div
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-full max-w-md transition-all duration-300 ${
+        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-100 w-full max-w-md transition-all duration-300 ${
           isAnimatingOut
             ? 'opacity-0 scale-95 translate-y-4'
             : 'opacity-100 scale-100 translate-y-0'
@@ -76,7 +76,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
         }}
       >
         <div
-          className={`relative overflow-hidden rounded-2xl bg-[var(--theme-bg-secondary)] ${
+          className={`relative overflow-hidden rounded-2xl bg-theme-secondary ${
             result.success ? 'border border-emerald-500/20' : 'border border-red-500/20'
           }`}
           style={{
@@ -92,8 +92,8 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
             <div
               className={`h-full w-full ${
                 result.success
-                  ? 'bg-gradient-to-r from-emerald-500 via-cyan-400 to-emerald-500'
-                  : 'bg-gradient-to-r from-red-500 via-amber-400 to-red-500'
+                  ? 'bg-linear-to-r from-emerald-500 via-cyan-400 to-emerald-500'
+                  : 'bg-linear-to-r from-red-500 via-amber-400 to-red-500'
               }`}
               style={{
                 animation: 'shimmer 2s linear infinite',
@@ -119,7 +119,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-2 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all z-10"
+            className="absolute top-4 right-4 p-2 rounded-lg bg-theme-hover border border-theme text-theme-subtle hover:text-theme-primary hover:border-theme-hover transition-all z-10"
           >
             <X className="w-4 h-4" />
           </button>
@@ -157,12 +157,12 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
 
               <div className="flex-1">
                 <h3
-                  className="text-xl font-bold text-[var(--theme-text-primary)] mb-1"
+                  className="text-xl font-bold text-theme-primary mb-1"
                   style={{ fontFamily: 'var(--font-family-display)' }}
                 >
                   {result.success ? `${platformName} Sync Complete!` : `${platformName} Sync Failed`}
                 </h3>
-                <p className="text-sm text-[var(--theme-text-muted)] flex items-center gap-2">
+                <p className="text-sm text-theme-muted flex items-center gap-2">
                   {isPsn ? (
                     <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.181.76.814.76 1.505v5.876c2.441 1.193 4.362-.002 4.362-3.153 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.391-1.502h-.002z" />
@@ -187,29 +187,29 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
             {result.success && (
               <div className={`grid ${isEpic ? 'grid-cols-3' : 'grid-cols-4'} gap-3 mb-5`}>
                 <div
-                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
+                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-theme-hover border border-theme"
                   style={{
                     animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards',
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-linear-to-t from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <Gamepad2 className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
                   <div
-                    className="text-2xl font-black text-[var(--theme-text-primary)] tabular-nums"
+                    className="text-2xl font-black text-theme-primary tabular-nums"
                     style={{ fontFamily: 'var(--font-family-display)' }}
                   >
                     {result.totalGames}
                   </div>
-                  <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">Total</div>
+                  <div className="text-[9px] uppercase tracking-wider text-theme-subtle font-semibold">Total</div>
                 </div>
 
                 <div
-                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
+                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-theme-hover border border-theme"
                   style={{
                     animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards',
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-linear-to-t from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="w-4 h-4 mx-auto mb-1 text-emerald-400 font-bold text-sm">+</div>
                   <div
                     className="text-2xl font-black text-emerald-400 tabular-nums"
@@ -217,16 +217,16 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                   >
                     {result.gamesAdded}
                   </div>
-                  <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">Added</div>
+                  <div className="text-[9px] uppercase tracking-wider text-theme-subtle font-semibold">Added</div>
                 </div>
 
                 <div
-                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
+                  className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-theme-hover border border-theme"
                   style={{
                     animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards',
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-linear-to-t from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="w-4 h-4 mx-auto mb-1 text-violet-400 font-bold text-sm">↻</div>
                   <div
                     className="text-2xl font-black text-violet-400 tabular-nums"
@@ -234,17 +234,17 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                   >
                     {result.gamesUpdated}
                   </div>
-                  <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">Updated</div>
+                  <div className="text-[9px] uppercase tracking-wider text-theme-subtle font-semibold">Updated</div>
                 </div>
 
                 {!isEpic && (
                   <div
-                    className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
+                    className="relative overflow-hidden p-3 rounded-xl text-center group transition-all bg-theme-hover border border-theme"
                     style={{
                       animation: 'cardReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards',
                     }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-t from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-linear-to-t from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Trophy className="w-4 h-4 text-amber-400 mx-auto mb-1" />
                     <div
                       className="text-2xl font-black text-amber-400 tabular-nums"
@@ -252,7 +252,7 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
                     >
                       {achievementCount || 0}
                     </div>
-                    <div className="text-[9px] uppercase tracking-wider text-[var(--theme-text-subtle)] font-semibold">{achievementLabel}</div>
+                    <div className="text-[9px] uppercase tracking-wider text-theme-subtle font-semibold">{achievementLabel}</div>
                   </div>
                 )}
               </div>
@@ -287,12 +287,12 @@ export function SyncToast({ isVisible, onClose, type, result }: SyncToastProps) 
               className="btn-primary w-full py-3.5 flex items-center justify-center gap-2 group"
             >
               <span>Continue</span>
-              <span className="text-[var(--theme-bg-primary)] group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-bg-primary group-hover:translate-x-1 transition-transform">→</span>
             </button>
           </div>
 
           {/* Bottom decorative bar */}
-          <div className="h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+          <div className="h-px bg-linear-to-r from-transparent via-violet-500/30 to-transparent" />
         </div>
       </div>
 

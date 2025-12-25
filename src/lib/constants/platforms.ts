@@ -171,9 +171,9 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   // Epic Games
   if (p.includes('epic')) {
     return {
-      bg: 'bg-[var(--theme-text-primary)]',
-      text: 'text-[var(--theme-bg-primary)]',
-      border: 'border-[var(--theme-text-primary)]/50',
+      bg: 'bg-text-primary',
+      text: 'text-bg-primary',
+      border: 'border-(--theme-text-primary)/50',
       glow: 'shadow-[0_0_20px_rgba(128,128,128,0.4),0_0_40px_rgba(128,128,128,0.15)]',
     };
   }
@@ -242,7 +242,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   return {
     bg: 'bg-white/10',
     text: 'text-white',
-    border: 'border-white/[0.08]',
+    border: 'border-white/8',
   };
 }
 
@@ -289,9 +289,9 @@ export function getPlatformBrandStyleSubtle(platform: string): PlatformBrandStyl
   // Epic Games
   if (p.includes('epic')) {
     return {
-      bg: 'bg-[var(--theme-text-primary)]/10',
-      text: 'text-[var(--theme-text-secondary)]',
-      border: 'border-[var(--theme-text-primary)]/15',
+      bg: 'bg-text-primary/10',
+      text: 'text-theme-secondary',
+      border: 'border-(--theme-text-primary)/15',
     };
   }
 
@@ -352,8 +352,8 @@ export function getPlatformBrandStyleSubtle(platform: string): PlatformBrandStyl
   // Default fallback
   return {
     bg: 'bg-white/5',
-    text: 'text-[var(--theme-text-muted)]',
-    border: 'border-white/[0.05]',
+    text: 'text-theme-muted',
+    border: 'border-white/5',
   };
 }
 

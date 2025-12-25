@@ -30,7 +30,7 @@ export function PlatformCard({
 
   return (
     <div
-      className={`group relative bg-[var(--theme-bg-secondary)] border ${borderColor} rounded-xl p-5 transition-all duration-300 overflow-hidden hover:border-opacity-60`}
+      className={`group relative bg-theme-secondary border ${borderColor} rounded-xl p-5 transition-all duration-300 overflow-hidden hover:border-opacity-60`}
       style={{ animation: `fadeIn 0.4s ease-out ${delay}s both` }}
     >
       {/* HUD corners */}
@@ -52,10 +52,10 @@ export function PlatformCard({
             <div style={{ color }}>{logo}</div>
           </div>
           <div>
-            <h3 className="font-semibold text-white font-[family-name:var(--font-family-display)]">
+            <h3 className="font-semibold text-white font-family-display">
               {name}
             </h3>
-            <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase">
+            <p className="text-[10px] font-mono text-theme-subtle uppercase">
               {stats.games} games
             </p>
           </div>
@@ -68,13 +68,13 @@ export function PlatformCard({
               <span className="text-2xl font-bold font-mono text-white tabular-nums">
                 {stats.earned.toLocaleString()}
               </span>
-              <span className="text-sm text-[var(--theme-text-subtle)]">
+              <span className="text-sm text-theme-subtle">
                 / {stats.total.toLocaleString()}
               </span>
             </div>
 
             {/* Progress bar */}
-            <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden mb-2">
+            <div className="h-2 bg-white/6 rounded-full overflow-hidden mb-2">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
@@ -92,7 +92,7 @@ export function PlatformCard({
           </>
         ) : (
           <div className="text-center py-4">
-            <p className="text-sm text-[var(--theme-text-subtle)]">No achievements synced</p>
+            <p className="text-sm text-theme-subtle">No achievements synced</p>
             <Link
               href="/settings"
               className="text-xs font-mono uppercase tracking-wider hover:opacity-80 transition-opacity mt-2 inline-block"

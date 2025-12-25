@@ -7,9 +7,9 @@ import { cn } from '@/lib/utils';
  * Base input styles used across all form inputs
  */
 export const inputBaseStyles = cn(
-  'w-full px-4 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl',
-  'text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)]',
-  'focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20',
+  'w-full px-4 py-3 bg-theme-hover border border-theme rounded-xl',
+  'text-theme-primary placeholder:text-theme-subtle',
+  'focus:outline-hidden focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20',
   'transition-all'
 );
 
@@ -26,7 +26,7 @@ interface FormFieldProps {
 export function FormField({ label, icon, children, className }: FormFieldProps) {
   return (
     <div className={cn('space-y-2', className)}>
-      <label className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-muted)]">
+      <label className="flex items-center gap-2 text-sm font-semibold text-theme-muted">
         {icon}
         {label}
       </label>

@@ -329,20 +329,20 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-[var(--theme-bg-primary)]/90 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-theme-primary/90 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden rounded-2xl animate-modal-slide-in bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)]"
+        className="relative w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden rounded-2xl animate-modal-slide-in bg-theme-secondary border border-theme"
         style={{
           boxShadow: '0 0 0 1px var(--theme-border), 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 80px rgba(168, 85, 247, 0.1)',
         }}
       >
         {/* Top accent */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-violet-400/50 to-transparent" />
 
         {/* Header */}
-        <div className="relative px-6 py-4 border-b border-[var(--theme-border)] flex-shrink-0">
+        <div className="relative px-6 py-4 border-b border-theme shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div
@@ -351,11 +351,11 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                 <Scan className="w-5 h-5 text-violet-400" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-[var(--theme-text-primary)]" style={{ fontFamily: 'var(--font-family-display)' }}>
+                <h2 className="text-lg font-bold text-theme-primary" style={{ fontFamily: 'var(--font-family-display)' }}>
                   DUPLICATE FINDER
                 </h2>
                 {phase === 'complete' && totalGroups > 0 && !isComplete && (
-                  <p className="text-xs text-[var(--theme-text-subtle)]">
+                  <p className="text-xs text-theme-subtle">
                     Reviewing {currentIndex + 1} of {totalGroups}
                   </p>
                 )}
@@ -363,7 +363,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all"
+              className="p-2 rounded-xl bg-theme-hover border border-theme text-theme-subtle hover:text-theme-primary hover:border-theme-hover transition-all"
             >
               <X className="w-5 h-5" />
             </button>
@@ -371,9 +371,9 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
 
           {/* Progress bar */}
           {phase === 'complete' && totalGroups > 0 && (
-            <div className="mt-4 h-1 bg-[var(--theme-border)] rounded-full overflow-hidden">
+            <div className="mt-4 h-1 bg-border rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all duration-300"
+                className="h-full bg-linear-to-r from-violet-500 to-cyan-400 transition-all duration-300"
                 style={{ width: `${((currentIndex + (isComplete ? 0 : 0)) / totalGroups) * 100}%` }}
               />
             </div>
@@ -385,7 +385,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
           {/* Error */}
           {error && (
             <div className="mx-6 mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3">
-              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
               <p className="text-sm text-red-400 flex-1">{error}</p>
               <button onClick={() => setError(null)} className="p-1 hover:bg-red-500/20 rounded">
                 <X className="w-3 h-3 text-red-400" />
@@ -397,18 +397,18 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
           {phase === 'idle' && (
             <div className="flex flex-col items-center justify-center py-16 px-6">
               <div className="relative mb-6">
-                <div className="w-24 h-24 rounded-2xl flex items-center justify-center bg-violet-500/10 border border-[var(--theme-border)]">
+                <div className="w-24 h-24 rounded-2xl flex items-center justify-center bg-violet-500/10 border border-theme">
                   <Layers className="w-10 h-10 text-violet-400/60" />
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-amber-500/30">
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg flex items-center justify-center bg-theme-secondary border border-amber-500/30">
                   <Sparkles className="w-4 h-4 text-amber-400" />
                 </div>
               </div>
 
-              <h3 className="text-xl font-bold text-[var(--theme-text-primary)] mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>
+              <h3 className="text-xl font-bold text-theme-primary mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>
                 SCAN FOR DUPLICATES
               </h3>
-              <p className="text-sm text-[var(--theme-text-subtle)] text-center max-w-sm mb-8">
+              <p className="text-sm text-theme-subtle text-center max-w-sm mb-8">
                 Find games that appear multiple times in your library and choose which copies to keep.
               </p>
 
@@ -417,10 +417,10 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                 disabled={isClearing}
                 className="group relative px-8 py-4 rounded-xl overflow-hidden transition-all disabled:opacity-50 bg-violet-500/10 border border-violet-500/40"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-r from-violet-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative flex items-center gap-3">
                   <Scan className="w-5 h-5 text-violet-400" />
-                  <span className="text-lg font-bold text-[var(--theme-text-primary)] uppercase tracking-wide" style={{ fontFamily: 'var(--font-family-display)' }}>
+                  <span className="text-lg font-bold text-theme-primary uppercase tracking-wide" style={{ fontFamily: 'var(--font-family-display)' }}>
                     Start Scan
                   </span>
                 </div>
@@ -429,7 +429,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
               <button
                 onClick={handleClearDismissed}
                 disabled={isClearing}
-                className="mt-6 text-xs text-[var(--theme-text-subtle)] hover:text-amber-400 transition-colors flex items-center gap-2"
+                className="mt-6 text-xs text-theme-subtle hover:text-amber-400 transition-colors flex items-center gap-2"
               >
                 {isClearing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-3 h-3" />}
                 Reset dismissed pairs
@@ -442,7 +442,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
             <div className="flex flex-col items-center justify-center py-16 px-6">
               <div className="relative mb-6">
                 <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="42" fill="none" className="stroke-[var(--theme-border)]" strokeWidth="4" />
+                  <circle cx="50" cy="50" r="42" fill="none" className="stroke-border" strokeWidth="4" />
                   <circle
                     cx="50" cy="50" r="42" fill="none" stroke="url(#scanGrad)" strokeWidth="4"
                     strokeLinecap="round" strokeDasharray={`${scanProgress * 2.64} 264`}
@@ -456,12 +456,12 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                   </defs>
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-[var(--theme-text-primary)] tabular-nums" style={{ fontFamily: 'var(--font-family-display)' }}>
+                  <span className="text-2xl font-bold text-theme-primary tabular-nums" style={{ fontFamily: 'var(--font-family-display)' }}>
                     {Math.round(scanProgress)}%
                   </span>
                 </div>
               </div>
-              <p className="text-sm text-[var(--theme-text-muted)] uppercase tracking-wider" style={{ fontFamily: 'var(--font-family-display)' }}>
+              <p className="text-sm text-theme-muted uppercase tracking-wider" style={{ fontFamily: 'var(--font-family-display)' }}>
                 Scanning Library...
               </p>
             </div>
@@ -477,17 +477,17 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                 </div>
               </div>
 
-              <h3 className="text-xl font-bold text-[var(--theme-text-primary)] mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>
+              <h3 className="text-xl font-bold text-theme-primary mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>
                 {totalGroups === 0 ? 'NO DUPLICATES FOUND' : 'ALL DONE!'}
               </h3>
-              <p className="text-sm text-[var(--theme-text-subtle)] mb-8">
+              <p className="text-sm text-theme-subtle mb-8">
                 {totalGroups === 0 ? 'Your library is clean!' : `${resolvedCount} duplicate ${resolvedCount === 1 ? 'group' : 'groups'} reviewed`}
               </p>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => { resetState(); startScan(); }}
-                  className="px-5 py-2.5 rounded-xl text-sm text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] transition-all flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl text-sm text-theme-muted hover:text-theme-primary bg-theme-hover border border-theme hover:border-theme-hover transition-all flex items-center gap-2"
                 >
                   <RotateCw className="w-4 h-4" />
                   Scan Again
@@ -507,23 +507,23 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
             <div className="p-6">
               {/* Game Title */}
               <div className="text-center mb-4">
-                <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider mb-1 font-mono">
+                <p className="text-[10px] text-theme-subtle uppercase tracking-wider mb-1 font-mono">
                   {currentGroup.matchType === 'exact' ? '// EXACT MATCH' : '// SIMILAR TITLES'}
                 </p>
-                <h3 className="text-2xl font-bold text-[var(--theme-text-primary)]" style={{ fontFamily: 'var(--font-family-display)' }}>
+                <h3 className="text-2xl font-bold text-theme-primary" style={{ fontFamily: 'var(--font-family-display)' }}>
                   {(currentGroup.games[0]?.game as Game)?.title || 'Unknown Game'}
                 </h3>
-                <p className="text-sm text-[var(--theme-text-subtle)] mt-1">
+                <p className="text-sm text-theme-subtle mt-1">
                   {currentGroup.games.length} copies found • {currentGroup.confidence}% match
                 </p>
               </div>
 
               {/* Selection Toolbar */}
-              <div className="flex items-center justify-between mb-4 py-2 px-3 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]">
+              <div className="flex items-center justify-between mb-4 py-2 px-3 rounded-lg bg-theme-hover border border-theme">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={selectedIds.size === currentGroup.games.length ? clearSelection : selectAll}
-                    className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-colors"
+                    className="flex items-center gap-2 text-xs text-theme-muted hover:text-theme-primary transition-colors"
                   >
                     {selectedIds.size === currentGroup.games.length ? (
                       <CheckSquare className="w-4 h-4 text-violet-400" />
@@ -538,7 +538,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                 {selectedIds.size > 0 && (
                   <button
                     onClick={clearSelection}
-                    className="text-xs text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] transition-colors"
+                    className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
                   >
                     Clear
                   </button>
@@ -569,10 +569,10 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                         <button
                           onClick={() => toggleSelection(userGame.id)}
                           disabled={isProcessing}
-                          className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
+                          className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
                             isSelected
                               ? 'bg-violet-500 border-2 border-violet-400'
-                              : 'bg-[var(--theme-bg-secondary)] border-2 border-[var(--theme-text-subtle)]/40 hover:border-violet-400/60'
+                              : 'bg-theme-secondary border-2 border-text-subtle/40 hover:border-violet-400/60'
                           }`}
                         >
                           {isSelected && <Check className="w-4 h-4 text-white" />}
@@ -584,27 +584,27 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                             <Image src={game.cover_url} alt={game.title} fill className="object-cover" sizes="56px" />
                           </div>
                         ) : (
-                          <div className="w-14 h-[72px] rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
-                            <Gamepad2 className="w-5 h-5 text-[var(--theme-text-primary)]/20" />
+                          <div className="w-14 h-[72px] rounded-lg bg-theme-hover border border-theme flex items-center justify-center">
+                            <Gamepad2 className="w-5 h-5 text-theme-primary/20" />
                           </div>
                         )}
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xs px-2 py-1 rounded-md bg-[var(--theme-hover-bg)] text-[var(--theme-text-muted)] uppercase tracking-wider font-medium">
+                            <span className="text-xs px-2 py-1 rounded-md bg-theme-hover text-theme-muted uppercase tracking-wider font-medium">
                               {platform}
                             </span>
                             <span className={`text-xs px-2 py-1 rounded-md uppercase tracking-wider ${
                               userGame.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
                               userGame.status === 'playing' ? 'bg-cyan-500/10 text-cyan-400' :
-                              'bg-[var(--theme-hover-bg)] text-[var(--theme-text-subtle)]'
+                              'bg-theme-hover text-theme-subtle'
                             }`}>
                               {userGame.status}
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-4 text-sm text-[var(--theme-text-muted)]">
+                          <div className="flex items-center gap-4 text-sm text-theme-muted">
                             {userGame.playtime_hours > 0 && (
                               <span className="flex items-center gap-1.5">
                                 <Clock className="w-4 h-4" />
@@ -626,7 +626,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                           </div>
 
                           {userGame.notes && (
-                            <p className="text-xs text-[var(--theme-text-subtle)] mt-2 truncate">"{userGame.notes}"</p>
+                            <p className="text-xs text-theme-subtle mt-2 truncate">"{userGame.notes}"</p>
                           )}
                         </div>
 
@@ -634,7 +634,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                         <button
                           onClick={() => handleKeepOne(userGame.id)}
                           disabled={isProcessing}
-                          className="flex-shrink-0 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all hover:bg-emerald-500/20"
+                          className="shrink-0 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium opacity-0 group-hover:opacity-100 transition-all hover:bg-emerald-500/20"
                         >
                           Keep Only
                         </button>
@@ -660,7 +660,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                     border: '1px solid rgba(168, 85, 247, 0.2)',
                   }}
                 >
-                  <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider mb-3 font-mono">
+                  <p className="text-[10px] text-theme-subtle uppercase tracking-wider mb-3 font-mono">
                     // Actions for {selectedIds.size} selected
                   </p>
                   <div className="flex gap-2 flex-wrap">
@@ -699,8 +699,8 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
 
               {/* Quick Actions (when nothing selected) */}
               {selectedIds.size === 0 && (
-                <div className="border-t border-[var(--theme-border)] pt-4">
-                  <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider mb-3 text-center">Quick actions for all</p>
+                <div className="border-t border-theme pt-4">
+                  <p className="text-[10px] text-theme-subtle uppercase tracking-wider mb-3 text-center">Quick actions for all</p>
                   <div className="flex gap-2 justify-center">
                     <button
                       onClick={() => { selectAll(); setViewMode('merge-select'); }}
@@ -730,7 +730,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                   <button
                     onClick={() => { setResolvedCount(prev => prev + 1); goToNext(); }}
                     disabled={isProcessing}
-                    className="w-full mt-3 py-2 text-xs text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-muted)] transition-colors flex items-center justify-center gap-1"
+                    className="w-full mt-3 py-2 text-xs text-theme-subtle hover:text-theme-muted transition-colors flex items-center justify-center gap-1"
                   >
                     Skip for now
                     <ChevronRight className="w-3 h-3" />
@@ -751,7 +751,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                 {/* Back button */}
                 <button
                   onClick={() => { setViewMode('choose'); setMergePrimaryId(null); }}
-                  className="flex items-center gap-2 text-sm text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] mb-4 transition-colors"
+                  className="flex items-center gap-2 text-sm text-theme-subtle hover:text-theme-primary mb-4 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back to selection
@@ -765,10 +765,10 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                       Merge {selectedIds.size} Items
                     </span>
                   </div>
-                  <h3 className="text-2xl font-bold text-[var(--theme-text-primary)]" style={{ fontFamily: 'var(--font-family-display)' }}>
+                  <h3 className="text-2xl font-bold text-theme-primary" style={{ fontFamily: 'var(--font-family-display)' }}>
                     {game?.title || 'Unknown Game'}
                   </h3>
-                  <p className="text-sm text-[var(--theme-text-subtle)] mt-1">
+                  <p className="text-sm text-theme-subtle mt-1">
                     Combine selected copies into one
                   </p>
                 </div>
@@ -781,33 +781,33 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                     border: '1px solid rgba(168, 85, 247, 0.15)',
                   }}
                 >
-                  <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider mb-3 font-mono">// Combined Stats from {selectedIds.size} items</p>
+                  <p className="text-[10px] text-theme-subtle uppercase tracking-wider mb-3 font-mono">// Combined Stats from {selectedIds.size} items</p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-cyan-400" />
                       <div>
-                        <p className="text-lg font-bold text-[var(--theme-text-primary)]">{mergedStats.totalPlaytime.toFixed(1)}h</p>
-                        <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase">Total Playtime</p>
+                        <p className="text-lg font-bold text-theme-primary">{mergedStats.totalPlaytime.toFixed(1)}h</p>
+                        <p className="text-[10px] text-theme-subtle uppercase">Total Playtime</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Trophy className="w-5 h-5 text-amber-400" />
                       <div>
-                        <p className="text-lg font-bold text-[var(--theme-text-primary)]">
+                        <p className="text-lg font-bold text-theme-primary">
                           {mergedStats.maxAchievementsEarned}
                           {mergedStats.maxAchievementsTotal > 0 && (
-                            <span className="text-[var(--theme-text-subtle)]">/{mergedStats.maxAchievementsTotal}</span>
+                            <span className="text-theme-subtle">/{mergedStats.maxAchievementsTotal}</span>
                           )}
                         </p>
-                        <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase">Best Achievements</p>
+                        <p className="text-[10px] text-theme-subtle uppercase">Best Achievements</p>
                       </div>
                     </div>
                     {mergedStats.maxCompletion > 0 && (
                       <div className="flex items-center gap-3">
                         <Sparkles className="w-5 h-5 text-emerald-400" />
                         <div>
-                          <p className="text-lg font-bold text-[var(--theme-text-primary)]">{mergedStats.maxCompletion}%</p>
-                          <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase">Best Completion</p>
+                          <p className="text-lg font-bold text-theme-primary">{mergedStats.maxCompletion}%</p>
+                          <p className="text-[10px] text-theme-subtle uppercase">Best Completion</p>
                         </div>
                       </div>
                     )}
@@ -815,18 +815,18 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                       <div className="flex items-center gap-3">
                         <Star className="w-5 h-5 text-violet-400" />
                         <div>
-                          <p className="text-lg font-bold text-[var(--theme-text-primary)]">{mergedStats.bestRating}/10</p>
-                          <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase">Your Rating</p>
+                          <p className="text-lg font-bold text-theme-primary">{mergedStats.bestRating}/10</p>
+                          <p className="text-[10px] text-theme-subtle uppercase">Your Rating</p>
                         </div>
                       </div>
                     )}
                   </div>
                   {mergedStats.allNotes.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-[var(--theme-border)]">
-                      <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2">Notes will be preserved</p>
-                      <p className="text-xs text-[var(--theme-text-muted)] truncate">"{mergedStats.allNotes[0]}"</p>
+                    <div className="mt-4 pt-4 border-t border-theme">
+                      <p className="text-[10px] text-theme-subtle uppercase tracking-wider mb-2">Notes will be preserved</p>
+                      <p className="text-xs text-theme-muted truncate">"{mergedStats.allNotes[0]}"</p>
                       {mergedStats.allNotes.length > 1 && (
-                        <p className="text-[10px] text-[var(--theme-text-subtle)] mt-1">+{mergedStats.allNotes.length - 1} more notes</p>
+                        <p className="text-[10px] text-theme-subtle mt-1">+{mergedStats.allNotes.length - 1} more notes</p>
                       )}
                     </div>
                   )}
@@ -834,7 +834,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
 
                 {/* Select Platform to Keep as Primary */}
                 <div className="mb-6">
-                  <p className="text-sm text-[var(--theme-text-secondary)] mb-3">Which platform version should be the primary?</p>
+                  <p className="text-sm text-theme-secondary mb-3">Which platform version should be the primary?</p>
                   <div className="grid gap-2">
                     {selectedGames.map((userGame) => {
                       const platform = (() => {
@@ -861,18 +861,18 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                                 isSelected ? 'border-violet-400 bg-violet-400' : 'border-white/20'
                               }`}>
-                                {isSelected && <div className="w-2 h-2 rounded-full bg-[var(--theme-bg-primary)]" />}
+                                {isSelected && <div className="w-2 h-2 rounded-full bg-theme-primary" />}
                               </div>
-                              <span className="text-sm font-medium text-[var(--theme-text-primary)]">{platform}</span>
+                              <span className="text-sm font-medium text-theme-primary">{platform}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-[var(--theme-text-subtle)]">
+                            <div className="flex items-center gap-3 text-xs text-theme-subtle">
                               {userGame.playtime_hours > 0 && (
                                 <span>{userGame.playtime_hours.toFixed(1)}h</span>
                               )}
                               <span className={`px-2 py-0.5 rounded ${
                                 userGame.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
                                 userGame.status === 'playing' ? 'bg-cyan-500/10 text-cyan-400' :
-                                'bg-[var(--theme-hover-bg)] text-[var(--theme-text-subtle)]'
+                                'bg-theme-hover text-theme-subtle'
                               }`}>
                                 {userGame.status}
                               </span>
@@ -901,7 +901,7 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                   ) : (
                     <>
                       <Merge className="w-5 h-5 text-violet-400" />
-                      <span className={mergePrimaryId ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-subtle)]'}>
+                      <span className={mergePrimaryId ? 'text-theme-primary' : 'text-theme-subtle'}>
                         {mergePrimaryId ? `Merge ${selectedIds.size} into One` : 'Select a primary platform'}
                       </span>
                     </>
@@ -914,11 +914,11 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
 
         {/* Navigation Footer */}
         {phase === 'complete' && !isComplete && totalGroups > 1 && (
-          <div className="px-6 py-4 border-t border-[var(--theme-border)] flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-theme flex items-center justify-between">
             <button
               onClick={goToPrev}
               disabled={currentIndex === 0 || isProcessing}
-              className="px-4 py-2 text-sm text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm text-theme-subtle hover:text-theme-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               ← Previous
             </button>
@@ -928,18 +928,18 @@ export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFi
                   key={idx}
                   className={`w-2 h-2 rounded-full transition-colors ${
                     idx === currentIndex ? 'bg-violet-400' :
-                    idx < currentIndex ? 'bg-emerald-400/50' : 'bg-[var(--theme-border)]'
+                    idx < currentIndex ? 'bg-emerald-400/50' : 'bg-border'
                   }`}
                 />
               ))}
               {duplicates.length > 10 && (
-                <span className="text-[10px] text-[var(--theme-text-subtle)] ml-1">+{duplicates.length - 10}</span>
+                <span className="text-[10px] text-theme-subtle ml-1">+{duplicates.length - 10}</span>
               )}
             </div>
             <button
               onClick={goToNext}
               disabled={currentIndex >= duplicates.length - 1 || isProcessing}
-              className="px-4 py-2 text-sm text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm text-theme-subtle hover:text-theme-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               Next →
             </button>

@@ -49,7 +49,7 @@ const SERVICE_CONFIG = {
     name: 'Epic Games',
     accent: '#888888',
     accentGlow: 'rgba(136, 136, 136, 0.2)',
-    icon: <EpicLogo className="w-4 h-4 text-[var(--theme-text-primary)]" />,
+    icon: <EpicLogo className="w-4 h-4 text-theme-primary" />,
   },
 } as const;
 
@@ -297,7 +297,7 @@ export function SyncServiceDropdown() {
         {/* Animated top border */}
         <div className="absolute top-0 left-0 right-0 h-px overflow-hidden">
           <div
-            className="h-full w-full bg-gradient-to-r from-cyan-400 via-violet-400 to-cyan-400"
+            className="h-full w-full bg-linear-to-r from-cyan-400 via-violet-400 to-cyan-400"
             style={{
               animation: syncingService ? 'shimmer 1.5s linear infinite' : 'none',
               backgroundSize: '200% 100%',
@@ -312,7 +312,7 @@ export function SyncServiceDropdown() {
           <RefreshCw className="relative w-4 h-4 text-cyan-400 transition-transform duration-500 group-hover:rotate-180" />
         )}
         <span
-          className="relative font-semibold text-[var(--theme-text-primary)] uppercase tracking-wide text-sm"
+          className="relative font-semibold text-theme-primary uppercase tracking-wide text-sm"
           style={{ fontFamily: 'var(--font-family-display)' }}
         >
           {syncingService ? 'Syncing...' : 'Sync'}
@@ -327,7 +327,7 @@ export function SyncServiceDropdown() {
             {connectedServices.slice(0, 4).map(([service]) => (
               <div
                 key={service}
-                className="w-2.5 h-2.5 rounded-full border-2 border-[var(--theme-bg-primary)]"
+                className="w-2.5 h-2.5 rounded-full border-2 border-bg-primary"
                 style={{
                   background: SERVICE_CONFIG[service].accent,
                   boxShadow: `0 0 6px ${SERVICE_CONFIG[service].accentGlow}`,
@@ -350,7 +350,7 @@ export function SyncServiceDropdown() {
           {/* Dropdown Container */}
           <div className="absolute right-0 top-full mt-2 z-50 w-80 animate-dropdown-slide-in">
             <div
-              className="relative overflow-hidden rounded-xl bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)]"
+              className="relative overflow-hidden rounded-xl bg-theme-secondary border border-theme"
               style={{
                 boxShadow: `
                   0 0 0 1px var(--theme-border),
@@ -367,25 +367,25 @@ export function SyncServiceDropdown() {
               />
 
               {/* Top accent line */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--theme-text-primary)]/15 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-text-primary/15 to-transparent" />
 
               {/* Header */}
-              <div className="relative px-5 py-4 border-b border-[var(--theme-border)]">
+              <div className="relative px-5 py-4 border-b border-theme">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div
-                      className="w-7 h-7 rounded-lg flex items-center justify-center bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center bg-theme-hover border border-theme"
                     >
                       <Zap className="w-3.5 h-3.5 text-cyan-400" />
                     </div>
                     <span
-                      className="text-xs font-semibold text-[var(--theme-text-muted)] uppercase tracking-wider"
+                      className="text-xs font-semibold text-theme-muted uppercase tracking-wider"
                       style={{ fontFamily: 'var(--font-family-display)' }}
                     >
                       Sync Services
                     </span>
                   </div>
-                  <span className="text-[10px] font-medium text-[var(--theme-text-subtle)] bg-[var(--theme-hover-bg)] px-2 py-1 rounded-md border border-[var(--theme-border)]">
+                  <span className="text-[10px] font-medium text-theme-subtle bg-theme-hover px-2 py-1 rounded-md border border-theme">
                     {connectedServices.length} connected
                   </span>
                 </div>
@@ -395,18 +395,18 @@ export function SyncServiceDropdown() {
               <div className="relative py-2">
                 {loading ? (
                   <div className="px-5 py-8 text-center">
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]">
-                      <RefreshCw className="w-5 h-5 animate-spin text-[var(--theme-text-subtle)]" />
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center bg-theme-hover border border-theme">
+                      <RefreshCw className="w-5 h-5 animate-spin text-theme-subtle" />
                     </div>
-                    <p className="text-sm text-[var(--theme-text-subtle)]">Loading services...</p>
+                    <p className="text-sm text-theme-subtle">Loading services...</p>
                   </div>
                 ) : !hasConnectedServices ? (
                   <div className="px-5 py-8 text-center">
                     <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center bg-amber-500/5 border border-amber-500/15">
                       <AlertCircle className="w-5 h-5 text-amber-400" />
                     </div>
-                    <p className="text-sm text-[var(--theme-text-muted)] font-medium">No services connected</p>
-                    <p className="text-xs text-[var(--theme-text-subtle)] mt-1">Connect services in Settings</p>
+                    <p className="text-sm text-theme-muted font-medium">No services connected</p>
+                    <p className="text-xs text-theme-subtle mt-1">Connect services in Settings</p>
                   </div>
                 ) : connectedServices.map(([service, profile], idx) => {
                   const config = SERVICE_CONFIG[service];
@@ -434,7 +434,7 @@ export function SyncServiceDropdown() {
                         disabled={syncingService !== null || isOnCooldown}
                         className={`
                           w-full px-4 py-3.5 flex items-center gap-3.5 transition-all duration-200
-                          ${isOnCooldown ? 'opacity-60' : 'hover:bg-[var(--theme-hover-bg)]'}
+                          ${isOnCooldown ? 'opacity-60' : 'hover:bg-theme-hover'}
                           disabled:cursor-not-allowed
                           group/item relative
                         `}
@@ -474,7 +474,7 @@ export function SyncServiceDropdown() {
                         {/* Service Info */}
                         <div className="flex-1 text-left min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-[var(--theme-text-primary)] text-sm">{config.name}</span>
+                            <span className="font-semibold text-theme-primary text-sm">{config.name}</span>
                             <div
                               className="w-4 h-4 rounded-full flex items-center justify-center"
                               style={{
@@ -497,7 +497,7 @@ export function SyncServiceDropdown() {
                                   {formatTimeRemaining(cooldownMs)}
                                 </span>
                               </div>
-                              <div className="flex-1 h-1 bg-[var(--theme-border)] rounded-full overflow-hidden max-w-20">
+                              <div className="flex-1 h-1 bg-border rounded-full overflow-hidden max-w-20">
                                 <div
                                   className="h-full rounded-full"
                                   style={{
@@ -509,21 +509,21 @@ export function SyncServiceDropdown() {
                               </div>
                             </div>
                           ) : (
-                            <p className="text-[11px] text-[var(--theme-text-subtle)] truncate">
+                            <p className="text-[11px] text-theme-subtle truncate">
                               {lastSync ? `Synced ${formatLastSync(lastSync)}` : 'Never synced'}
                             </p>
                           )}
                         </div>
 
                         {/* Action indicator */}
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           {isOnCooldown ? (
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/5 border border-amber-500/15">
                               <Clock className="w-4 h-4 text-amber-400/70" />
                             </div>
                           ) : (
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-all bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] group-hover/item:bg-[var(--theme-bg-tertiary)] group-hover/item:border-[var(--theme-border-hover)]">
-                              <RefreshCw className="w-4 h-4 text-[var(--theme-text-subtle)] group-hover/item:text-[var(--theme-text-muted)] group-hover/item:rotate-90 transition-all duration-300" />
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-all bg-theme-hover border border-theme group-hover/item:bg-theme-tertiary group-hover/item:border-theme-hover">
+                              <RefreshCw className="w-4 h-4 text-theme-subtle group-hover/item:text-theme-muted group-hover/item:rotate-90 transition-all duration-300" />
                             </div>
                           )}
                         </div>
@@ -543,7 +543,7 @@ export function SyncServiceDropdown() {
                   : 0;
 
                 return (
-                  <div className="relative px-4 py-3 border-t border-[var(--theme-border)]">
+                  <div className="relative px-4 py-3 border-t border-theme">
                     <button
                       onClick={handleSyncAll}
                       disabled={syncingService !== null || allOnCooldown}
@@ -574,7 +574,7 @@ export function SyncServiceDropdown() {
                           <Zap className="w-4 h-4" />
                           <span>Sync All Services</span>
                           {someOnCooldown && (
-                            <span className="text-[10px] text-[var(--theme-bg-primary)]/50 bg-[var(--theme-text-primary)]/10 px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] text-bg-primary/50 bg-text-primary/10 px-1.5 py-0.5 rounded">
                               {connectedServices.length - servicesOnCooldown.length} ready
                             </span>
                           )}

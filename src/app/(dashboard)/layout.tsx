@@ -13,13 +13,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user } = useDashboardData();
 
   return (
-    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)] flex overflow-hidden">
+    <div className="min-h-screen bg-theme-primary text-theme-primary flex overflow-hidden">
       {/* Noise texture overlay */}
       <div className="noise-overlay" />
 
       {/* Scan line effect */}
-      <div className="fixed inset-0 pointer-events-none z-[60] overflow-hidden">
-        <div className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/15 to-transparent animate-scan-line" />
+      <div className="fixed inset-0 pointer-events-none z-60 overflow-hidden">
+        <div className="absolute w-full h-[2px] bg-linear-to-r from-transparent via-cyan-400/15 to-transparent animate-scan-line" />
       </div>
 
       {/* Grid background */}

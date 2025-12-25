@@ -138,7 +138,7 @@ export function SteamAchievementIcon({
       {icons[variant % icons.length]}
       {!unlocked && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <Lock className="w-5 h-5 text-[var(--theme-text-muted)]" />
+          <Lock className="w-5 h-5 text-theme-muted" />
         </div>
       )}
     </div>

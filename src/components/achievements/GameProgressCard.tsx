@@ -19,11 +19,11 @@ export function GameProgressCard({ userGame, percentage, index }: GameProgressCa
   return (
     <Link href={`/game/${userGame.id}`}>
       <div
-        className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden hover:border-cyan-400/30 transition-all duration-300 cursor-pointer"
+        className="group relative bg-theme-secondary border border-theme rounded-xl overflow-hidden hover:border-cyan-400/30 transition-all duration-300 cursor-pointer"
         style={{ animation: `fadeIn 0.4s ease-out ${index * 0.03}s both` }}
       >
         {/* Cover */}
-        <div className="relative aspect-[3/4] overflow-hidden">
+        <div className="relative aspect-3/4 overflow-hidden">
           {coverUrl ? (
             <Image
               src={coverUrl}
@@ -33,13 +33,13 @@ export function GameProgressCard({ userGame, percentage, index }: GameProgressCa
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
             />
           ) : (
-            <div className="w-full h-full bg-[var(--theme-hover-bg)] flex items-center justify-center">
-              <Gamepad2 className="w-10 h-10 text-[var(--theme-text-subtle)]" />
+            <div className="w-full h-full bg-theme-hover flex items-center justify-center">
+              <Gamepad2 className="w-10 h-10 text-theme-subtle" />
             </div>
           )}
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#030304] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-void via-transparent to-transparent" />
 
           {/* Progress overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -47,7 +47,7 @@ export function GameProgressCard({ userGame, percentage, index }: GameProgressCa
               <span className="text-sm font-bold font-mono text-white">
                 {percentage}%
               </span>
-              <span className="text-[10px] font-mono text-[var(--theme-text-muted)]">
+              <span className="text-[10px] font-mono text-theme-muted">
                 {earned}/{total}
               </span>
             </div>
@@ -62,7 +62,7 @@ export function GameProgressCard({ userGame, percentage, index }: GameProgressCa
 
         {/* Title */}
         <div className="p-3 pt-2">
-          <h4 className="text-xs font-medium text-[var(--theme-text-primary)] truncate group-hover:text-white transition-colors">
+          <h4 className="text-xs font-medium text-theme-primary truncate group-hover:text-white transition-colors">
             {title}
           </h4>
         </div>

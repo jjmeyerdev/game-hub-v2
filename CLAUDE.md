@@ -196,3 +196,83 @@ TypeScript strict mode is enabled. Avoid using:
 - Import icons from `lucide-react`
 - Follow the established pattern of gradient buttons with hover effects
 - Use Rajdhani font (via CSS variable) for headings and display text
+
+## AI Rules & Coding Conventions
+
+### Core Architectural Rules
+
+- **Prioritize Server Components (RSC)**: Server Components should be the default. Use `"use client"` only when necessary for interactions like event handlers, effects, or browser-specific APIs (e.g., local storage).
+- **Minimize Client-Side Logic**: Avoid client-side data fetching (`useEffect`, `useState` with fetch) if possible. Leverage Next.js data fetching methods within Server Components or Server Actions.
+- **Use the App Router**: Structure your application using the `app/` directory for all routing and project structure.
+- **Implement Streaming with Suspense**: Wrap client components or data-fetching components with `<Suspense fallback={<LoadingComponent />}>` to improve perceived performance and enable streaming.
+
+### Code Style and Standards
+
+- **Use TypeScript Exclusively**: All code should be written in TypeScript (`.ts`, `.tsx`). Prefer interfaces over types for object shapes, and use `unknown` with runtime checks instead of `any`.
+- **Functional Programming**: Favor functional components and functional, declarative programming patterns. Avoid classes.
+- **File Structure**: Keep files concise (around 150 lines). Structure files with the exported component first, followed by subcomponents, helpers, and types/interfaces at the end.
+- **Naming Conventions**:
+  - Use lowercase with dashes for directories (e.g., `components/auth-wizard`).
+  - Favor named exports for components over default exports.
+  - Use descriptive variable names (e.g., `isLoading`, `hasError`).
+
+### Performance and Optimization
+
+- **Image Optimization**: Use the Next.js `Image` component for all images. Always include `alt`, `width`, and `height` properties or use `fill`, and prefer the WebP format when possible.
+- **Font Optimization**: Use `next/font` for automatic optimization of local and Google fonts; avoid manual `<link>` tags.
+- **Minimize JavaScript**: Aim to ship minimal JavaScript to the browser by leveraging server-side rendering and static generation capabilities.
+- **Optimize Web Vitals**: Regularly run Lighthouse and address performance bottlenecks, focusing on LCP, CLS, and FID.
+
+### Error Handling and Security
+
+- **Sanitize User Input**: Always sanitize user inputs and use validation libraries like Zod to prevent XSS and other vulnerabilities.
+- **Implement Error Boundaries**: Use `error.tsx` files to handle unexpected errors gracefully in the UI.
+- **Handle Errors Early**: Use guard clauses and early returns for expected error conditions to avoid deeply nested logic.
+- **Prioritize Security Reviews**: For high-risk areas (authentication, user input), enforce a mandatory security review as part of the process. Use `<SECURITY_REVIEW>` tag to flag code requiring security attention.
+
+### Tailwind CSS v4 Rules
+
+- **Specify the Version**: Always use Tailwind CSS v4 features and syntax. Do not default to older v3 patterns.
+- **Embrace Utility-First**: Leverage Tailwind's extensive utility classes directly in the HTML/JSX, minimizing the need for custom CSS files.
+- **Prioritize Semantic HTML & Accessibility**: Use proper semantic HTML and include necessary ARIA attributes for accessibility.
+- **Mobile-First Design**: Enforce a mobile-first approach, using responsive prefixes (`sm:`, `md:`, `lg:`, etc.) for different screen sizes.
+- **Avoid @apply (Generally)**: Avoid the `@apply` directive for general styling. Using direct utility classes is the recommended v4 approach.
+- **Leverage Modern CSS Features**: Utilize new CSS features integrated into v4, such as native cascade layers, `color-mix()`, and logical properties.
+
+### Tailwind CSS v4 Specifics
+
+- **CSS-First Configuration**: Configuration is now primarily done in a global CSS file using the `@theme` directive. While `tailwind.config.js` is supported for backward compatibility, prefer `@theme` in `globals.css`.
+- **New Utility Classes**: v4 supports more dynamic utilities by default, including granular spacing values (e.g., `p-7`, `gap-9`, `m-11`) without custom configuration.
+- **Automatic Content Detection**: Do not manually configure content purging. v4 features automatic content detection and a high-performance engine.
+- **Editor Setup Awareness**: Custom `@` rules (like `@theme` or `@plugin`) might trigger errors in standard editors without the official Tailwind CSS IntelliSense plugin. These warnings can be safely ignored if the plugin is not installed.
+
+### AI Connection & Security Rules
+
+To securely connect AI tools (using the Model Context Protocol, or MCP) to your Supabase project, follow these essential guidelines to prevent data leaks and unintended modifications:
+
+- **Use Development Environment**: Always use a development environment with non-production (or obfuscated) data. Never connect an AI agent to your live production database.
+- **Enable Read-Only Mode**: If you must connect to a database containing real data, enable read-only mode. This prevents the AI from performing any `INSERT`, `UPDATE`, or `DELETE` operations.
+- **Scope AI Access**: Use the `--project-ref` flag to scope AI access to a single project. This ensures the AI cannot access other projects within your Supabase account.
+- **Strict Authentication**: Implement strict authentication and input validation if deploying an MCP server internally.
+- **Manual Tool Approval**: Never disable manual tool approval in your AI client/IDE. Always review and approve the specific SQL queries the AI generates before they run.
+- **Use Database Branches**: Use Supabase database branches to test schema changes and migrations in a safe, isolated environment before merging to production.
+
+### Database Design & Coding Style Rules
+
+These rules ensure consistent, secure, and maintainable SQL code for your Supabase database.
+
+#### General Naming & Style Conventions
+
+- **Use snake_case**: Apply `snake_case` for all table, column, and function names.
+- **Plural Table Names**: Prefer plural names for tables (e.g., `users`, `products`) and singular names for columns (e.g., `id`, `name`).
+- **Lowercase SQL Keywords**: Use lowercase for all SQL keywords (e.g., `select`, `from`, `where` instead of `SELECT`, `FROM`, `WHERE`).
+- **Primary Key Convention**: Add an `id` column of type `uuid` or `int` as a primary key to all tables.
+- **Copious Comments**: Include copious comments in your SQL code to explain complex logic or the purpose of a table, function, or migration step.
+
+#### Row Level Security (RLS) and Functions
+
+- **Enable RLS by Default**: Enable Row Level Security (RLS) by default for all new tables, even if they are intended for public access.
+- **Granular RLS Policies**: Create granular RLS policies with one policy per action (e.g., a separate policy for `SELECT` and `INSERT`).
+- **Avoid JOINs in Policies**: Write policies that avoid JOINs where possible, instead fetching necessary data from the target table first for performance.
+- **Empty search_path**: Set the `search_path` to an empty string (`set search_path = '';`) within database functions to prevent security risks and ensure you use fully qualified names (e.g., `public.users`).
+- **Prefer SECURITY INVOKER**: Default to `SECURITY INVOKER` for new functions, only using `SECURITY DEFINER` when explicitly required and justified.

@@ -53,8 +53,8 @@ export function FriendSearchInput({ platform, onSearch, isSearching, onClear }: 
 
   return (
     <form onSubmit={handleSubmit} className="relative">
-      <div className={`flex items-center gap-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl px-4 py-3 transition-all duration-200 ${colors.border}`}>
-        <Search className="w-5 h-5 text-[var(--theme-text-subtle)] flex-shrink-0" />
+      <div className={`flex items-center gap-2 bg-theme-secondary border border-theme rounded-xl px-4 py-3 transition-all duration-200 ${colors.border}`}>
+        <Search className="w-5 h-5 text-theme-subtle shrink-0" />
 
         <input
           type="text"
@@ -62,14 +62,14 @@ export function FriendSearchInput({ platform, onSearch, isSearching, onClear }: 
           onChange={(e) => setValue(e.target.value)}
           placeholder={platformPlaceholders[platform]}
           disabled={isSearching}
-          className={`flex-1 bg-transparent text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] outline-none text-sm disabled:opacity-50`}
+          className={`flex-1 bg-transparent text-theme-primary placeholder:text-theme-subtle outline-hidden text-sm disabled:opacity-50`}
         />
 
         {value && !isSearching && (
           <button
             type="button"
             onClick={handleClear}
-            className="p-1 text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] transition-colors"
+            className="p-1 text-theme-subtle hover:text-theme-primary transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

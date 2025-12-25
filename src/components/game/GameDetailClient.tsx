@@ -107,30 +107,30 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
     on_hold: { label: 'On Hold', color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
     paused: { label: 'Paused', color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
     dropped: { label: 'Dropped', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
-    unplayed: { label: 'Unplayed', color: 'text-[var(--theme-text-muted)]', bg: 'bg-[var(--theme-hover-bg)]', border: 'border-[var(--theme-border)]' },
+    unplayed: { label: 'Unplayed', color: 'text-theme-muted', bg: 'bg-theme-hover', border: 'border-theme' },
   };
 
   const status = statusConfig[game.status] || statusConfig.unplayed;
   const brandStyle = getPlatformBrandStyle(game.platform);
 
   return (
-    <div className="relative min-h-screen bg-[var(--theme-bg-primary)]">
+    <div className="relative min-h-screen bg-theme-primary">
       {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-cyan-500/[0.03] rounded-full blur-[120px] animate-breathe" />
-        <div className="absolute top-1/3 -right-40 w-[500px] h-[500px] bg-violet-500/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
+        <div className="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-cyan-500/3 rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute top-1/3 -right-40 w-[500px] h-[500px] bg-violet-500/3 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[var(--theme-bg-primary)]/80 border-b border-[var(--theme-border)]">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-theme-primary/80 border-b border-theme">
         {/* Top accent line */}
-        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
+        <div className="absolute top-0 left-8 right-8 h-px bg-linear-to-r from-transparent via-cyan-500/30 to-transparent" />
 
         <div className="px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <button
               onClick={() => router.back()}
-              className="group flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/10 border border-[var(--theme-border)] hover:border-cyan-500/30 rounded-xl text-sm text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all"
+              className="group flex items-center gap-2 px-4 py-2 bg-theme-hover hover:bg-cyan-500/10 border border-theme hover:border-cyan-500/30 rounded-xl text-sm text-theme-muted hover:text-cyan-400 transition-all"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span className="font-mono text-xs uppercase tracking-wider">Back</span>
@@ -139,17 +139,17 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowEditModal(true)}
-                className="group p-2.5 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/10 border border-[var(--theme-border)] hover:border-cyan-500/30 rounded-xl transition-all"
+                className="group p-2.5 bg-theme-hover hover:bg-cyan-500/10 border border-theme hover:border-cyan-500/30 rounded-xl transition-all"
                 title="Edit"
               >
-                <Edit className="w-4 h-4 text-[var(--theme-text-muted)] group-hover:text-cyan-400" />
+                <Edit className="w-4 h-4 text-theme-muted group-hover:text-cyan-400" />
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="group p-2.5 bg-[var(--theme-hover-bg)] hover:bg-red-500/10 border border-[var(--theme-border)] hover:border-red-500/30 rounded-xl transition-all"
+                className="group p-2.5 bg-theme-hover hover:bg-red-500/10 border border-theme hover:border-red-500/30 rounded-xl transition-all"
                 title="Delete"
               >
-                <Trash2 className="w-4 h-4 text-[var(--theme-text-muted)] group-hover:text-red-400" />
+                <Trash2 className="w-4 h-4 text-theme-muted group-hover:text-red-400" />
               </button>
             </div>
           </div>
@@ -175,7 +175,7 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
             <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-10">
               {/* Cover Art */}
               <div className="relative">
-                <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)]">
+                <div className="relative w-full aspect-3/4 rounded-2xl overflow-hidden bg-theme-secondary border border-theme">
                   {/* HUD corners */}
                   <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-cyan-400/40 z-10" />
                   <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-cyan-400/40 z-10" />
@@ -193,7 +193,7 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Gamepad2 className="w-20 h-20 text-[var(--theme-text-subtle)]" />
+                      <Gamepad2 className="w-20 h-20 text-theme-subtle" />
                     </div>
                   )}
                 </div>
@@ -202,7 +202,7 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
                 <div className="absolute -bottom-4 left-4 right-4">
                   <div className={`relative px-4 py-2.5 ${status.bg} ${status.border} border backdrop-blur-xl rounded-xl flex items-center justify-center overflow-hidden`}>
                     <div className={`absolute left-0 top-0 bottom-0 w-1 ${status.color.replace('text-', 'bg-')}`} />
-                    <span className={`text-sm font-semibold uppercase tracking-wide font-[family-name:var(--font-family-display)] ${status.color}`}>
+                    <span className={`text-sm font-semibold uppercase tracking-wide font-family-display ${status.color}`}>
                       {status.label}
                     </span>
                   </div>
@@ -223,8 +223,8 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
 
                 {/* Title */}
                 <div>
-                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2 block">// GAME_DATA</span>
-                  <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                  <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-2 block">// GAME_DATA</span>
+                  <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight uppercase tracking-wide font-family-display">
                     {game.game?.title}
                   </h1>
                 </div>
@@ -346,28 +346,28 @@ function ProgressSection({
     : 0;
 
   return (
-    <div className="relative p-5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl space-y-4 overflow-hidden">
+    <div className="relative p-5 bg-theme-secondary border border-theme rounded-xl space-y-4 overflow-hidden">
       {/* HUD corners */}
-      <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-white/[0.12]" />
-      <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-white/[0.12]" />
-      <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-white/[0.12]" />
-      <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-white/[0.12]" />
+      <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-white/12" />
+      <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-white/12" />
+      <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-white/12" />
+      <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-white/12" />
 
       <div className="flex items-center gap-2">
         <BarChart3 className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">Progress</span>
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// STATS</span>
+        <span className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">Progress</span>
+        <span className="text-[10px] font-mono text-theme-subtle">// STATS</span>
       </div>
 
       {game.completion_percentage > 0 && (
         <div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">Completion</span>
+            <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">Completion</span>
             <span className="text-xs font-mono font-medium text-violet-400">{game.completion_percentage}%</span>
           </div>
-          <div className="h-2 bg-[var(--theme-hover-bg)] rounded-full overflow-hidden">
+          <div className="h-2 bg-theme-hover rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all duration-500"
+              className="h-full bg-linear-to-r from-violet-500 to-violet-400 rounded-full transition-all duration-500"
               style={{ width: `${game.completion_percentage}%` }}
             />
           </div>
@@ -377,16 +377,16 @@ function ProgressSection({
       {displayAchievementsTotal > 0 && (
         <div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
+            <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">
               {game.platform.includes('PlayStation') || game.platform.startsWith('PS') ? 'Trophies' : 'Achievements'}
             </span>
             <span className="text-xs font-mono font-medium text-amber-400">
               {displayAchievementsEarned} / {displayAchievementsTotal}
             </span>
           </div>
-          <div className="h-2 bg-[var(--theme-hover-bg)] rounded-full overflow-hidden">
+          <div className="h-2 bg-theme-hover rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
+              className="h-full bg-linear-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
               style={{ width: `${achievementPercent}%` }}
             />
           </div>
@@ -399,25 +399,25 @@ function ProgressSection({
 // Game Info Card Component
 function GameInfoCard({ game }: { game: UserGame }) {
   return (
-    <div className="relative p-6 bg-[var(--theme-bg-secondary)] border border-cyan-500/20 rounded-xl space-y-5 overflow-hidden">
+    <div className="relative p-6 bg-theme-secondary border border-cyan-500/20 rounded-xl space-y-5 overflow-hidden">
       {/* HUD corners */}
       <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/30" />
       <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/30" />
       <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-cyan-400/30" />
       <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-400/30" />
 
-      <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+      <h3 className="text-sm font-semibold text-theme-muted flex items-center gap-2 uppercase tracking-wide font-family-display">
         <Zap className="w-4 h-4 text-cyan-400" />
         Game Details
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// METADATA</span>
+        <span className="text-[10px] font-mono text-theme-subtle font-normal">// METADATA</span>
       </h3>
 
       {game.game?.description ? (
-        <p className="text-sm text-[var(--theme-text-muted)] leading-relaxed">
+        <p className="text-sm text-theme-muted leading-relaxed">
           {game.game.description}
         </p>
       ) : (
-        <p className="text-sm text-[var(--theme-text-subtle)] italic font-mono">
+        <p className="text-sm text-theme-subtle italic font-mono">
           // No description available
         </p>
       )}
@@ -444,8 +444,8 @@ function GameInfoCard({ game }: { game: UserGame }) {
       </div>
 
       {game.game?.genres && game.game.genres.length > 0 && (
-        <div className="pt-4 border-t border-[var(--theme-border)]">
-          <div className="text-[10px] font-mono text-[var(--theme-text-muted)] mb-3 uppercase tracking-wider">Genres</div>
+        <div className="pt-4 border-t border-theme">
+          <div className="text-[10px] font-mono text-theme-muted mb-3 uppercase tracking-wider">Genres</div>
           <div className="flex flex-wrap gap-2">
             {game.game.genres.map((genre, index) => (
               <span
@@ -465,17 +465,17 @@ function GameInfoCard({ game }: { game: UserGame }) {
 // Activity Card Component
 function ActivityCard({ game }: { game: UserGame }) {
   return (
-    <div className="relative p-6 bg-[var(--theme-bg-secondary)] border border-violet-500/20 rounded-xl space-y-4 overflow-hidden">
+    <div className="relative p-6 bg-theme-secondary border border-violet-500/20 rounded-xl space-y-4 overflow-hidden">
       {/* HUD corners */}
       <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-violet-400/30" />
       <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-violet-400/30" />
       <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-violet-400/30" />
       <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-violet-400/30" />
 
-      <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+      <h3 className="text-sm font-semibold text-theme-muted flex items-center gap-2 uppercase tracking-wide font-family-display">
         <Activity className="w-4 h-4 text-violet-400" />
         Activity
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// TIMELINE</span>
+        <span className="text-[10px] font-mono text-theme-subtle font-normal">// TIMELINE</span>
       </h3>
 
       <div className="space-y-3">
@@ -520,17 +520,17 @@ function ActivityCard({ game }: { game: UserGame }) {
 // Tags Card Component
 function TagsCard({ tags }: { tags: string[] }) {
   return (
-    <div className="relative p-6 bg-[var(--theme-bg-secondary)] border border-amber-500/20 rounded-xl space-y-4 overflow-hidden">
+    <div className="relative p-6 bg-theme-secondary border border-amber-500/20 rounded-xl space-y-4 overflow-hidden">
       {/* HUD corners */}
       <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-amber-400/30" />
       <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-amber-400/30" />
       <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-amber-400/30" />
       <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-amber-400/30" />
 
-      <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+      <h3 className="text-sm font-semibold text-theme-muted flex items-center gap-2 uppercase tracking-wide font-family-display">
         <Tag className="w-4 h-4 text-amber-400" />
         Tags
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// USER_TAGS</span>
+        <span className="text-[10px] font-mono text-theme-subtle font-normal">// USER_TAGS</span>
       </h3>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag, index) => (
@@ -549,19 +549,19 @@ function TagsCard({ tags }: { tags: string[] }) {
 // Notes Card Component
 function NotesCard({ notes }: { notes: string }) {
   return (
-    <div className="relative mt-6 p-6 bg-[var(--theme-bg-secondary)] border border-emerald-500/20 rounded-xl space-y-4 overflow-hidden">
+    <div className="relative mt-6 p-6 bg-theme-secondary border border-emerald-500/20 rounded-xl space-y-4 overflow-hidden">
       {/* HUD corners */}
       <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-emerald-400/30" />
       <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-emerald-400/30" />
       <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-emerald-400/30" />
       <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-emerald-400/30" />
 
-      <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] flex items-center gap-2 uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+      <h3 className="text-sm font-semibold text-theme-muted flex items-center gap-2 uppercase tracking-wide font-family-display">
         <Terminal className="w-4 h-4 text-emerald-400" />
         Notes
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// PERSONAL_LOG</span>
+        <span className="text-[10px] font-mono text-theme-subtle font-normal">// PERSONAL_LOG</span>
       </h3>
-      <p className="text-sm text-[var(--theme-text-muted)] leading-relaxed whitespace-pre-wrap">
+      <p className="text-sm text-theme-muted leading-relaxed whitespace-pre-wrap">
         {notes}
       </p>
     </div>

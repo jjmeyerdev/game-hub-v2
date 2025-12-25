@@ -4,17 +4,17 @@ import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/ico
 
 export default function GuidePage() {
   return (
-    <div className="relative min-h-screen bg-[var(--theme-bg-primary)]">
+    <div className="relative min-h-screen bg-theme-primary">
       {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-amber-500/[0.03] rounded-full blur-[120px] animate-breathe" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-cyan-500/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-amber-500/3 rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-cyan-500/3 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Header */}
-      <header className="relative border-b border-[var(--theme-border)]">
+      <header className="relative border-b border-theme">
         {/* Top accent line */}
-        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+        <div className="absolute top-0 left-8 right-8 h-px bg-linear-to-r from-transparent via-amber-500/30 to-transparent" />
 
         <div className="px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
@@ -32,9 +32,9 @@ export default function GuidePage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">// SETUP_MANUAL</span>
+                  <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">// SETUP_MANUAL</span>
                 </div>
-                <h1 className="text-2xl font-bold text-[var(--theme-text-primary)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                <h1 className="text-2xl font-bold text-theme-primary uppercase tracking-wide font-family-display">
                   SETUP GUIDE
                 </h1>
               </div>
@@ -42,7 +42,7 @@ export default function GuidePage() {
 
             <Link
               href="/settings"
-              className="group flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] hover:bg-amber-500/10 border border-[var(--theme-border)] hover:border-amber-500/30 rounded-xl text-sm text-[var(--theme-text-muted)] hover:text-amber-400 transition-all"
+              className="group flex items-center gap-2 px-4 py-2 bg-theme-hover hover:bg-amber-500/10 border border-theme hover:border-amber-500/30 rounded-xl text-sm text-theme-muted hover:text-amber-400 transition-all"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span className="font-mono text-xs uppercase tracking-wider">Back to Settings</span>
@@ -55,7 +55,7 @@ export default function GuidePage() {
       <div className="max-w-4xl mx-auto px-6 lg:px-8 py-10 space-y-10">
 
         {/* Introduction */}
-        <section className="relative p-6 bg-[var(--theme-bg-secondary)] border border-cyan-500/20 rounded-xl overflow-hidden">
+        <section className="relative p-6 bg-theme-secondary border border-cyan-500/20 rounded-xl overflow-hidden">
           {/* HUD corners */}
           <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-cyan-400/30" />
           <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-cyan-400/30" />
@@ -63,18 +63,18 @@ export default function GuidePage() {
           <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-cyan-400/30" />
 
           <div className="flex items-start gap-4">
-            <div className="relative w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+            <div className="relative w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
               <Zap className="w-6 h-6 text-cyan-400" />
               <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-lg font-bold text-[var(--theme-text-primary)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                <h2 className="text-lg font-bold text-theme-primary uppercase tracking-wide font-family-display">
                   Getting Started
                 </h2>
-                <span className="text-[10px] font-mono text-[var(--theme-text-muted)]">// INIT_SEQUENCE</span>
+                <span className="text-[10px] font-mono text-theme-muted">// INIT_SEQUENCE</span>
               </div>
-              <p className="text-sm text-[var(--theme-text-muted)] leading-relaxed">
+              <p className="text-sm text-theme-muted leading-relaxed">
                 Connect your gaming platforms to automatically sync game libraries, track achievements, and monitor playtime.
                 Each platform uses a different authentication method detailed below.
               </p>
@@ -226,7 +226,7 @@ export default function GuidePage() {
           color="gray"
           difficulty="Medium"
           time="3 min"
-          icon={<span className="text-[var(--theme-text-primary)]"><EpicLogo size="md" /></span>}
+          icon={<span className="text-theme-primary"><EpicLogo size="md" /></span>}
           requirements={[
             'Epic Games account',
             'Access to a web browser',
@@ -262,12 +262,12 @@ export default function GuidePage() {
         {/* Quick Reference */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <Terminal className="w-4 h-4 text-[var(--theme-text-muted)]" />
-            <h2 className="text-sm font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+            <Terminal className="w-4 h-4 text-theme-muted" />
+            <h2 className="text-sm font-semibold text-theme-secondary uppercase tracking-wide font-family-display">
               Quick Reference
             </h2>
-            <span className="text-[10px] font-mono text-[var(--theme-text-muted)]">// AUTH_METHODS</span>
-            <div className="h-px flex-1 bg-[var(--theme-border)]" />
+            <span className="text-[10px] font-mono text-theme-muted">// AUTH_METHODS</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -279,24 +279,24 @@ export default function GuidePage() {
         </section>
 
         {/* Footer */}
-        <footer className="relative pt-6 border-t border-[var(--theme-border)]">
+        <footer className="relative pt-6 border-t border-theme">
           {/* HUD corners */}
-          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-[var(--theme-border)]" />
-          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-[var(--theme-border)]" />
+          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-theme" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-theme" />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Terminal className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+              <Terminal className="w-3.5 h-3.5 text-theme-subtle" />
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                <p className="text-[11px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
-                  Guide v2.0.0-pre-alpha <span className="text-[var(--theme-text-subtle)]">•</span> Documentation
+                <p className="text-[11px] font-mono text-theme-muted uppercase tracking-wider">
+                  Guide v2.0.0-pre-alpha <span className="text-theme-subtle">•</span> Documentation
                 </p>
               </div>
             </div>
             <Link
               href="/settings"
-              className="group flex items-center gap-1.5 text-[11px] font-mono text-[var(--theme-accent-cyan)] hover:text-cyan-300 transition-colors uppercase tracking-wider"
+              className="group flex items-center gap-1.5 text-[11px] font-mono text-accent-cyan hover:text-cyan-300 transition-colors uppercase tracking-wider"
             >
               Return to Settings
               <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
@@ -347,11 +347,11 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
       corner: 'border-emerald-400/30',
     },
     gray: {
-      border: 'border-[var(--theme-border)]',
+      border: 'border-theme',
       text: '',
-      bg: 'bg-[var(--theme-hover-bg)]',
-      headerBg: 'bg-[var(--theme-hover-bg)]',
-      corner: 'border-[var(--theme-text-subtle)]',
+      bg: 'bg-theme-hover',
+      headerBg: 'bg-theme-hover',
+      corner: 'border-text-subtle',
     },
   };
 
@@ -361,7 +361,7 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
 
   return (
     <section id={id} className="scroll-mt-24">
-      <div className={`relative bg-[var(--theme-bg-secondary)] border ${c.border} rounded-xl overflow-hidden`}>
+      <div className={`relative bg-theme-secondary border ${c.border} rounded-xl overflow-hidden`}>
         {/* HUD corners */}
         <div className={`absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 ${c.corner}`} />
         <div className={`absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 ${c.corner}`} />
@@ -369,7 +369,7 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
         <div className={`absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 ${c.corner}`} />
 
         {/* Header */}
-        <div className={`px-6 py-4 ${c.headerBg} border-b border-[var(--theme-border)]`}>
+        <div className={`px-6 py-4 ${c.headerBg} border-b border-theme`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`relative w-11 h-11 rounded-lg ${c.bg} ${c.border} border flex items-center justify-center`}>
@@ -377,27 +377,27 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-[var(--theme-text-primary)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                  <h3 className="text-lg font-bold text-theme-primary uppercase tracking-wide font-family-display">
                     {name}
                   </h3>
-                  <span className="text-[9px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+                  <span className="text-[9px] font-mono text-theme-subtle uppercase tracking-wider">
                     // {id.toUpperCase()}_API
                   </span>
                 </div>
-                <p className="text-[11px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">{tagline}</p>
+                <p className="text-[11px] font-mono text-theme-muted uppercase tracking-wider">{tagline}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-[9px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider mb-1">Difficulty</p>
+                <p className="text-[9px] font-mono text-theme-muted uppercase tracking-wider mb-1">Difficulty</p>
                 <div className={`px-2 py-0.5 rounded ${difficultyBg} border`}>
                   <p className={`text-[10px] font-mono font-medium ${difficultyColor} uppercase tracking-wider`}>{difficulty}</p>
                 </div>
               </div>
-              <div className="w-px h-8 bg-[var(--theme-border)]" />
+              <div className="w-px h-8 bg-border" />
               <div className="text-right">
-                <p className="text-[9px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider mb-1">Time</p>
-                <p className="text-xs font-mono font-medium text-[var(--theme-text-primary)]">{time}</p>
+                <p className="text-[9px] font-mono text-theme-muted uppercase tracking-wider mb-1">Time</p>
+                <p className="text-xs font-mono font-medium text-theme-primary">{time}</p>
               </div>
             </div>
           </div>
@@ -405,17 +405,17 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
 
         <div className="p-6 space-y-6">
           {/* Requirements */}
-          <div className="relative p-4 bg-[var(--theme-hover-bg)] rounded-lg border border-[var(--theme-border)] overflow-hidden">
-            <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-[var(--theme-text-subtle)]" />
-            <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-[var(--theme-text-subtle)]" />
-            <h4 className="text-[10px] font-mono font-medium text-[var(--theme-text-muted)] uppercase tracking-wider mb-3 flex items-center gap-2">
+          <div className="relative p-4 bg-theme-hover rounded-lg border border-theme overflow-hidden">
+            <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-text-subtle" />
+            <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-text-subtle" />
+            <h4 className="text-[10px] font-mono font-medium text-theme-muted uppercase tracking-wider mb-3 flex items-center gap-2">
               <Shield className="w-3 h-3" />
               Requirements
             </h4>
             <ul className="space-y-2">
               {requirements.map((req, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-[var(--theme-text-secondary)]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                <li key={i} className="flex items-center gap-2 text-sm text-theme-secondary">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   {req}
                 </li>
               ))}
@@ -424,19 +424,19 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
 
           {/* Steps */}
           <div>
-            <h4 className="text-[10px] font-mono font-medium text-[var(--theme-text-muted)] uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h4 className="text-[10px] font-mono font-medium text-theme-muted uppercase tracking-wider mb-4 flex items-center gap-2">
               <Zap className="w-3 h-3" />
               Execution Steps
             </h4>
             <div className="space-y-4">
               {steps.map((step, i) => (
                 <div key={i} className="flex gap-3">
-                  <div className={`relative w-7 h-7 rounded-md ${c.bg} ${c.border} border flex items-center justify-center flex-shrink-0`}>
+                  <div className={`relative w-7 h-7 rounded-md ${c.bg} ${c.border} border flex items-center justify-center shrink-0`}>
                     <span className={`text-xs font-mono font-bold ${c.text}`}>{i + 1}</span>
                   </div>
                   <div className="flex-1 pt-0.5">
-                    <h5 className="text-sm font-semibold text-[var(--theme-text-primary)] mb-0.5">{step.title}</h5>
-                    <p className="text-sm text-[var(--theme-text-muted)] leading-relaxed">{step.description}</p>
+                    <h5 className="text-sm font-semibold text-theme-primary mb-0.5">{step.title}</h5>
+                    <p className="text-sm text-theme-muted leading-relaxed">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -454,7 +454,7 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
               </h4>
               <ul className="space-y-1.5">
                 {tips.map((tip, i) => (
-                  <li key={i} className="text-xs text-[var(--theme-text-muted)] flex items-start gap-1.5">
+                  <li key={i} className="text-xs text-theme-muted flex items-start gap-1.5">
                     <span className="text-emerald-500 mt-0.5 font-mono">+</span>
                     {tip}
                   </li>
@@ -471,7 +471,7 @@ function PlatformSection({ id, name, tagline, color, difficulty, time, icon, req
               </h4>
               <ul className="space-y-1.5">
                 {warnings.map((warning, i) => (
-                  <li key={i} className="text-xs text-[var(--theme-text-muted)] flex items-start gap-1.5">
+                  <li key={i} className="text-xs text-theme-muted flex items-start gap-1.5">
                     <span className="text-amber-500 mt-0.5 font-mono">!</span>
                     {warning}
                   </li>
@@ -498,13 +498,13 @@ function QuickRefCard({ platform, method, color, icon }: QuickRefCardProps) {
     cyan: { border: 'border-cyan-500/20', text: 'text-cyan-400', bg: 'bg-cyan-500/5', corner: 'border-cyan-400/30' },
     blue: { border: 'border-blue-500/20', text: 'text-blue-400', bg: 'bg-blue-500/5', corner: 'border-blue-400/30' },
     emerald: { border: 'border-emerald-500/20', text: 'text-emerald-400', bg: 'bg-emerald-500/5', corner: 'border-emerald-400/30' },
-    gray: { border: 'border-[var(--theme-border)]', text: 'text-[var(--theme-text-muted)]', bg: 'bg-[var(--theme-hover-bg)]', corner: 'border-[var(--theme-text-subtle)]' },
+    gray: { border: 'border-theme', text: 'text-theme-muted', bg: 'bg-theme-hover', corner: 'border-text-subtle' },
   };
 
   const c = colorMap[color];
 
   return (
-    <div className={`group relative flex items-center gap-3 p-3 bg-[var(--theme-bg-secondary)] ${c.bg} border ${c.border} rounded-lg hover:border-[var(--theme-text-muted)] transition-all`}>
+    <div className={`group relative flex items-center gap-3 p-3 bg-theme-secondary ${c.bg} border ${c.border} rounded-lg hover:border-text-muted transition-all`}>
       {/* HUD corners on hover */}
       <div className={`absolute top-0 left-0 w-2 h-2 border-l border-t ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
       <div className={`absolute top-0 right-0 w-2 h-2 border-r border-t ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -513,10 +513,10 @@ function QuickRefCard({ platform, method, color, icon }: QuickRefCardProps) {
 
       <span className={c.text}>{icon}</span>
       <div>
-        <p className={`text-sm font-semibold uppercase tracking-wide font-[family-name:var(--font-family-display)] ${c.text}`}>
+        <p className={`text-sm font-semibold uppercase tracking-wide font-family-display ${c.text}`}>
           {platform}
         </p>
-        <p className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">{method}</p>
+        <p className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">{method}</p>
       </div>
     </div>
   );

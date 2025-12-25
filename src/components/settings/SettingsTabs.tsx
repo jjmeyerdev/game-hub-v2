@@ -132,8 +132,8 @@ export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) 
               className={`
                 relative group overflow-hidden rounded-xl p-4 transition-all duration-200
                 ${isActive
-                  ? `bg-[var(--theme-bg-secondary)] border ${c.border}`
-                  : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border)] hover:bg-[var(--theme-hover-bg)]'
+                  ? `bg-theme-secondary border ${c.border}`
+                  : 'bg-theme-hover border border-theme hover:border-theme hover:bg-theme-hover'
                 }
               `}
               style={{ animation: `fadeIn 0.3s ease-out ${index * 0.05}s both` }}
@@ -152,9 +152,9 @@ export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) 
                 {/* Icon */}
                 <div className={`
                   relative p-2 rounded-lg transition-all duration-200
-                  ${isActive ? `${c.bg} ${c.border} border` : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)]'}
+                  ${isActive ? `${c.bg} ${c.border} border` : 'bg-theme-hover border border-theme'}
                 `}>
-                  <Icon className={`w-4 h-4 ${isActive ? c.text : 'text-[var(--theme-text-muted)]'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? c.text : 'text-theme-muted'}`} />
                   {isActive && (
                     <div className={`absolute -top-0.5 -right-0.5 w-1.5 h-1.5 ${c.indicator} rounded-full animate-pulse`} />
                   )}
@@ -163,12 +163,12 @@ export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) 
                 {/* Text */}
                 <div className="flex-1 text-left">
                   <div className="flex items-center gap-2">
-                    <h3 className={`font-semibold text-sm uppercase tracking-wide font-[family-name:var(--font-family-display)] ${isActive ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]'}`}>
+                    <h3 className={`font-semibold text-sm uppercase tracking-wide font-family-display ${isActive ? 'text-theme-primary' : 'text-theme-muted'}`}>
                       {tab.label}
                     </h3>
                     {isActive && <ChevronRight className={`w-3 h-3 ${c.text}`} />}
                   </div>
-                  <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] mt-0.5 uppercase tracking-wider">
+                  <p className="text-[10px] font-mono text-theme-subtle mt-0.5 uppercase tracking-wider">
                     {isActive ? `// ${tab.terminalLabel}` : tab.description}
                   </p>
                 </div>
@@ -212,14 +212,14 @@ function PlatformsContent() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Cpu className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+          <h2 className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">
             Platform Integrations
           </h2>
-          <div className="h-px flex-1 bg-[var(--theme-border)] w-20" />
+          <div className="h-px flex-1 bg-border w-20" />
         </div>
         <Link
           href="/guide"
-          className="group flex items-center gap-1.5 px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/10 border border-[var(--theme-border)] hover:border-cyan-500/30 rounded-lg text-[10px] font-mono font-medium text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all uppercase tracking-wider"
+          className="group flex items-center gap-1.5 px-3 py-1.5 bg-theme-hover hover:bg-cyan-500/10 border border-theme hover:border-cyan-500/30 rounded-lg text-[10px] font-mono font-medium text-theme-muted hover:text-cyan-400 transition-all uppercase tracking-wider"
         >
           <Book className="w-3 h-3" />
           Setup Guide
@@ -227,7 +227,7 @@ function PlatformsContent() {
         </Link>
       </div>
 
-      <p className="text-sm text-[var(--theme-text-muted)]">
+      <p className="text-sm text-theme-muted">
         Connect your gaming accounts to import libraries, achievements, and playtime data.
       </p>
 
@@ -254,11 +254,11 @@ function PlatformsContent() {
       <div className="pt-4">
         <div className="flex items-center gap-3 mb-4">
           <Terminal className="w-4 h-4 text-amber-400" />
-          <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+          <h3 className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">
             Sync Diagnostics
           </h3>
-          <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// SYNC_LOGS</span>
-          <div className="h-px flex-1 bg-[var(--theme-border)]" />
+          <span className="text-[10px] font-mono text-theme-subtle">// SYNC_LOGS</span>
+          <div className="h-px flex-1 bg-border" />
         </div>
 
         <SettingsCard color="amber">
@@ -270,10 +270,10 @@ function PlatformsContent() {
       <div className="pt-4">
         <div className="flex items-center gap-3 mb-4">
           <Database className="w-4 h-4 text-red-400" />
-          <h3 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+          <h3 className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">
             Library Management
           </h3>
-          <div className="h-px flex-1 bg-[var(--theme-border)]" />
+          <div className="h-px flex-1 bg-border" />
           <div className="flex items-center gap-2 px-2 py-1 bg-red-500/10 border border-red-500/20 rounded">
             <div className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
             <span className="text-[10px] font-mono font-medium text-red-400 uppercase tracking-wider">Danger Zone</span>
@@ -298,11 +298,11 @@ function AccountContent({ profile, userEmail }: { profile: SettingsTabsProps['pr
       {/* Section header */}
       <div className="flex items-center gap-3">
         <User className="w-4 h-4 text-violet-400" />
-        <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+        <h2 className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">
           Account Settings
         </h2>
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// USER_PROFILE</span>
-        <div className="h-px flex-1 bg-[var(--theme-border)]" />
+        <span className="text-[10px] font-mono text-theme-subtle">// USER_PROFILE</span>
+        <div className="h-px flex-1 bg-border" />
       </div>
 
       <SettingsCard color="violet">
@@ -322,11 +322,11 @@ function NotificationsContent() {
       {/* Section header */}
       <div className="flex items-center gap-3">
         <Bell className="w-4 h-4 text-amber-400" />
-        <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+        <h2 className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">
           Notification Preferences
         </h2>
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// ALERT_CONFIG</span>
-        <div className="h-px flex-1 bg-[var(--theme-border)]" />
+        <span className="text-[10px] font-mono text-theme-subtle">// ALERT_CONFIG</span>
+        <div className="h-px flex-1 bg-border" />
       </div>
 
       <SettingsCard color="amber">
@@ -346,11 +346,11 @@ function PrivacyContent() {
       {/* Section header */}
       <div className="flex items-center gap-3">
         <Shield className="w-4 h-4 text-emerald-400" />
-        <h2 className="text-sm font-semibold text-[var(--theme-text-muted)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+        <h2 className="text-sm font-semibold text-theme-muted uppercase tracking-wide font-family-display">
           Privacy & Security
         </h2>
-        <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">// SECURITY_LAYER</span>
-        <div className="h-px flex-1 bg-[var(--theme-border)]" />
+        <span className="text-[10px] font-mono text-theme-subtle">// SECURITY_LAYER</span>
+        <div className="h-px flex-1 bg-border" />
         <div className="flex items-center gap-2 px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded">
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
           <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Protected</span>
@@ -378,7 +378,7 @@ function SettingsCard({ children, color }: SettingsCardProps) {
     cyan: { border: 'border-cyan-500/20', corner: 'border-cyan-400/30' },
     blue: { border: 'border-blue-500/20', corner: 'border-blue-400/30' },
     emerald: { border: 'border-emerald-500/20', corner: 'border-emerald-400/30' },
-    gray: { border: 'border-[var(--theme-border)]', corner: 'border-[var(--theme-border)]' },
+    gray: { border: 'border-theme', corner: 'border-theme' },
     violet: { border: 'border-violet-500/20', corner: 'border-violet-400/30' },
     amber: { border: 'border-amber-500/20', corner: 'border-amber-400/30' },
     red: { border: 'border-red-500/20', corner: 'border-red-400/30' },
@@ -387,7 +387,7 @@ function SettingsCard({ children, color }: SettingsCardProps) {
   const c = colorMap[color];
 
   return (
-    <div className={`relative bg-[var(--theme-bg-secondary)] border ${c.border} rounded-xl p-6 overflow-hidden`}>
+    <div className={`relative bg-theme-secondary border ${c.border} rounded-xl p-6 overflow-hidden`}>
       {/* HUD corners */}
       <div className={`absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 ${c.corner}`} />
       <div className={`absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 ${c.corner}`} />
@@ -434,11 +434,11 @@ function PlatformCard({ children, color, label, icon }: PlatformCardProps) {
       corner: 'border-emerald-400/30',
     },
     gray: {
-      border: 'border-[var(--theme-border)]',
-      hoverBorder: 'hover:border-[var(--theme-border)]',
-      text: 'text-[var(--theme-text-muted)]',
-      headerBg: 'bg-[var(--theme-hover-bg)]',
-      corner: 'border-[var(--theme-border)]',
+      border: 'border-theme',
+      hoverBorder: 'hover:border-theme',
+      text: 'text-theme-muted',
+      headerBg: 'bg-theme-hover',
+      corner: 'border-theme',
     },
   };
 
@@ -455,7 +455,7 @@ function PlatformCard({ children, color, label, icon }: PlatformCardProps) {
   }[icon];
 
   return (
-    <div className={`group relative bg-[var(--theme-bg-secondary)] border ${c.border} ${c.hoverBorder} rounded-xl overflow-hidden transition-all duration-200`}>
+    <div className={`group relative bg-theme-secondary border ${c.border} ${c.hoverBorder} rounded-xl overflow-hidden transition-all duration-200`}>
       {/* HUD corners */}
       <div className={`absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
       <div className={`absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -463,13 +463,13 @@ function PlatformCard({ children, color, label, icon }: PlatformCardProps) {
       <div className={`absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 ${c.corner} opacity-0 group-hover:opacity-100 transition-opacity`} />
 
       {/* Header */}
-      <div className={`relative px-4 py-3 ${c.headerBg} border-b border-[var(--theme-border)] flex items-center gap-2`}>
+      <div className={`relative px-4 py-3 ${c.headerBg} border-b border-theme flex items-center gap-2`}>
         <IconComponent size="sm" className={c.text} />
-        <span className={`text-sm font-semibold uppercase tracking-wide font-[family-name:var(--font-family-display)] ${c.text}`}>
+        <span className={`text-sm font-semibold uppercase tracking-wide font-family-display ${c.text}`}>
           {label}
         </span>
         <div className="flex-1" />
-        <span className="text-[9px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+        <span className="text-[9px] font-mono text-theme-subtle uppercase tracking-wider">
           // {icon.toUpperCase()}_API
         </span>
       </div>

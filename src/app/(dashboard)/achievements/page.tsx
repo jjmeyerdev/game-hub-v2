@@ -24,19 +24,19 @@ export default async function AchievementsPage() {
   // Empty state - no achievements tracked yet
   if (!stats || stats.gamesWithAchievements === 0) {
     return (
-      <div className="min-h-screen bg-[var(--theme-bg-primary)] relative">
+      <div className="min-h-screen bg-theme-primary relative">
         {/* Ambient glow */}
-        <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/[0.03] rounded-full blur-[120px] pointer-events-none animate-breathe" />
+        <div className="fixed top-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/3 rounded-full blur-[120px] pointer-events-none animate-breathe" />
 
         <div className="relative max-w-4xl mx-auto px-6 py-20">
-          <div className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl p-12 text-center overflow-hidden">
+          <div className="relative bg-theme-secondary border border-theme rounded-2xl p-12 text-center overflow-hidden">
             {/* HUD corners */}
             <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-emerald-400/30" />
             <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-emerald-400/30" />
             <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-emerald-400/30" />
             <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-emerald-400/30" />
 
-            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-6 block">
+            <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-6 block">
               // NO_DATA
             </span>
 
@@ -44,19 +44,19 @@ export default async function AchievementsPage() {
               <Trophy className="w-10 h-10 text-emerald-400" />
             </div>
 
-            <h1 className="text-3xl font-bold text-white mb-4 font-[family-name:var(--font-family-display)]">
+            <h1 className="text-3xl font-bold text-white mb-4 font-family-display">
               NO ACHIEVEMENTS YET
             </h1>
 
-            <p className="text-[var(--theme-text-muted)] mb-8 max-w-md mx-auto">
+            <p className="text-theme-muted mb-8 max-w-md mx-auto">
               Sync your Steam, PlayStation, or Xbox library to start tracking your achievements.
               Your trophy hunting journey begins here.
             </p>
 
             <Link href="/settings">
               <button className="group relative inline-flex items-center gap-2 px-6 py-3 overflow-hidden rounded-xl">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity" />
-                <span className="relative font-semibold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+                <span className="relative font-semibold text-white uppercase tracking-wide font-family-display">
                   Connect Platforms
                 </span>
                 <ArrowRight className="relative w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
@@ -69,7 +69,7 @@ export default async function AchievementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--theme-bg-primary)] relative">
+    <div className="min-h-screen bg-theme-primary relative">
       {/* Ambient glow orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div
@@ -90,7 +90,7 @@ export default async function AchievementsPage() {
         <div className="mb-10">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/10 to-amber-500/10 border border-[var(--theme-border)] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-linear-to-br from-emerald-500/10 to-amber-500/10 border border-theme flex items-center justify-center">
                 <Trophy className="w-7 h-7 text-emerald-400" />
               </div>
               {/* HUD corners */}
@@ -100,10 +100,10 @@ export default async function AchievementsPage() {
               <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-emerald-400/50" />
             </div>
             <div>
-              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider block mb-1">
                 // TROPHY_HUNTER
               </span>
-              <h1 className="text-3xl font-bold text-white font-[family-name:var(--font-family-display)]">
+              <h1 className="text-3xl font-bold text-white font-family-display">
                 ACHIEVEMENTS
               </h1>
             </div>
@@ -113,11 +113,11 @@ export default async function AchievementsPage() {
         {/* Hero Stats */}
         <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center gap-4 mb-5">
-            <Target className="w-4 h-4 text-[var(--theme-text-subtle)]" />
-            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+            <Target className="w-4 h-4 text-theme-subtle" />
+            <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
               // OVERALL_STATS
             </span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="flex-1 h-px bg-white/6" />
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -159,11 +159,11 @@ export default async function AchievementsPage() {
         {/* Platform Breakdown */}
         <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center gap-4 mb-5">
-            <Gamepad2 className="w-4 h-4 text-[var(--theme-text-subtle)]" />
-            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+            <Gamepad2 className="w-4 h-4 text-theme-subtle" />
+            <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
               // PLATFORM_BREAKDOWN
             </span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <div className="flex-1 h-px bg-white/6" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -201,11 +201,11 @@ export default async function AchievementsPage() {
         {stats.almostComplete.length > 0 && (
           <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center gap-4 mb-5">
-              <Zap className="w-4 h-4 text-[var(--theme-text-subtle)]" />
-              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+              <Zap className="w-4 h-4 text-theme-subtle" />
+              <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
                 // ALMOST_THERE
               </span>
-              <div className="flex-1 h-px bg-white/[0.06]" />
+              <div className="flex-1 h-px bg-white/6" />
               <span className="text-[10px] font-mono text-violet-400/60 uppercase">
                 {stats.almostComplete.length} games at 90%+
               </span>
@@ -229,11 +229,11 @@ export default async function AchievementsPage() {
         {stats.topCompletedGames.length > 0 && (
           <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <div className="flex items-center gap-4 mb-5">
-              <Medal className="w-4 h-4 text-[var(--theme-text-subtle)]" />
-              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+              <Medal className="w-4 h-4 text-theme-subtle" />
+              <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
                 // IN_PROGRESS
               </span>
-              <div className="flex-1 h-px bg-white/[0.06]" />
+              <div className="flex-1 h-px bg-white/6" />
               <Link
                 href="/library"
                 className="text-[10px] font-mono text-cyan-400/60 hover:text-cyan-400 uppercase flex items-center gap-1 transition-colors"
@@ -259,7 +259,7 @@ export default async function AchievementsPage() {
         {/* Perfect Games Section */}
         {stats.perfectGames > 0 && (
           <section className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-            <div className="relative bg-[var(--theme-bg-secondary)] border border-amber-500/20 rounded-xl p-6 overflow-hidden">
+            <div className="relative bg-theme-secondary border border-amber-500/20 rounded-xl p-6 overflow-hidden">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-amber-400/40" />
               <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-amber-400/40" />
@@ -267,7 +267,7 @@ export default async function AchievementsPage() {
               <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-amber-400/40" />
 
               {/* Subtle gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/[0.03] to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-r from-amber-500/3 to-transparent" />
 
               <div className="relative flex items-center gap-6">
                 <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
@@ -276,14 +276,14 @@ export default async function AchievementsPage() {
 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-bold text-white font-[family-name:var(--font-family-display)]">
+                    <h3 className="text-lg font-bold text-white font-family-display">
                       PERFECTIONIST
                     </h3>
                     <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[10px] font-mono text-amber-400 uppercase">
                       {stats.perfectGames} games
                     </span>
                   </div>
-                  <p className="text-sm text-[var(--theme-text-muted)]">
+                  <p className="text-sm text-theme-muted">
                     You&apos;ve achieved 100% completion on {stats.perfectGames} game
                     {stats.perfectGames !== 1 ? 's' : ''}. That&apos;s dedication!
                   </p>

@@ -62,14 +62,14 @@ export function BaseModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-[var(--theme-overlay-bg)] backdrop-blur-sm"
+        className="absolute inset-0 bg-overlay backdrop-blur-sm"
         onClick={onClose}
         style={{ animation: 'modalFadeIn 0.2s ease-out' }}
       />
 
       {/* Modal */}
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl overflow-hidden`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-theme-secondary border border-theme rounded-2xl overflow-hidden`}
         style={{
           animation: 'modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           boxShadow: 'var(--theme-shadow-xl)'
@@ -85,27 +85,27 @@ export function BaseModal({
         />
 
         {/* Subtle gradient glow at top */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-[var(--theme-accent-cyan)]/20 to-transparent" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-linear-to-r from-transparent via-accent-cyan/20 to-transparent" />
 
         {/* Header */}
-        <div className="relative px-6 py-5 border-b border-[var(--theme-border)]">
+        <div className="relative px-6 py-5 border-b border-theme">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {icon && (
-                <div className="w-10 h-10 rounded-xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-theme-hover border border-theme flex items-center justify-center">
                   {icon}
                 </div>
               )}
               <div>
-                <h2 className="text-lg font-semibold text-[var(--theme-text-primary)]">{title}</h2>
+                <h2 className="text-lg font-semibold text-theme-primary">{title}</h2>
                 {subtitle && (
-                  <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">{subtitle}</p>
+                  <p className="text-xs text-theme-muted mt-0.5">{subtitle}</p>
                 )}
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-active-bg)] hover:border-[var(--theme-border-hover)] transition-all"
+              className="w-9 h-9 rounded-lg bg-theme-hover border border-theme flex items-center justify-center text-theme-muted hover:text-theme-primary hover:bg-theme-active hover:border-theme-hover transition-all"
             >
               <X className="w-4 h-4" />
             </button>

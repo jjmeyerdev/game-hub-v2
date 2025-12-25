@@ -13,7 +13,7 @@ const colorMap = {
 
 export function StatBox({ label, value, color }: StatBoxProps) {
   return (
-    <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-[var(--theme-border-hover)] transition-colors overflow-hidden">
+    <div className="group relative bg-theme-secondary border border-theme rounded-xl p-4 hover:border-theme-hover transition-colors overflow-hidden">
       {/* Hover HUD corners */}
       <div className={`absolute top-0 left-0 w-2 h-2 border-l border-t ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
       <div className={`absolute top-0 right-0 w-2 h-2 border-r border-t ${colorMap[color].border} opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -22,7 +22,7 @@ export function StatBox({ label, value, color }: StatBoxProps) {
 
       <div className="relative">
         <div className={`text-2xl font-bold font-mono ${colorMap[color].text} tabular-nums`}>{value}</div>
-        <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] mt-1 uppercase tracking-wider">{label}</div>
+        <div className="text-[10px] font-mono text-theme-subtle mt-1 uppercase tracking-wider">{label}</div>
       </div>
     </div>
   );

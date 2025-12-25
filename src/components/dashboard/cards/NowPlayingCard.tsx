@@ -60,12 +60,12 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
 
   return (
     <div
-      className="relative flex-shrink-0 w-80 lg:w-[340px] bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-2xl overflow-hidden transition-all duration-500 group cursor-pointer hover:bg-[var(--theme-hover-bg)] hover:border-[var(--theme-border-hover)]"
+      className="relative shrink-0 w-80 lg:w-[340px] bg-card border border-theme rounded-2xl overflow-hidden transition-all duration-500 group cursor-pointer hover:bg-theme-hover hover:border-theme-hover"
       style={{ animationDelay: `${index * 100}ms` }}
       onClick={handleClick}
     >
       {/* Cover Image */}
-      <div className="aspect-[16/10] bg-[var(--theme-card-bg)] relative overflow-hidden">
+      <div className="aspect-16/10 bg-card relative overflow-hidden">
         {game.game?.cover_url ? (
           <img
             src={game.game.cover_url}
@@ -82,11 +82,11 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         <div
           className={`absolute inset-0 ${game.game?.cover_url ? 'hidden' : 'flex'} items-center justify-center ${showBlur ? 'blur-xl' : ''}`}
         >
-          <Library className="w-12 h-12 text-[var(--theme-text-subtle)]" />
+          <Library className="w-12 h-12 text-theme-subtle" />
         </div>
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg-primary)] via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-linear-to-t from-theme-primary via-transparent to-transparent opacity-80" />
 
         {/* Platform badge */}
         {(() => {
@@ -105,7 +105,7 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
               e.stopPropagation();
               onEdit();
             }}
-            className="p-2 bg-[var(--theme-hover-bg)] backdrop-blur-sm hover:bg-[var(--theme-card-hover)] rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all border border-[var(--theme-border)]"
+            className="p-2 bg-theme-hover backdrop-blur-sm hover:bg-card-hover rounded-lg text-theme-muted hover:text-theme-primary transition-all border border-theme"
             title="Edit game"
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -126,7 +126,7 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         {isRestricted && isRevealed && (
           <button
             onClick={handleHide}
-            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--theme-hover-bg)] backdrop-blur-sm hover:bg-[var(--theme-card-hover)] rounded-lg text-xs font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all border border-[var(--theme-border)]"
+            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-hover backdrop-blur-sm hover:bg-card-hover rounded-lg text-xs font-medium text-theme-muted hover:text-theme-primary transition-all border border-theme"
           >
             <EyeOff className="w-3.5 h-3.5" />
             Hide
@@ -137,15 +137,15 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         {showBlur && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full border border-[var(--theme-border-hover)] flex items-center justify-center mb-3">
-                <EyeOff className="w-5 h-5 text-[var(--theme-text-muted)]" />
+              <div className="w-12 h-12 rounded-full border border-theme-hover flex items-center justify-center mb-3">
+                <EyeOff className="w-5 h-5 text-theme-muted" />
               </div>
-              <span className="text-[10px] font-medium tracking-[0.2em] text-[var(--theme-text-subtle)] uppercase mb-4">
+              <span className="text-[10px] font-medium tracking-[0.2em] text-theme-subtle uppercase mb-4">
                 Restricted
               </span>
               <button
                 onClick={handleReveal}
-                className="flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-card-hover)] border border-[var(--theme-border-hover)] rounded-full text-xs font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-theme-hover hover:bg-card-hover border border-theme-hover rounded-full text-xs font-medium text-theme-muted hover:text-theme-primary transition-all"
               >
                 <Eye className="w-3.5 h-3.5" />
                 Reveal
@@ -157,15 +157,15 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
 
       {/* Card content */}
       <div className={`p-5 ${showBlur ? 'blur-sm' : ''}`}>
-        <h3 className="text-lg font-semibold text-[var(--theme-text-primary)] mb-3 truncate group-hover:text-cyan-400 transition-colors">
+        <h3 className="text-lg font-semibold text-theme-primary mb-3 truncate group-hover:text-cyan-400 transition-colors">
           {game.game?.title || 'Untitled'}
         </h3>
 
         <div className="flex items-center justify-between text-sm mb-4">
-          <span className="text-[var(--theme-text-subtle)]">
+          <span className="text-theme-subtle">
             {Math.round(game.playtime_hours)}h played
           </span>
-          <span className="text-[var(--theme-text-subtle)] text-xs">
+          <span className="text-theme-subtle text-xs">
             {formatLastPlayed(game.last_played_at)}
           </span>
         </div>
@@ -175,7 +175,7 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs text-[var(--theme-text-subtle)]">
+              <span className="text-xs text-theme-subtle">
                 {game.platform?.toLowerCase().includes('playstation') ? 'Trophies' : 'Achievements'}
               </span>
             </div>
@@ -183,15 +183,15 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
               <span className="text-sm font-semibold text-amber-400 tabular-nums">
                 {game.achievements_earned}
               </span>
-              <span className="text-xs text-[var(--theme-text-subtle)]">/</span>
-              <span className="text-xs text-[var(--theme-text-subtle)] tabular-nums">
+              <span className="text-xs text-theme-subtle">/</span>
+              <span className="text-xs text-theme-subtle tabular-nums">
                 {game.achievements_total}
               </span>
             </div>
           </div>
-          <div className="relative w-full h-1.5 bg-[var(--theme-border)] rounded-full overflow-hidden">
+          <div className="relative w-full h-1.5 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
+              className="h-full bg-linear-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
               style={{ width: `${game.achievements_total > 0 ? (game.achievements_earned / game.achievements_total) * 100 : 0}%` }}
             />
           </div>

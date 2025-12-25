@@ -26,10 +26,10 @@ export function NavItem({ icon: Icon, label, collapsed, href }: NavItemProps) {
         relative flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300
         ${active
           ? 'bg-cyan-500/15 border border-cyan-500/30'
-          : 'bg-transparent group-hover:bg-[var(--theme-hover-bg)]'
+          : 'bg-transparent group-hover:bg-theme-hover'
         }
       `}>
-        <Icon className={`w-[18px] h-[18px] flex-shrink-0 transition-colors duration-300 ${active ? 'text-cyan-400' : 'text-[var(--theme-text-subtle)] group-hover:text-[var(--theme-text-secondary)]'}`} />
+        <Icon className={`w-[18px] h-[18px] shrink-0 transition-colors duration-300 ${active ? 'text-cyan-400' : 'text-theme-subtle group-hover:text-theme-secondary'}`} />
       </div>
 
       {/* Label */}
@@ -37,7 +37,7 @@ export function NavItem({ icon: Icon, label, collapsed, href }: NavItemProps) {
         className={`
           font-semibold text-sm tracking-wide whitespace-nowrap transition-all duration-500
           ${collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
-          ${active ? 'text-cyan-400' : 'text-[var(--theme-text-subtle)] group-hover:text-[var(--theme-text-primary)]'}
+          ${active ? 'text-cyan-400' : 'text-theme-subtle group-hover:text-theme-primary'}
         `}
         style={{ fontFamily: 'var(--font-rajdhani)' }}
       >
@@ -46,12 +46,12 @@ export function NavItem({ icon: Icon, label, collapsed, href }: NavItemProps) {
 
       {/* Tooltip for collapsed state */}
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-2 bg-[var(--theme-bg-secondary)] border border-cyan-500/30 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
+        <div className="absolute left-full ml-3 px-3 py-2 bg-theme-secondary border border-cyan-500/30 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
           <div className="text-xs font-bold text-cyan-400 whitespace-nowrap" style={{ fontFamily: 'var(--font-rajdhani)' }}>
             {label}
           </div>
           {/* Tooltip arrow */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-[var(--theme-bg-secondary)] border-l border-b border-cyan-500/30 rotate-45" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-theme-secondary border-l border-b border-cyan-500/30 rotate-45" />
         </div>
       )}
     </>
@@ -60,7 +60,7 @@ export function NavItem({ icon: Icon, label, collapsed, href }: NavItemProps) {
   const className = `
     w-full flex items-center gap-3 py-2 rounded-lg transition-all duration-300 group relative
     ${collapsed ? 'justify-center px-2' : 'px-3'}
-    ${active ? 'bg-cyan-500/5' : 'hover:bg-[var(--theme-hover-bg)]'}
+    ${active ? 'bg-cyan-500/5' : 'hover:bg-theme-hover'}
   `;
 
   if (href) {

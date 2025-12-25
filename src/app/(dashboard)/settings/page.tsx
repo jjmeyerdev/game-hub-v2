@@ -22,17 +22,17 @@ export default async function SettingsPage() {
     .single();
 
   return (
-    <div className="relative min-h-screen bg-[var(--theme-bg-primary)]">
+    <div className="relative min-h-screen bg-theme-primary">
       {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-violet-500/[0.03] rounded-full blur-[120px] animate-breathe" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-cyan-500/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-violet-500/3 rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-cyan-500/3 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Header */}
-      <header className="relative border-b border-[var(--theme-border)]">
+      <header className="relative border-b border-theme">
         {/* Top accent line */}
-        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+        <div className="absolute top-0 left-8 right-8 h-px bg-linear-to-r from-transparent via-violet-500/30 to-transparent" />
 
         <div className="px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
@@ -51,9 +51,9 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// SYSTEM_CONFIG</span>
+                  <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">// SYSTEM_CONFIG</span>
                 </div>
-                <h1 className="text-2xl font-bold text-[var(--theme-text-primary)] uppercase tracking-wide font-[family-name:var(--font-family-display)]">
+                <h1 className="text-2xl font-bold text-theme-primary uppercase tracking-wide font-family-display">
                   SETTINGS
                 </h1>
               </div>
@@ -68,21 +68,21 @@ export default async function SettingsPage() {
               </div>
 
               {/* User card */}
-              <div className="relative flex items-center gap-3 px-4 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl hover:border-[var(--theme-border-hover)] transition-colors">
+              <div className="relative flex items-center gap-3 px-4 py-2 bg-theme-secondary border border-theme rounded-xl hover:border-theme-hover transition-colors">
                 {profile?.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.full_name || 'User'}
-                    className="w-8 h-8 rounded-lg border border-[var(--theme-border)] object-cover"
+                    className="w-8 h-8 rounded-lg border border-theme object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-[var(--theme-border)] flex items-center justify-center">
-                    <User className="w-4 h-4 text-[var(--theme-text-muted)]" />
+                  <div className="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500/20 to-cyan-500/20 border border-theme flex items-center justify-center">
+                    <User className="w-4 h-4 text-theme-muted" />
                   </div>
                 )}
                 <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-[var(--theme-text-primary)]">{profile?.full_name || 'Operator'}</p>
-                  <p className="text-[11px] font-mono text-[var(--theme-text-subtle)]">{user.email}</p>
+                  <p className="text-sm font-medium text-theme-primary">{profile?.full_name || 'Operator'}</p>
+                  <p className="text-[11px] font-mono text-theme-subtle">{user.email}</p>
                 </div>
               </div>
             </div>
@@ -99,24 +99,24 @@ export default async function SettingsPage() {
         />
 
         {/* Footer */}
-        <footer className="relative mt-12 pt-6 border-t border-[var(--theme-border)]">
+        <footer className="relative mt-12 pt-6 border-t border-theme">
           {/* HUD corners */}
-          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-[var(--theme-border)]" />
-          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-[var(--theme-border)]" />
+          <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-theme" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-r border-t border-theme" />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Terminal className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+              <Terminal className="w-3.5 h-3.5 text-theme-subtle" />
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                <p className="text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
-                  Game Hub v2.0.0-pre-alpha <span className="text-[var(--theme-text-subtle)]">•</span> All systems operational
+                <p className="text-[11px] font-mono text-theme-subtle uppercase tracking-wider">
+                  Game Hub v2.0.0-pre-alpha <span className="text-theme-subtle">•</span> All systems operational
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Shield className="w-3 h-3 text-[var(--theme-text-subtle)]" />
-              <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+              <Shield className="w-3 h-3 text-theme-subtle" />
+              <p className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
                 End-to-end encrypted
               </p>
             </div>

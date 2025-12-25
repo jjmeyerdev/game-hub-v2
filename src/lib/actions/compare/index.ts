@@ -294,7 +294,7 @@ export async function getCurrentUserComparisonData(
       username = profile.xbox_gamertag || 'You';
       avatarUrl = profile.xbox_avatar_url;
     } else {
-      username = profile.steam_username || 'You';
+      username = profile.steam_persona_name || 'You';
       avatarUrl = profile.steam_avatar_url;
     }
 
@@ -332,11 +332,26 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
     return { success: false, error: 'PSN account not connected. Please link your PSN account first.' };
   }
 
+  // Get current user's PSN ID to check for self-comparison
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('psn_online_id')
+    .eq('id', user.id)
+    .single();
+
   try {
     // Search for the friend
     const friendResult = await searchPsnUser(accessToken, username);
     if (!friendResult) {
       return { success: false, error: `No PSN user found with username "${username}"` };
+    }
+
+    // Check if comparing with self
+    if (profile?.psn_online_id && friendResult.onlineId.toLowerCase() === profile.psn_online_id.toLowerCase()) {
+      return {
+        success: false,
+        error: "You can't compare with yourself! Try searching for a friend's PSN profile instead."
+      };
     }
 
     // Get current user's data
@@ -470,6 +485,13 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
     return { success: false, error: 'Xbox account not connected. Please link your Xbox account first.' };
   }
 
+  // Get current user's Xbox gamertag to check for self-comparison
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('xbox_gamertag')
+    .eq('id', user.id)
+    .single();
+
   try {
     // Search for the friend
     const friendResult = await searchByGamertag(gamertag, apiKey);
@@ -477,6 +499,14 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
       return {
         success: false,
         error: `No Xbox user found with gamertag "${gamertag}". Make sure you're entering the exact gamertag (case-insensitive). If they have a suffix like #1234, try without it first.`
+      };
+    }
+
+    // Check if comparing with self
+    if (profile?.xbox_gamertag && friendResult.gamertag.toLowerCase() === profile.xbox_gamertag.toLowerCase()) {
+      return {
+        success: false,
+        error: "You can't compare with yourself! Try searching for a friend's Xbox profile instead."
       };
     }
 
@@ -590,7 +620,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
   // Check if current user has Steam linked
   const { data: profile } = await supabase
     .from('profiles')
-    .select('steam_id')
+    .select('steam_id, steam_persona_name, steam_avatar_url')
     .eq('id', user.id)
     .single();
 
@@ -608,6 +638,14 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
         return { success: false, error: error.message };
       }
       throw error;
+    }
+
+    // Check if comparing with self
+    if (friendSteamId === profile.steam_id) {
+      return {
+        success: false,
+        error: "You can't compare with yourself! Try searching for a friend's Steam profile instead."
+      };
     }
 
     // Get friend's profile

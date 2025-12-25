@@ -118,7 +118,7 @@ export default function LibraryManagement() {
       id: 'epic' as const,
       name: 'Epic',
       count: counts.epic,
-      color: 'text-[var(--theme-text-muted)]',
+      color: 'text-theme-muted',
       icon: (
         <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
           <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3 4h6v1.5H6.5v2.25H10V9.25H6.5V12H11v1.5H5V4z"/>
@@ -137,9 +137,9 @@ export default function LibraryManagement() {
             : 'bg-red-500/10 border border-red-500/30'
         }`}>
           {message.type === 'success' ? (
-            <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
           ) : (
-            <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+            <XCircle className="w-4 h-4 text-red-400 shrink-0" />
           )}
           <p className={`text-xs ${message.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`}>
             {message.text}
@@ -150,16 +150,16 @@ export default function LibraryManagement() {
       {/* IGDB Enrichment - Compact */}
       <div className="flex items-center justify-between gap-3 p-3 bg-cyan-500/5 border border-cyan-500/20 rounded-lg">
         <div className="flex items-center gap-3 min-w-0">
-          <Sparkles className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+          <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-[var(--theme-text-primary)] truncate">IGDB Enrichment</p>
-            <p className="text-[10px] text-[var(--theme-text-subtle)]">Fetch cover art & metadata</p>
+            <p className="text-xs font-semibold text-theme-primary truncate">IGDB Enrichment</p>
+            <p className="text-[10px] text-theme-subtle">Fetch cover art & metadata</p>
           </div>
         </div>
         <button
           onClick={handleEnrichFromIGDB}
           disabled={enriching}
-          className="px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 rounded-lg text-xs font-semibold text-cyan-400 transition-all disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0"
+          className="px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 rounded-lg text-xs font-semibold text-cyan-400 transition-all disabled:opacity-50 flex items-center gap-1.5 shrink-0"
         >
           {enriching ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
           {enriching ? 'Processing...' : 'Enrich'}
@@ -170,16 +170,16 @@ export default function LibraryManagement() {
       <div className="space-y-2">
         <button
           onClick={() => setShowPlatforms(!showPlatforms)}
-          className="w-full flex items-center justify-between px-3 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs hover:border-[var(--theme-border-hover)] transition-colors"
+          className="w-full flex items-center justify-between px-3 py-2 bg-theme-secondary border border-theme rounded-lg text-xs hover:border-theme-hover transition-colors"
         >
           <div className="flex items-center gap-2">
-            <RefreshCw className={`w-3 h-3 text-[var(--theme-text-subtle)] ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-[var(--theme-text-muted)]">
+            <RefreshCw className={`w-3 h-3 text-theme-subtle ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-theme-muted">
               Synced Games:{' '}
-              <span className="text-[var(--theme-text-primary)] font-semibold">{loading ? '...' : counts.total}</span>
+              <span className="text-theme-primary font-semibold">{loading ? '...' : counts.total}</span>
             </span>
           </div>
-          <ChevronDown className={`w-3 h-3 text-[var(--theme-text-subtle)] transition-transform ${showPlatforms ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3 h-3 text-theme-subtle transition-transform ${showPlatforms ? 'rotate-180' : ''}`} />
         </button>
 
         {/* Platform Breakdown */}
@@ -188,12 +188,12 @@ export default function LibraryManagement() {
             {platforms.map((platform) => (
               <div
                 key={platform.id}
-                className="flex items-center justify-between px-3 py-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg"
+                className="flex items-center justify-between px-3 py-2 bg-theme-hover border border-theme rounded-lg"
               >
                 <div className="flex items-center gap-2">
                   <span className={platform.color}>{platform.icon}</span>
                   <span className={`text-xs font-medium ${platform.color}`}>{platform.name}</span>
-                  <span className="text-[10px] text-[var(--theme-text-subtle)]">
+                  <span className="text-[10px] text-theme-subtle">
                     {loading ? '...' : platform.count}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export default function LibraryManagement() {
                   disabled={deleting !== null || platform.count === 0}
                   className={`px-2 py-1 rounded text-[10px] font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 ${
                     confirmDelete === platform.id
-                      ? 'bg-red-500 text-[var(--theme-text-primary)]'
+                      ? 'bg-red-500 text-theme-primary'
                       : 'text-red-400 hover:bg-red-500/10'
                   }`}
                 >
@@ -223,10 +223,10 @@ export default function LibraryManagement() {
       <div className="pt-3 border-t border-red-500/10">
         <div className="flex items-center justify-between gap-3 p-3 bg-red-500/5 border border-red-500/20 rounded-lg">
           <div className="flex items-center gap-3 min-w-0">
-            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
             <div className="min-w-0">
               <p className="text-xs font-semibold text-red-400">Purge All Data</p>
-              <p className="text-[10px] text-[var(--theme-text-subtle)]">
+              <p className="text-[10px] text-theme-subtle">
                 {loading ? 'Loading...' : `Remove ${counts.total} synced games`}
               </p>
             </div>
@@ -234,9 +234,9 @@ export default function LibraryManagement() {
           <button
             onClick={() => handleRemove('all')}
             disabled={deleting !== null || counts.total === 0}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 flex-shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0 ${
               confirmDelete === 'all'
-                ? 'bg-red-500 text-[var(--theme-text-primary)]'
+                ? 'bg-red-500 text-theme-primary'
                 : 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30'
             }`}
           >

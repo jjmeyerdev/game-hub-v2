@@ -45,7 +45,7 @@ function getRarityConfig(rarity: Achievement['rarity']) {
     case 'uncommon':
       return { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', icon: Sparkles, label: 'Uncommon', glow: '' };
     default:
-      return { color: 'text-[var(--theme-text-muted)]', bg: 'bg-[var(--theme-hover-bg)]', border: 'border-[var(--theme-border)]', icon: Circle, label: 'Common', glow: '' };
+      return { color: 'text-theme-muted', bg: 'bg-theme-hover', border: 'border-theme', icon: Circle, label: 'Common', glow: '' };
   }
 }
 
@@ -113,7 +113,7 @@ export function AchievementsSection({
   const maxGamerscore = isXbox && hasRealData ? achievements.reduce((sum, a) => sum + (a.gamerscore || 0), 0) : null;
 
   return (
-    <div className="relative mt-8 p-6 bg-[var(--theme-bg-secondary)] border border-amber-500/20 rounded-2xl overflow-hidden">
+    <div className="relative mt-8 p-6 bg-theme-secondary border border-amber-500/20 rounded-2xl overflow-hidden">
       {/* HUD corners */}
       <div className="absolute top-0 left-0 w-5 h-5 border-l-2 border-t-2 border-amber-400/40" />
       <div className="absolute top-0 right-0 w-5 h-5 border-r-2 border-t-2 border-amber-400/40" />
@@ -122,7 +122,7 @@ export function AchievementsSection({
 
       {/* Decorative scan line */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent animate-scan-line" />
+        <div className="absolute w-full h-px bg-linear-to-r from-transparent via-amber-400/20 to-transparent animate-scan-line" />
       </div>
 
       {/* Header */}
@@ -137,11 +137,11 @@ export function AchievementsSection({
             <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-amber-400/50" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)] flex items-center gap-2">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wide font-family-display flex items-center gap-2">
               {termLabel}
-              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] font-normal">// {isPlayStation ? 'PSN_TROPHIES' : isXbox ? 'XBOX_ACHIEVEMENTS' : 'PROGRESS_TRACKING'}</span>
+              <span className="text-[10px] font-mono text-theme-subtle font-normal">// {isPlayStation ? 'PSN_TROPHIES' : isXbox ? 'XBOX_ACHIEVEMENTS' : 'PROGRESS_TRACKING'}</span>
             </h3>
-            <p className="text-[11px] font-mono text-[var(--theme-text-muted)]">
+            <p className="text-[11px] font-mono text-theme-muted">
               {earnedAchievements} of {totalAchievements} unlocked
             </p>
           </div>
@@ -150,27 +150,27 @@ export function AchievementsSection({
         {/* Platform-specific summary */}
         <div className="flex items-center gap-3">
           {isPlayStation && trophyCounts && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl">
+            <div className="flex items-center gap-2 px-4 py-2 bg-theme-hover border border-theme rounded-xl">
               <div className="flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-sky-300 to-sky-500 flex items-center justify-center shadow-[0_0_10px_rgba(125,211,252,0.5)]">
+                <div className="w-4 h-4 rounded-full bg-linear-to-br from-sky-300 to-sky-500 flex items-center justify-center shadow-[0_0_10px_rgba(125,211,252,0.5)]">
                   <span className="text-[8px] font-bold text-white">P</span>
                 </div>
                 <span className="text-xs font-mono text-sky-300">{trophyCounts.platinum}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-[0_0_8px_rgba(251,191,36,0.4)]">
+                <div className="w-4 h-4 rounded-full bg-linear-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-[0_0_8px_rgba(251,191,36,0.4)]">
                   <span className="text-[8px] font-bold text-white">G</span>
                 </div>
                 <span className="text-xs font-mono text-amber-300">{trophyCounts.gold}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center">
+                <div className="w-4 h-4 rounded-full bg-linear-to-br from-slate-300 to-slate-400 flex items-center justify-center">
                   <span className="text-[8px] font-bold text-white">S</span>
                 </div>
                 <span className="text-xs font-mono text-slate-300">{trophyCounts.silver}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                <div className="w-4 h-4 rounded-full bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                   <span className="text-[8px] font-bold text-white">B</span>
                 </div>
                 <span className="text-xs font-mono text-orange-400">{trophyCounts.bronze}</span>
@@ -180,12 +180,12 @@ export function AchievementsSection({
 
           {isXbox && totalGamerscore !== null && maxGamerscore !== null && (
             <div className="flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-[0_0_12px_rgba(52,211,153,0.4)]">
+              <div className="w-6 h-6 rounded-full bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-[0_0_12px_rgba(52,211,153,0.4)]">
                 <span className="text-[9px] font-bold text-white">G</span>
               </div>
               <div>
-                <span className="text-lg font-bold text-emerald-400 font-[family-name:var(--font-family-display)]">{totalGamerscore}</span>
-                <span className="text-xs font-mono text-[var(--theme-text-subtle)] ml-1">/ {maxGamerscore}</span>
+                <span className="text-lg font-bold text-emerald-400 font-family-display">{totalGamerscore}</span>
+                <span className="text-xs font-mono text-theme-subtle ml-1">/ {maxGamerscore}</span>
               </div>
             </div>
           )}
@@ -196,7 +196,7 @@ export function AchievementsSection({
             className={`p-2.5 rounded-xl border transition-all ${
               showHidden
                 ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                : 'bg-[var(--theme-hover-bg)] border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] hover:border-white/[0.15]'
+                : 'bg-theme-hover border-theme text-theme-muted hover:text-theme-muted hover:border-white/15'
             }`}
             title={showHidden ? 'Hide locked descriptions' : 'Show locked descriptions'}
           >
@@ -208,10 +208,10 @@ export function AchievementsSection({
       {/* Progress bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">Overall Progress</span>
+          <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">Overall Progress</span>
           <span className="text-sm font-mono font-bold text-amber-400">{progressPercent.toFixed(1)}%</span>
         </div>
-        <div className="relative h-3 bg-[var(--theme-hover-bg)] rounded-full overflow-hidden">
+        <div className="relative h-3 bg-theme-hover rounded-full overflow-hidden">
           {/* Striped background pattern */}
           <div
             className="absolute inset-0 opacity-20"
@@ -220,11 +220,11 @@ export function AchievementsSection({
             }}
           />
           <div
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 rounded-full transition-all duration-700 ease-out"
+            className="absolute inset-y-0 left-0 bg-linear-to-r from-amber-500 via-amber-400 to-yellow-400 rounded-full transition-all duration-700 ease-out"
             style={{ width: `${progressPercent}%` }}
           >
             {/* Animated shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
           </div>
           {/* Segment markers */}
           {[25, 50, 75].map(percent => (
@@ -238,7 +238,7 @@ export function AchievementsSection({
       </div>
 
       {/* Filter tabs */}
-      <div className="flex items-center gap-2 mb-6 p-1 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl w-fit">
+      <div className="flex items-center gap-2 mb-6 p-1 bg-theme-hover border border-theme rounded-xl w-fit">
         {(['all', 'unlocked', 'locked'] as const).map(f => {
           const count = f === 'all'
             ? achievements.length
@@ -253,7 +253,7 @@ export function AchievementsSection({
               className={`relative px-4 py-2 rounded-lg text-xs font-mono uppercase tracking-wider transition-all overflow-hidden ${
                 filter === f
                   ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                  : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-muted)] border border-transparent hover:bg-[var(--theme-hover-bg)]'
+                  : 'text-theme-muted hover:text-theme-muted border border-transparent hover:bg-theme-hover'
               }`}
             >
               {filter === f && (
@@ -278,20 +278,20 @@ export function AchievementsSection({
             <Loader2 className="w-8 h-8 text-amber-400/60 animate-spin" />
             <div className="absolute inset-0 w-8 h-8 border-2 border-amber-400/20 rounded-full" />
           </div>
-          <p className="text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// Fetching {termLabel.toLowerCase()}...</p>
+          <p className="text-[11px] font-mono text-theme-subtle uppercase tracking-wider">// Fetching {termLabel.toLowerCase()}...</p>
         </div>
       )}
 
       {/* No real data - show counts only view */}
       {!achievementsLoading && !hasRealData && (
-        <div className="text-center py-12 border border-[var(--theme-border)] rounded-xl bg-[var(--theme-hover-bg)]">
+        <div className="text-center py-12 border border-theme rounded-xl bg-theme-hover">
           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <Trophy className="w-10 h-10 text-amber-400/60" />
           </div>
-          <p className="text-sm font-mono text-[var(--theme-text-muted)] mb-2">
+          <p className="text-sm font-mono text-theme-muted mb-2">
             {earnedAchievements} of {totalAchievements} {termLabel.toLowerCase()} unlocked
           </p>
-          <p className="text-[11px] font-mono text-[var(--theme-text-subtle)]">
+          <p className="text-[11px] font-mono text-theme-subtle">
             {isXbox
               ? '// Xbox 360 games only provide summary counts via API'
               : `// Individual ${termLabel.toLowerCase()} data not available`
@@ -317,14 +317,14 @@ export function AchievementsSection({
           {/* Empty state for filtered results */}
           {filteredAchievements.length === 0 && (
             <div className="col-span-full text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-theme-hover border border-theme flex items-center justify-center">
                 {filter === 'unlocked' ? (
-                  <Lock className="w-8 h-8 text-[var(--theme-text-subtle)]" />
+                  <Lock className="w-8 h-8 text-theme-subtle" />
                 ) : (
-                  <Unlock className="w-8 h-8 text-[var(--theme-text-subtle)]" />
+                  <Unlock className="w-8 h-8 text-theme-subtle" />
                 )}
               </div>
-              <p className="text-sm font-mono text-[var(--theme-text-subtle)]">
+              <p className="text-sm font-mono text-theme-subtle">
                 // No {filter === 'unlocked' ? 'unlocked' : 'locked'} {termLabel.toLowerCase()} found
               </p>
             </div>
@@ -358,7 +358,7 @@ function AchievementCard({
       className={`group relative p-4 rounded-xl border transition-all duration-300 overflow-hidden ${
         achievement.unlocked
           ? `${trophyConfig?.bg || rarityConfig.bg} ${trophyConfig?.border || rarityConfig.border} ${trophyConfig?.glow || rarityConfig.glow} hover:scale-[1.01]`
-          : 'bg-[var(--theme-hover-bg)] border-[var(--theme-border)] hover:border-white/[0.12]'
+          : 'bg-theme-hover border-theme hover:border-white/12'
       }`}
       style={{ animationDelay: `${index * 50}ms` }}
     >
@@ -384,22 +384,22 @@ function AchievementCard({
         {/* Achievement details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`font-semibold text-sm uppercase tracking-wide font-[family-name:var(--font-family-display)] ${
-              achievement.unlocked ? 'text-white' : 'text-[var(--theme-text-muted)]'
+            <h4 className={`font-semibold text-sm uppercase tracking-wide font-family-display ${
+              achievement.unlocked ? 'text-white' : 'text-theme-muted'
             }`}>
               {achievement.unlocked || showHidden ? achievement.name : '// CLASSIFIED'}
             </h4>
 
             {/* Rarity badge */}
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider ${
-              achievement.unlocked ? `${rarityConfig.bg} ${rarityConfig.color}` : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-subtle)]'
+              achievement.unlocked ? `${rarityConfig.bg} ${rarityConfig.color}` : 'bg-theme-hover text-theme-subtle'
             }`}>
               {achievement.rarityPercentage?.toFixed(1)}%
             </div>
           </div>
 
           <p className={`text-xs leading-relaxed mb-2 ${
-            achievement.unlocked ? 'text-[var(--theme-text-muted)]' : 'text-[var(--theme-text-subtle)]'
+            achievement.unlocked ? 'text-theme-muted' : 'text-theme-subtle'
           }`}>
             {achievement.unlocked || showHidden
               ? achievement.description
@@ -420,7 +420,7 @@ function AchievementCard({
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 text-[var(--theme-text-subtle)]">
+              <div className="flex items-center gap-1.5 text-theme-subtle">
                 <Lock className="w-3 h-3" />
                 <span className="text-[10px] font-mono uppercase">Locked</span>
               </div>
@@ -428,7 +428,7 @@ function AchievementCard({
 
             {/* Rarity label */}
             <div className={`text-[10px] font-mono uppercase tracking-wider ${
-              achievement.unlocked ? rarityConfig.color : 'text-[var(--theme-text-subtle)]'
+              achievement.unlocked ? rarityConfig.color : 'text-theme-subtle'
             }`}>
               {rarityConfig.label}
             </div>
@@ -438,7 +438,7 @@ function AchievementCard({
               <div className={`flex items-center gap-1 px-2 py-0.5 rounded ${
                 achievement.unlocked
                   ? 'bg-emerald-500/20 text-emerald-400'
-                  : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-subtle)]'
+                  : 'bg-theme-hover text-theme-subtle'
               }`}>
                 <span className="text-[10px] font-mono font-bold">{achievement.gamerscore}G</span>
               </div>
@@ -459,7 +459,7 @@ function PlayStationTrophyIcon({
   trophyConfig: ReturnType<typeof getTrophyConfig> | null;
 }) {
   return (
-    <div className={`relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
+    <div className={`relative shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
       achievement.unlocked
         ? `${trophyConfig?.glow} ring-1 ${trophyConfig?.border}`
         : 'ring-1 ring-white/10 grayscale opacity-60'
@@ -474,21 +474,21 @@ function PlayStationTrophyIcon({
         />
       ) : achievement.unlocked ? (
         <div className={`w-full h-full flex items-center justify-center ${
-          achievement.trophyType === 'platinum' ? 'bg-gradient-to-br from-sky-200 via-sky-400 to-sky-600' :
-          achievement.trophyType === 'gold' ? 'bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600' :
-          achievement.trophyType === 'silver' ? 'bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500' :
-          'bg-gradient-to-br from-orange-300 via-orange-500 to-orange-700'
+          achievement.trophyType === 'platinum' ? 'bg-linear-to-br from-sky-200 via-sky-400 to-sky-600' :
+          achievement.trophyType === 'gold' ? 'bg-linear-to-br from-amber-200 via-amber-400 to-amber-600' :
+          achievement.trophyType === 'silver' ? 'bg-linear-to-br from-slate-200 via-slate-300 to-slate-500' :
+          'bg-linear-to-br from-orange-300 via-orange-500 to-orange-700'
         }`}>
           <Trophy className="w-6 h-6 text-white" />
         </div>
       ) : (
-        <div className="w-full h-full bg-white/[0.05] flex items-center justify-center">
-          <Lock className="w-5 h-5 text-[var(--theme-text-subtle)]" />
+        <div className="w-full h-full bg-white/5 flex items-center justify-center">
+          <Lock className="w-5 h-5 text-theme-subtle" />
         </div>
       )}
       {!achievement.unlocked && achievement.iconUrl && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <Lock className="w-4 h-4 text-[var(--theme-text-muted)]" />
+          <Lock className="w-4 h-4 text-theme-muted" />
         </div>
       )}
     </div>
@@ -506,7 +506,7 @@ function XboxAchievementIcon({
   RarityIcon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className={`relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
+    <div className={`relative shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
       achievement.unlocked
         ? `${rarityConfig.glow} ring-1 ${rarityConfig.border}`
         : 'ring-1 ring-white/10 grayscale opacity-60'
@@ -520,17 +520,17 @@ function XboxAchievementIcon({
           sizes="56px"
         />
       ) : achievement.unlocked ? (
-        <div className="w-full h-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+        <div className="w-full h-full bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
           <RarityIcon className="w-6 h-6 text-white" />
         </div>
       ) : (
-        <div className="w-full h-full bg-white/[0.05] flex items-center justify-center">
-          <Lock className="w-5 h-5 text-[var(--theme-text-subtle)]" />
+        <div className="w-full h-full bg-white/5 flex items-center justify-center">
+          <Lock className="w-5 h-5 text-theme-subtle" />
         </div>
       )}
       {!achievement.unlocked && achievement.iconUrl && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <Lock className="w-4 h-4 text-[var(--theme-text-muted)]" />
+          <Lock className="w-4 h-4 text-theme-muted" />
         </div>
       )}
     </div>
@@ -550,7 +550,7 @@ function SteamPCAchievementIcon({
     : (achievement.iconGrayUrl || achievement.iconUrl);
 
   return (
-    <div className={`relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden ${
+    <div className={`relative shrink-0 w-14 h-14 rounded-lg overflow-hidden ${
       achievement.unlocked
         ? `${rarityConfig.glow} ring-1 ${rarityConfig.border}`
         : 'ring-1 ring-white/10 grayscale opacity-60'
@@ -572,7 +572,7 @@ function SteamPCAchievementIcon({
       )}
       {!achievement.unlocked && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <Lock className="w-4 h-4 text-[var(--theme-text-muted)]" />
+          <Lock className="w-4 h-4 text-theme-muted" />
         </div>
       )}
     </div>

@@ -66,7 +66,7 @@ export function SectionHeader({
           <div className="relative">
             <div
               className={cn(
-                'w-12 h-12 rounded-xl bg-gradient-to-br border flex items-center justify-center',
+                'w-12 h-12 rounded-xl bg-linear-to-br border flex items-center justify-center',
                 styles.bg,
                 styles.border
               )}
@@ -82,16 +82,16 @@ export function SectionHeader({
           </div>
         )}
         <div>
-          <h2 className="text-2xl font-bold text-[var(--theme-text-primary)] tracking-wide">{title}</h2>
+          <h2 className="text-2xl font-bold text-theme-primary tracking-wide">{title}</h2>
           {description && (
-            <p className="text-[var(--theme-text-muted)] text-sm">{description}</p>
+            <p className="text-theme-muted text-sm">{description}</p>
           )}
         </div>
       </div>
       {/* Decorative scanline */}
       <div
         className={cn(
-          'absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent',
+          'absolute -bottom-4 left-0 right-0 h-px bg-linear-to-r from-transparent to-transparent',
           accent === 'cyan' && 'via-cyan-500/50',
           accent === 'purple' && 'via-purple-500/50',
           accent === 'emerald' && 'via-emerald-500/50',

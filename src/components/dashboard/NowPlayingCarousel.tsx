@@ -65,8 +65,8 @@ export function NowPlayingCarousel({
   return (
     <div className="relative group">
       {/* Gradient fade edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[var(--theme-bg-primary)] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--theme-bg-primary)] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-linear-to-r from-theme-primary to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-linear-to-l from-theme-primary to-transparent z-10 pointer-events-none" />
 
       {/* Scrollable container */}
       <div
@@ -77,7 +77,7 @@ export function NowPlayingCarousel({
         {games.map((game, index) => (
           <div
             key={game.id}
-            className="flex-shrink-0"
+            className="shrink-0"
             style={{ scrollSnapAlign: 'start' }}
           >
             <NowPlayingCard
@@ -94,7 +94,7 @@ export function NowPlayingCarousel({
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all shadow-xl"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-theme-secondary border border-theme rounded-xl text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all shadow-xl"
           aria-label="Scroll left"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -104,7 +104,7 @@ export function NowPlayingCarousel({
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all shadow-xl"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-theme-secondary border border-theme rounded-xl text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all shadow-xl"
           aria-label="Scroll right"
         >
           <ChevronRight className="w-5 h-5" />
@@ -114,9 +114,9 @@ export function NowPlayingCarousel({
       {/* Progress indicator */}
       {games.length > 3 && (
         <div className="flex justify-center mt-4">
-          <div className="w-24 h-1 bg-[var(--theme-border)] rounded-full overflow-hidden">
+          <div className="w-24 h-1 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-150"
+              className="h-full bg-linear-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-150"
               style={{ width: `${Math.max(20, scrollProgress)}%` }}
             />
           </div>

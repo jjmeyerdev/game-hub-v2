@@ -20,8 +20,8 @@ export function ThemeToggle({ collapsed = false }: ThemeToggleProps) {
   if (!mounted) {
     return (
       <div className={`flex items-center gap-3 w-full ${collapsed ? 'justify-center px-3 py-2.5' : 'px-3 py-2.5'} rounded-xl`}>
-        <div className="w-5 h-5 bg-[var(--theme-border)] rounded animate-pulse" />
-        {!collapsed && <div className="h-4 w-20 bg-[var(--theme-border)] rounded animate-pulse" />}
+        <div className="w-5 h-5 bg-border rounded animate-pulse" />
+        {!collapsed && <div className="h-4 w-20 bg-border rounded animate-pulse" />}
       </div>
     );
   }
@@ -39,14 +39,14 @@ export function ThemeToggle({ collapsed = false }: ThemeToggleProps) {
         relative group flex items-center gap-3 w-full
         ${collapsed ? 'justify-center px-3 py-2.5' : 'px-3 py-2.5'}
         rounded-xl transition-all duration-300
-        text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]
-        hover:bg-[var(--theme-border)]
-        border border-transparent hover:border-[var(--theme-border)]
+        text-theme-muted hover:text-theme-primary
+        hover:bg-border
+        border border-transparent hover:border-theme
       `}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
       {/* Icon container with animated switch */}
-      <div className="relative w-5 h-5 flex-shrink-0">
+      <div className="relative w-5 h-5 shrink-0">
         {/* Sun icon */}
         <Sun
           className={`
@@ -126,8 +126,8 @@ export function ThemeToggle({ collapsed = false }: ThemeToggleProps) {
 
       {/* Tooltip for collapsed state */}
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-1.5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
-          <span className="text-sm text-[var(--theme-text-primary)] whitespace-nowrap">
+        <div className="absolute left-full ml-3 px-3 py-1.5 bg-theme-secondary border border-theme rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
+          <span className="text-sm text-theme-primary whitespace-nowrap">
             {isDark ? 'Switch to Light' : 'Switch to Dark'}
           </span>
         </div>

@@ -63,7 +63,7 @@ const CONSOLE_CONFIG: Record<string, {
 function getConsoleIcon(consoleId: string, family: string, isSelected: boolean) {
   const config = CONSOLE_CONFIG[consoleId];
   const colorClass = isSelected ? config?.selectedColor : config?.color;
-  const defaultColor = isSelected ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]';
+  const defaultColor = isSelected ? 'text-theme-primary' : 'text-theme-muted';
 
   // Nintendo - use console-specific icons
   if (family === 'Nintendo') {
@@ -224,12 +224,12 @@ export function ConsoleFilter({
   }, [consoleCounts, allowedFamilies]);
 
   if (consolesWithGames.length === 0) {
-    return <p className="text-xs text-[var(--theme-text-subtle)]">No console-specific games found</p>;
+    return <p className="text-xs text-theme-subtle">No console-specific games found</p>;
   }
 
   const getButtonStyle = (family: string, isSelected: boolean) => {
     if (!isSelected) {
-      return 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] border-transparent hover:border-[var(--theme-border-hover)]';
+      return 'bg-theme-hover text-theme-muted hover:text-theme-primary border-transparent hover:border-theme-hover';
     }
     switch (family) {
       case 'PlayStation':
@@ -258,7 +258,7 @@ export function ConsoleFilter({
             >
               {getConsoleIcon(console.id, family.family, isSelected)}
               <span>{console.id}</span>
-              <span className={`px-1.5 py-0.5 rounded text-[10px] ${isSelected ? 'bg-black/10 dark:bg-white/20' : 'bg-black/[0.04] dark:bg-white/[0.06]'}`}>
+              <span className={`px-1.5 py-0.5 rounded text-[10px] ${isSelected ? 'bg-black/10 dark:bg-white/20' : 'bg-black/4 dark:bg-white/6'}`}>
                 {console.count}
               </span>
             </button>

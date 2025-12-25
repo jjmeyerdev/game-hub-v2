@@ -83,14 +83,14 @@ export function DashboardSidebar({
   return (
     <aside
       className={`
-        fixed h-screen bg-[var(--theme-bg-secondary)] border-r border-[var(--theme-border)]
+        fixed h-screen bg-theme-secondary border-r border-theme
         flex flex-col z-40
         ${collapsed ? 'w-20' : 'w-72'}
       `}
       style={{ transition: 'width 400ms cubic-bezier(0.4, 0, 0.2, 1)' }}
     >
       {/* Subtle gradient at top */}
-      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[var(--theme-accent-cyan)]/[0.03] to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-40 bg-linear-to-b from-accent-cyan/3 to-transparent pointer-events-none" />
 
       {/* Toggle Button */}
       <button
@@ -98,11 +98,11 @@ export function DashboardSidebar({
         className="absolute -right-3 top-8 z-50 group"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        <div className="w-6 h-6 rounded-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] flex items-center justify-center transition-all hover:border-[var(--theme-accent-cyan)]/40 hover:bg-[var(--theme-accent-cyan)]/10">
+        <div className="w-6 h-6 rounded-full bg-theme-secondary border border-theme flex items-center justify-center transition-all hover:border-accent-cyan/40 hover:bg-accent-cyan/10">
           {collapsed ? (
-            <ChevronRight className="w-3 h-3 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent-cyan)]" />
+            <ChevronRight className="w-3 h-3 text-theme-muted group-hover:text-accent-cyan" />
           ) : (
-            <ChevronLeft className="w-3 h-3 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent-cyan)]" />
+            <ChevronLeft className="w-3 h-3 text-theme-muted group-hover:text-accent-cyan" />
           )}
         </div>
       </button>
@@ -110,8 +110,8 @@ export function DashboardSidebar({
       {/* Logo Section */}
       <div className={`relative py-6 ${collapsed ? 'px-4' : 'px-6'}`}>
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex-shrink-0">
-            <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
+          <div className="relative shrink-0">
+            <div className="w-11 h-11 bg-linear-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
               <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2.5} />
             </div>
             {/* Corner brackets */}
@@ -125,10 +125,10 @@ export function DashboardSidebar({
               collapsed ? 'opacity-0 w-0' : 'opacity-100'
             }`}
           >
-            <span className="text-lg font-semibold tracking-wide text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">
+            <span className="text-lg font-semibold tracking-wide text-theme-primary font-family-display">
               GAMEHUB
             </span>
-            <span className="text-[9px] text-[var(--theme-accent-cyan)]/60 tracking-[0.2em] uppercase">
+            <span className="text-[9px] text-accent-cyan/60 tracking-[0.2em] uppercase">
               Command Center
             </span>
           </div>
@@ -136,7 +136,7 @@ export function DashboardSidebar({
       </div>
 
       {/* Divider */}
-      <div className="mx-6 h-px bg-gradient-to-r from-[var(--theme-accent-cyan)]/20 via-[var(--theme-border)] to-transparent" />
+      <div className="mx-6 h-px bg-linear-to-r from-accent-cyan/20 via-border to-transparent" />
 
       {/* Navigation */}
       <nav className={`flex-1 py-6 overflow-y-auto ${collapsed ? 'px-3' : 'px-4'}`}>
@@ -213,23 +213,23 @@ export function DashboardSidebar({
         ref={userMenuRef}
       >
         {/* Top divider */}
-        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent" />
+        <div className="absolute top-0 left-6 right-6 h-px bg-linear-to-r from-transparent via-border to-transparent" />
 
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
           className={`
             w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group
-            hover:bg-[var(--theme-hover-bg)] border border-transparent hover:border-[var(--theme-accent-cyan)]/20
+            hover:bg-theme-hover border border-transparent hover:border-accent-cyan/20
             ${collapsed ? 'justify-center' : ''}
           `}
         >
           {/* Avatar */}
-          <div className="relative flex-shrink-0">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-[family-name:var(--font-family-display)]">
+          <div className="relative shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-family-display">
               {userName.substring(0, 2).toUpperCase()}
             </div>
             {/* Online indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[var(--theme-bg-secondary)]">
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-bg-secondary">
               <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-50" />
             </div>
           </div>
@@ -242,7 +242,7 @@ export function DashboardSidebar({
           >
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-[var(--theme-text-primary)]/90 truncate font-[family-name:var(--font-family-display)]">
+                <div className="text-sm font-medium text-theme-primary/90 truncate font-family-display">
                   {userName}
                 </div>
                 <div className="text-[10px] text-emerald-400/80 font-mono uppercase tracking-wider">
@@ -250,7 +250,7 @@ export function DashboardSidebar({
                 </div>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-[var(--theme-text-subtle)] transition-all duration-300 flex-shrink-0 ${
+                className={`w-4 h-4 text-theme-subtle transition-all duration-300 shrink-0 ${
                   userMenuOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -259,8 +259,8 @@ export function DashboardSidebar({
 
           {/* Tooltip for collapsed state */}
           {collapsed && (
-            <div className="absolute left-full ml-3 px-3 py-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
-              <div className="text-sm font-medium text-[var(--theme-text-primary)] whitespace-nowrap font-[family-name:var(--font-family-display)]">
+            <div className="absolute left-full ml-3 px-3 py-2 bg-theme-secondary border border-theme rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
+              <div className="text-sm font-medium text-theme-primary whitespace-nowrap font-family-display">
                 {userName}
               </div>
               <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">ONLINE</div>
@@ -274,18 +274,18 @@ export function DashboardSidebar({
             className={`
               absolute z-50 overflow-hidden
               ${collapsed ? 'left-full ml-2 bottom-4 w-56' : 'bottom-full mb-2 left-4 right-4'}
-              bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-2xl
+              bg-theme-secondary border border-theme rounded-xl shadow-2xl
             `}
           >
             {/* Menu header */}
-            <div className="px-4 py-3 border-b border-[var(--theme-border)] bg-[var(--theme-hover-bg)]">
+            <div className="px-4 py-3 border-b border-theme bg-theme-hover">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-[family-name:var(--font-family-display)]">
+                <div className="w-9 h-9 rounded-lg bg-linear-to-br from-cyan-500 to-violet-600 flex items-center justify-center text-sm font-bold text-white font-family-display">
                   {userName.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-[var(--theme-text-primary)] truncate font-[family-name:var(--font-family-display)]">{userName}</div>
-                  <div className="text-[10px] text-[var(--theme-text-subtle)] truncate font-mono">{userEmail}</div>
+                  <div className="text-sm font-medium text-theme-primary truncate font-family-display">{userName}</div>
+                  <div className="text-[10px] text-theme-subtle truncate font-mono">{userEmail}</div>
                 </div>
               </div>
             </div>
@@ -295,36 +295,36 @@ export function DashboardSidebar({
               {/* Theme Toggle */}
               <button
                 onClick={() => setTheme(mounted && theme === 'dark' ? 'light' : 'dark')}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--theme-hover-bg)] transition-all duration-200 group"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-theme-hover transition-all duration-200 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--theme-accent-cyan)]/30 group-hover:bg-[var(--theme-accent-cyan)]/10 transition-all">
+                <div className="w-8 h-8 rounded-lg bg-theme-hover border border-theme flex items-center justify-center group-hover:border-accent-cyan/30 group-hover:bg-accent-cyan/10 transition-all">
                   {mounted && theme === 'dark' ? (
-                    <Moon className="w-4 h-4 text-[var(--theme-accent-cyan)]" />
+                    <Moon className="w-4 h-4 text-accent-cyan" />
                   ) : (
                     <Sun className="w-4 h-4 text-amber-400" />
                   )}
                 </div>
-                <span className="text-sm text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)] transition-colors">
+                <span className="text-sm text-theme-muted group-hover:text-theme-primary transition-colors">
                   {mounted ? (theme === 'dark' ? 'Dark Mode' : 'Light Mode') : 'Theme'}
                 </span>
               </button>
 
-              <div className="h-px bg-[var(--theme-border)] my-2 mx-4" />
+              <div className="h-px bg-border my-2 mx-4" />
 
               <Link
                 href="/settings"
                 onClick={() => setUserMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--theme-hover-bg)] transition-all duration-200 group"
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-theme-hover transition-all duration-200 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--theme-accent-cyan)]/30 group-hover:bg-[var(--theme-accent-cyan)]/10 transition-all">
-                  <Settings className="w-4 h-4 text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent-cyan)]" />
+                <div className="w-8 h-8 rounded-lg bg-theme-hover border border-theme flex items-center justify-center group-hover:border-accent-cyan/30 group-hover:bg-accent-cyan/10 transition-all">
+                  <Settings className="w-4 h-4 text-theme-muted group-hover:text-accent-cyan" />
                 </div>
-                <span className="text-sm text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)] transition-colors">
+                <span className="text-sm text-theme-muted group-hover:text-theme-primary transition-colors">
                   Settings
                 </span>
               </Link>
 
-              <div className="h-px bg-[var(--theme-border)] my-2 mx-4" />
+              <div className="h-px bg-border my-2 mx-4" />
 
               <button
                 onClick={() => {
@@ -364,18 +364,18 @@ function NavItem({ icon: Icon, label, href, collapsed, active }: NavItemProps) {
         relative flex items-center gap-3 px-3 py-2.5 rounded-xl
         transition-all duration-300 group
         ${active
-          ? 'bg-[var(--theme-accent-cyan)]/10 text-[var(--theme-text-primary)] border border-[var(--theme-accent-cyan)]/20'
-          : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-secondary)] hover:bg-[var(--theme-hover-bg)] border border-transparent hover:border-[var(--theme-border)]'
+          ? 'bg-accent-cyan/10 text-theme-primary border border-accent-cyan/20'
+          : 'text-theme-subtle hover:text-theme-secondary hover:bg-theme-hover border border-transparent hover:border-theme'
         }
         ${collapsed ? 'justify-center' : ''}
       `}
     >
       {/* Active indicator */}
       {active && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[var(--theme-accent-cyan)] rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-accent-cyan rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
       )}
 
-      <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-[var(--theme-accent-cyan)]' : ''}`} />
+      <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-accent-cyan' : ''}`} />
 
       <span
         className={`text-sm font-medium overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
@@ -387,8 +387,8 @@ function NavItem({ icon: Icon, label, href, collapsed, active }: NavItemProps) {
 
       {/* Tooltip for collapsed state */}
       {collapsed && (
-        <div className="absolute left-full ml-3 px-3 py-1.5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
-          <span className="text-sm text-[var(--theme-text-primary)] whitespace-nowrap">{label}</span>
+        <div className="absolute left-full ml-3 px-3 py-1.5 bg-theme-secondary border border-theme rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl">
+          <span className="text-sm text-theme-primary whitespace-nowrap">{label}</span>
         </div>
       )}
     </Link>

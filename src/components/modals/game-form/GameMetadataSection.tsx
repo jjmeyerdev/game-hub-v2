@@ -56,7 +56,7 @@ function FieldLabel({
 }) {
   return (
     <div className="flex items-center justify-between mb-2">
-      <label className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">
+      <label className="flex items-center gap-1.5 text-[11px] font-medium text-theme-subtle uppercase tracking-wider">
         {Icon && <Icon className="w-3 h-3" />}
         {children}
         {required && <span className="text-red-400">*</span>}
@@ -65,7 +65,7 @@ function FieldLabel({
         <button
           type="button"
           onClick={onToggleLock}
-          className={`p-1 rounded transition-all ${isLocked ? 'text-amber-400 bg-amber-500/10' : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-muted)]'}`}
+          className={`p-1 rounded transition-all ${isLocked ? 'text-amber-400 bg-amber-500/10' : 'text-theme-subtle hover:text-theme-muted'}`}
           title={isLocked ? 'Unlock field' : 'Lock from IGDB updates'}
         >
           {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
@@ -99,13 +99,13 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full px-3 py-2.5 bg-[var(--theme-hover-bg)] border rounded-lg text-[var(--theme-text-primary)] text-sm placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-[var(--theme-border-hover)] focus:bg-[var(--theme-active-bg)] transition-all ${isLocked ? 'border-amber-500/30' : 'border-[var(--theme-border)]'} ${type === 'date' ? '[color-scheme:dark]' : ''} ${className}`}
+        className={`w-full px-3 py-2.5 bg-theme-hover border rounded-lg text-theme-primary text-sm placeholder:text-theme-subtle focus:outline-hidden focus:border-theme-hover focus:bg-theme-active transition-all ${isLocked ? 'border-amber-500/30' : 'border-theme'} ${type === 'date' ? 'scheme-dark' : ''} ${className}`}
       />
       {value && onClear && (
         <button
           type="button"
           onClick={onClear}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-muted)] transition-colors"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-theme-subtle hover:text-theme-muted transition-colors"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -142,13 +142,13 @@ export function GameMetadataSection({
   return (
     <div className="space-y-4">
       {/* Section Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-[var(--theme-border)]">
-        <span className="text-xs font-medium text-[var(--theme-text-muted)]">Game Info</span>
+      <div className="flex items-center justify-between pb-3 border-b border-theme">
+        <span className="text-xs font-medium text-theme-muted">Game Info</span>
         <button
           type="button"
           onClick={onRefreshFromIGDB}
           disabled={refreshingMetadata || !title.trim()}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-active-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] rounded-lg text-[10px] font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-hover hover:bg-theme-active border border-theme hover:border-theme-hover rounded-lg text-[10px] font-medium text-theme-muted hover:text-theme-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {refreshingMetadata ? (
             <Loader2 className="w-3 h-3 animate-spin" />
@@ -162,12 +162,12 @@ export function GameMetadataSection({
       {/* Cover + Title Row */}
       <div className="flex gap-4">
         {/* Cover Preview */}
-        <div className="flex-shrink-0">
-          <div className="w-24 h-32 bg-[var(--theme-hover-bg)] rounded-xl overflow-hidden border border-[var(--theme-border)] relative group">
+        <div className="shrink-0">
+          <div className="w-24 h-32 bg-theme-hover rounded-xl overflow-hidden border border-theme relative group">
             {coverUrl ? (
               <Image src={coverUrl} alt="Cover" fill className="object-cover" sizes="96px" />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-[var(--theme-text-subtle)]">
+              <div className="w-full h-full flex flex-col items-center justify-center text-theme-subtle">
                 <ImageIcon className="w-8 h-8 mb-1" />
                 <span className="text-[10px]">No Cover</span>
               </div>
@@ -178,7 +178,7 @@ export function GameMetadataSection({
               type="button"
               onClick={onUpdateCoverFromIGDB}
               disabled={updatingCover || !title.trim()}
-              className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-active-bg)] border border-[var(--theme-border)] rounded-lg text-[10px] font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all disabled:opacity-30"
+              className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-theme-hover hover:bg-theme-active border border-theme rounded-lg text-[10px] font-medium text-theme-muted hover:text-theme-primary transition-all disabled:opacity-30"
             >
               {updatingCover ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
               {updatingCover ? 'Updating...' : 'Get Cover'}
@@ -248,7 +248,7 @@ export function GameMetadataSection({
       {/* Genres */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">
+          <label className="flex items-center gap-1.5 text-[11px] font-medium text-theme-subtle uppercase tracking-wider">
             <Tag className="w-3 h-3" /> Genres
           </label>
           <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ export function GameMetadataSection({
               <button
                 type="button"
                 onClick={() => setGenres([])}
-                className="text-[10px] text-[var(--theme-text-subtle)] hover:text-red-400/70 transition-colors"
+                className="text-[10px] text-theme-subtle hover:text-red-400/70 transition-colors"
               >
                 Clear all
               </button>
@@ -264,20 +264,20 @@ export function GameMetadataSection({
             <button
               type="button"
               onClick={() => toggleFieldLock('genres')}
-              className={`p-1 rounded transition-all ${isFieldLocked('genres') ? 'text-amber-400 bg-amber-500/10' : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-muted)]'}`}
+              className={`p-1 rounded transition-all ${isFieldLocked('genres') ? 'text-amber-400 bg-amber-500/10' : 'text-theme-subtle hover:text-theme-muted'}`}
             >
               {isFieldLocked('genres') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
             </button>
           </div>
         </div>
-        <div className={`flex flex-wrap gap-1.5 p-2.5 bg-[var(--theme-hover-bg)] border rounded-lg min-h-[42px] ${isFieldLocked('genres') ? 'border-amber-500/30' : 'border-[var(--theme-border)]'}`}>
+        <div className={`flex flex-wrap gap-1.5 p-2.5 bg-theme-hover border rounded-lg min-h-[42px] ${isFieldLocked('genres') ? 'border-amber-500/30' : 'border-theme'}`}>
           {genres.map((genre) => (
             <span
               key={genre}
               className="inline-flex items-center gap-1 px-2 py-1 bg-violet-500/10 border border-violet-500/20 rounded text-xs text-violet-400/80"
             >
               {genre}
-              <button type="button" onClick={() => removeGenre(genre)} className="hover:text-[var(--theme-text-primary)] transition-colors">
+              <button type="button" onClick={() => removeGenre(genre)} className="hover:text-theme-primary transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -290,7 +290,7 @@ export function GameMetadataSection({
               if (e.key === 'Enter') { e.preventDefault(); addGenre(genreInput); }
             }}
             placeholder={genres.length === 0 ? "Add genre..." : ""}
-            className="flex-1 min-w-[80px] bg-transparent text-sm text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] outline-none"
+            className="flex-1 min-w-[80px] bg-transparent text-sm text-theme-primary placeholder:text-theme-subtle outline-hidden"
           />
         </div>
       </div>
@@ -298,7 +298,7 @@ export function GameMetadataSection({
       {/* Description */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider">
+          <label className="flex items-center gap-1.5 text-[11px] font-medium text-theme-subtle uppercase tracking-wider">
             <FileText className="w-3 h-3" /> Description
           </label>
           <div className="flex items-center gap-2">
@@ -306,7 +306,7 @@ export function GameMetadataSection({
               <button
                 type="button"
                 onClick={() => setDescription('')}
-                className="text-[10px] text-[var(--theme-text-subtle)] hover:text-red-400/70 transition-colors"
+                className="text-[10px] text-theme-subtle hover:text-red-400/70 transition-colors"
               >
                 Clear
               </button>
@@ -314,7 +314,7 @@ export function GameMetadataSection({
             <button
               type="button"
               onClick={() => toggleFieldLock('description')}
-              className={`p-1 rounded transition-all ${isFieldLocked('description') ? 'text-amber-400 bg-amber-500/10' : 'text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-muted)]'}`}
+              className={`p-1 rounded transition-all ${isFieldLocked('description') ? 'text-amber-400 bg-amber-500/10' : 'text-theme-subtle hover:text-theme-muted'}`}
             >
               {isFieldLocked('description') ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
             </button>
@@ -325,7 +325,7 @@ export function GameMetadataSection({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Game description..."
           rows={3}
-          className={`w-full px-3 py-2.5 bg-[var(--theme-hover-bg)] border rounded-lg text-[var(--theme-text-primary)] text-sm placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-[var(--theme-border-hover)] focus:bg-[var(--theme-active-bg)] resize-none transition-all ${isFieldLocked('description') ? 'border-amber-500/30' : 'border-[var(--theme-border)]'}`}
+          className={`w-full px-3 py-2.5 bg-theme-hover border rounded-lg text-theme-primary text-sm placeholder:text-theme-subtle focus:outline-hidden focus:border-theme-hover focus:bg-theme-active resize-none transition-all ${isFieldLocked('description') ? 'border-amber-500/30' : 'border-theme'}`}
         />
       </div>
     </div>

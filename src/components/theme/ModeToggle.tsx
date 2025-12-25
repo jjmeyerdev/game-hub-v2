@@ -23,7 +23,7 @@ export function ModeToggle() {
   if (!mounted) {
     return (
       <Button variant="outline" size="icon" className="w-9 h-9">
-        <div className="h-[1.2rem] w-[1.2rem] bg-[var(--theme-border)] rounded animate-pulse" />
+        <div className="h-[1.2rem] w-[1.2rem] bg-border rounded animate-pulse" />
       </Button>
     );
   }
@@ -31,30 +31,30 @@ export function ModeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="w-9 h-9 bg-[var(--theme-bg-secondary)] border-[var(--theme-border)] hover:bg-[var(--theme-hover-bg)] hover:border-[var(--theme-border-hover)]">
+        <Button variant="outline" size="icon" className="w-9 h-9 bg-theme-secondary border-theme hover:bg-theme-hover hover:border-theme-hover">
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-cyan-400" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-[var(--theme-bg-secondary)] border-[var(--theme-border)]">
+      <DropdownMenuContent align="end" className="bg-theme-secondary border-theme">
         <DropdownMenuItem
           onClick={() => setTheme('light')}
-          className="text-[var(--theme-text-primary)] hover:bg-[var(--theme-hover-bg)] cursor-pointer"
+          className="text-theme-primary hover:bg-theme-hover cursor-pointer"
         >
           <Sun className="mr-2 h-4 w-4 text-amber-500" />
           Light
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme('dark')}
-          className="text-[var(--theme-text-primary)] hover:bg-[var(--theme-hover-bg)] cursor-pointer"
+          className="text-theme-primary hover:bg-theme-hover cursor-pointer"
         >
           <Moon className="mr-2 h-4 w-4 text-cyan-400" />
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme('system')}
-          className="text-[var(--theme-text-primary)] hover:bg-[var(--theme-hover-bg)] cursor-pointer"
+          className="text-theme-primary hover:bg-theme-hover cursor-pointer"
         >
           <Monitor className="mr-2 h-4 w-4 text-violet-400" />
           System

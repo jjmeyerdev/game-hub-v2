@@ -41,7 +41,7 @@ export function HeroStatCard({ icon: Icon, value, label, sublabel, color, delay 
 
   return (
     <div
-      className={`group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden ${styles.glow} hover:shadow-lg`}
+      className={`group relative bg-theme-secondary border border-theme rounded-xl p-5 hover:border-white/12 transition-all duration-300 overflow-hidden ${styles.glow} hover:shadow-lg`}
       style={{ animation: `fadeIn 0.4s ease-out ${delay}s both` }}
     >
       {/* HUD corners */}
@@ -51,7 +51,7 @@ export function HeroStatCard({ icon: Icon, value, label, sublabel, color, delay 
       <div className={`absolute bottom-0 right-0 w-2 h-2 border-r border-b ${styles.border} opacity-0 group-hover:opacity-100 transition-opacity`} />
 
       <div className="relative flex items-start gap-4">
-        <div className={`w-12 h-12 rounded-xl ${styles.bg} ${styles.border} border flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform`}>
+        <div className={`w-12 h-12 rounded-xl ${styles.bg} ${styles.border} border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
           <Icon className={`w-6 h-6 ${styles.text}`} />
         </div>
 
@@ -59,8 +59,8 @@ export function HeroStatCard({ icon: Icon, value, label, sublabel, color, delay 
           <div className={`text-2xl font-bold font-mono ${styles.text} tabular-nums`}>
             {value}
           </div>
-          <div className="text-sm text-[var(--theme-text-muted)] font-medium truncate">{label}</div>
-          <div className="text-[11px] font-mono text-[var(--theme-text-subtle)]">{sublabel}</div>
+          <div className="text-sm text-theme-muted font-medium truncate">{label}</div>
+          <div className="text-[11px] font-mono text-theme-subtle">{sublabel}</div>
         </div>
       </div>
     </div>

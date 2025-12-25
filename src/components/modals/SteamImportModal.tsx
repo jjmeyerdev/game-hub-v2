@@ -64,14 +64,14 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
           /* Initial State */
           <div className="space-y-6">
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-[var(--theme-bg-primary)]" viewBox="0 0 24 24" fill="currentColor">
+              <div className="w-20 h-20 mx-auto bg-linear-to-br from-cyan-500 to-purple-500 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-bg-primary" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-[var(--theme-text-primary)] mb-2">Import Your Steam Games</h3>
-                <p className="text-[var(--theme-text-muted)]">
+                <h3 className="text-xl font-bold text-theme-primary mb-2">Import Your Steam Games</h3>
+                <p className="text-theme-muted">
                   This will fetch your Steam library and add all games to Game Hub.
                 </p>
               </div>
@@ -79,7 +79,7 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
 
             <div className="p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-xl space-y-2">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
                 <div className="text-sm text-yellow-400 space-y-2">
                   <p>
                     <strong>Before importing:</strong>
@@ -97,13 +97,13 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
             <div className="flex gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 px-6 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl font-semibold text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all"
+                className="flex-1 px-6 py-3 bg-theme-hover border border-theme rounded-xl font-semibold text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleImport}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-[var(--theme-bg-primary)] transition-all"
+                className="flex-1 px-6 py-3 bg-linear-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-bg-primary transition-all"
               >
                 Start Import
               </button>
@@ -119,8 +119,8 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
               <div className="absolute inset-0 bg-cyan-400/30 rounded-full blur-xl animate-pulse" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-[var(--theme-text-primary)] mb-2">Importing Steam Library...</h3>
-              <p className="text-[var(--theme-text-muted)]">
+              <h3 className="text-xl font-bold text-theme-primary mb-2">Importing Steam Library...</h3>
+              <p className="text-theme-muted">
                 Fetching your games from Steam. This may take a moment.
               </p>
             </div>
@@ -140,14 +140,14 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
               <div className="absolute inset-0 bg-red-400/30 rounded-full blur-xl" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-[var(--theme-text-primary)] mb-2">Import Failed</h3>
+              <h3 className="text-xl font-bold text-theme-primary mb-2">Import Failed</h3>
               <p className="text-red-400">{error}</p>
             </div>
             <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-left">
               <p className="text-sm text-red-400 mb-2">
                 <strong>Common issues:</strong>
               </p>
-              <ul className="text-sm text-[var(--theme-text-muted)] space-y-1 list-disc list-inside">
+              <ul className="text-sm text-theme-muted space-y-1 list-disc list-inside">
                 <li>Steam profile is set to private</li>
                 <li>Game details are not public</li>
                 <li>Invalid Steam ID</li>
@@ -156,7 +156,7 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
             </div>
             <button
               onClick={handleClose}
-              className="px-6 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl font-semibold text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all"
+              className="px-6 py-3 bg-theme-hover border border-theme rounded-xl font-semibold text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all"
             >
               Close
             </button>
@@ -172,8 +172,8 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
                 <div className="absolute inset-0 bg-emerald-400/30 rounded-full blur-xl animate-pulse" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-[var(--theme-text-primary)] mb-2">Import Complete!</h3>
-                <p className="text-[var(--theme-text-muted)]">
+                <h3 className="text-xl font-bold text-theme-primary mb-2">Import Complete!</h3>
+                <p className="text-theme-muted">
                   Your Steam library has been successfully imported.
                 </p>
               </div>
@@ -181,21 +181,21 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-center">
+              <div className="p-4 bg-theme-hover border border-theme rounded-xl text-center">
                 <div className="text-2xl font-bold text-cyan-400">{result.totalGames}</div>
-                <div className="text-xs text-[var(--theme-text-muted)] uppercase mt-1">Total Games</div>
+                <div className="text-xs text-theme-muted uppercase mt-1">Total Games</div>
               </div>
-              <div className="p-4 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-center">
+              <div className="p-4 bg-theme-hover border border-theme rounded-xl text-center">
                 <div className="text-2xl font-bold text-emerald-400">{result.gamesAdded}</div>
-                <div className="text-xs text-[var(--theme-text-muted)] uppercase mt-1">Added</div>
+                <div className="text-xs text-theme-muted uppercase mt-1">Added</div>
               </div>
-              <div className="p-4 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-center">
+              <div className="p-4 bg-theme-hover border border-theme rounded-xl text-center">
                 <div className="text-2xl font-bold text-purple-400">{result.gamesUpdated}</div>
-                <div className="text-xs text-[var(--theme-text-muted)] uppercase mt-1">Updated</div>
+                <div className="text-xs text-theme-muted uppercase mt-1">Updated</div>
               </div>
-              <div className="p-4 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-center">
+              <div className="p-4 bg-theme-hover border border-theme rounded-xl text-center">
                 <div className="text-2xl font-bold text-yellow-400">{result.achievementsUpdated}</div>
-                <div className="text-xs text-[var(--theme-text-muted)] uppercase mt-1">Achievements</div>
+                <div className="text-xs text-theme-muted uppercase mt-1">Achievements</div>
               </div>
             </div>
 
@@ -203,12 +203,12 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
             {result.errors.length > 0 && (
               <div className="p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-xl">
                 <div className="flex items-start gap-3 mb-2">
-                  <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
                   <p className="text-sm font-semibold text-yellow-400">
                     Some games could not be imported ({result.errors.length} errors)
                   </p>
                 </div>
-                <ul className="text-xs text-[var(--theme-text-muted)] space-y-1 max-h-32 overflow-y-auto ml-8">
+                <ul className="text-xs text-theme-muted space-y-1 max-h-32 overflow-y-auto ml-8">
                   {result.errors.slice(0, 10).map((err, i) => (
                     <li key={i}>• {err}</li>
                   ))}
@@ -222,13 +222,13 @@ export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModa
             <div className="flex gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 px-6 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl font-semibold text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)] transition-all"
+                className="flex-1 px-6 py-3 bg-theme-hover border border-theme rounded-xl font-semibold text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all"
               >
                 Close
               </button>
               <button
                 onClick={() => window.location.href = '/dashboard'}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-[var(--theme-bg-primary)] transition-all flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-linear-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-bg-primary transition-all flex items-center justify-center gap-2"
               >
                 View Library
                 <ExternalLink className="w-4 h-4" />

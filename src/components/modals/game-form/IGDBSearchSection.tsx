@@ -29,14 +29,14 @@ export function IGDBSearchSection({
   isEditMode,
 }: IGDBSearchSectionProps) {
   return (
-    <div className="p-5 border-b border-[var(--theme-border)]" ref={containerRef}>
+    <div className="p-5 border-b border-theme" ref={containerRef}>
       <div className="relative">
         {/* Search input */}
         <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
           {searching ? (
-            <Loader2 className="w-4 h-4 text-[var(--theme-accent-cyan)] animate-spin" />
+            <Loader2 className="w-4 h-4 text-accent-cyan animate-spin" />
           ) : (
-            <Search className="w-4 h-4 text-[var(--theme-text-muted)]" />
+            <Search className="w-4 h-4 text-theme-muted" />
           )}
         </div>
         <input
@@ -45,16 +45,16 @@ export function IGDBSearchSection({
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchResults.length > 0 && setShowResults(true)}
           placeholder={isEditMode ? "Search IGDB to update game data..." : "Search IGDB by title..."}
-          className="w-full pl-11 pr-24 py-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] text-sm placeholder:text-[var(--theme-text-muted)] focus:outline-none focus:border-[var(--theme-border-hover)] focus:bg-[var(--theme-active-bg)] transition-all"
+          className="w-full pl-11 pr-24 py-3 bg-theme-hover border border-theme rounded-xl text-theme-primary text-sm placeholder:text-theme-muted focus:outline-hidden focus:border-theme-hover focus:bg-theme-active transition-all"
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg">
-          <Database className="w-3 h-3 text-[var(--theme-accent-cyan)]" />
-          <span className="text-[10px] font-medium text-[var(--theme-text-muted)]">IGDB</span>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-hover border border-theme rounded-lg">
+          <Database className="w-3 h-3 text-accent-cyan" />
+          <span className="text-[10px] font-medium text-theme-muted">IGDB</span>
         </div>
 
         {/* Search Results Dropdown */}
         {showResults && searchResults.length > 0 && (
-          <div className="absolute left-0 right-0 top-full mt-2 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden z-50 max-h-80 overflow-y-auto" style={{ boxShadow: 'var(--theme-shadow-xl)' }}>
+          <div className="absolute left-0 right-0 top-full mt-2 bg-theme-secondary border border-theme rounded-xl overflow-hidden z-50 max-h-80 overflow-y-auto" style={{ boxShadow: 'var(--theme-shadow-xl)' }}>
             {(() => {
               // Group results by platform
               const grouped = searchResults.reduce((acc, game) => {
@@ -78,9 +78,9 @@ export function IGDBSearchSection({
               return sortedPlatforms.map((platform) => (
                 <div key={platform}>
                   {/* Platform Header */}
-                  <div className="sticky top-0 px-4 py-2 bg-[var(--theme-bg-secondary)]/95 backdrop-blur-sm border-b border-[var(--theme-border)]">
-                    <span className="text-[10px] font-medium text-[var(--theme-text-muted)] uppercase tracking-wider">{platform}</span>
-                    <span className="text-[10px] text-[var(--theme-text-subtle)] ml-2">({grouped[platform].length})</span>
+                  <div className="sticky top-0 px-4 py-2 bg-theme-secondary/95 backdrop-blur-sm border-b border-theme">
+                    <span className="text-[10px] font-medium text-theme-muted uppercase tracking-wider">{platform}</span>
+                    <span className="text-[10px] text-theme-subtle ml-2">({grouped[platform].length})</span>
                   </div>
                   {/* Games list */}
                   {grouped[platform].map((game) => (
@@ -88,29 +88,29 @@ export function IGDBSearchSection({
                       key={game.id}
                       type="button"
                       onClick={() => onSelectGame(game)}
-                      className="w-full flex items-start gap-3 p-3 hover:bg-[var(--theme-hover-bg)] transition-all border-b border-[var(--theme-border)] last:border-0 group"
+                      className="w-full flex items-start gap-3 p-3 hover:bg-theme-hover transition-all border-b border-theme last:border-0 group"
                     >
-                      <div className="flex-shrink-0 w-10 h-14 bg-[var(--theme-hover-bg)] rounded-lg overflow-hidden border border-[var(--theme-border)] group-hover:border-[var(--theme-border-hover)] transition-all relative">
+                      <div className="shrink-0 w-10 h-14 bg-theme-hover rounded-lg overflow-hidden border border-theme group-hover:border-theme-hover transition-all relative">
                         {game.cover ? (
                           <Image src={game.cover} alt={game.name} fill className="object-cover" sizes="40px" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Gamepad2 className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+                            <Gamepad2 className="w-4 h-4 text-theme-subtle" />
                           </div>
                         )}
                       </div>
                       <div className="flex-1 text-left min-w-0">
-                        <h4 className="font-medium text-[var(--theme-text-secondary)] group-hover:text-[var(--theme-text-primary)] transition-colors text-sm truncate">
+                        <h4 className="font-medium text-theme-secondary group-hover:text-theme-primary transition-colors text-sm truncate">
                           {game.name}
                         </h4>
                         <div className="flex items-center gap-2 mt-1">
                           {game.releaseDate && (
-                            <span className="text-[10px] px-1.5 py-0.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded text-[var(--theme-text-muted)]">
+                            <span className="text-[10px] px-1.5 py-0.5 bg-theme-hover border border-theme rounded text-theme-muted">
                               {new Date(game.releaseDate).getFullYear()}
                             </span>
                           )}
                           {game.developer && (
-                            <span className="text-[10px] text-[var(--theme-text-muted)] truncate max-w-[120px]">
+                            <span className="text-[10px] text-theme-muted truncate max-w-[120px]">
                               {game.developer}
                             </span>
                           )}
@@ -136,11 +136,11 @@ export function IGDBSearchSection({
 
       {/* Divider */}
       <div className="flex items-center gap-3 mt-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent" />
-        <span className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider">
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
+        <span className="text-[10px] text-theme-subtle uppercase tracking-wider">
           {isEditMode ? 'or edit manually' : 'or enter manually'}
         </span>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
       </div>
     </div>
   );

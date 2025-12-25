@@ -55,7 +55,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--theme-bg-primary)] overflow-x-hidden">
+    <div className="relative min-h-screen bg-theme-primary overflow-x-hidden">
       {/* Ambient glow orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div
@@ -131,18 +131,18 @@ export default function DashboardPage() {
                 <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
                   <Activity className="w-3.5 h-3.5 text-amber-400" />
                 </div>
-                <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">
+                <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
                   // RECENT_ACTIVITY
                 </span>
               </div>
-              <div className="flex-1 h-px bg-gradient-to-r from-[var(--theme-border)] to-transparent" />
+              <div className="flex-1 h-px bg-linear-to-r from-border to-transparent" />
               <span className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg text-[10px] font-mono font-medium text-amber-400/80 uppercase tracking-wider">
                 Coming Soon
               </span>
             </div>
 
             {/* Coming soon card */}
-            <div className="relative overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-12 group hover:border-[var(--theme-border)] hover:opacity-80 transition-all duration-300">
+            <div className="relative overflow-hidden rounded-2xl border border-theme bg-theme-secondary p-12 group hover:border-theme hover:opacity-80 transition-all duration-300">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/30" />
               <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/30" />
@@ -150,11 +150,11 @@ export default function DashboardPage() {
               <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/30" />
 
               {/* Subtle gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.02] via-transparent to-violet-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-linear-to-br from-amber-500/2 via-transparent to-violet-500/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
               <div className="relative flex flex-col items-center justify-center text-center">
-                <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-4">// TIMELINE_PREVIEW</span>
-                <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300">
+                <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-4">// TIMELINE_PREVIEW</span>
+                <div className="relative w-16 h-16 rounded-2xl bg-linear-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300">
                   <Sparkles className="w-7 h-7 text-amber-400" />
                   {/* Mini HUD corners */}
                   <div className="absolute -top-1 -left-1 w-2 h-2 border-l border-t border-amber-400/50" />
@@ -163,10 +163,10 @@ export default function DashboardPage() {
                   <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r border-b border-amber-400/50" />
                 </div>
 
-                <h3 className="text-base font-bold text-[var(--theme-text-muted)] mb-2 font-[family-name:var(--font-family-display)] uppercase">
+                <h3 className="text-base font-bold text-theme-muted mb-2 font-family-display uppercase">
                   Activity Tracking
                 </h3>
-                <p className="text-sm text-[var(--theme-text-subtle)] max-w-md leading-relaxed">
+                <p className="text-sm text-theme-subtle max-w-md leading-relaxed">
                   Your achievements, milestones, and gaming moments will appear here.
                   Track your progress and celebrate your victories.
                 </p>
