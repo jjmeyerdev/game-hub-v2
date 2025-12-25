@@ -63,7 +63,7 @@ const CONSOLE_CONFIG: Record<string, {
 function getConsoleIcon(consoleId: string, family: string, isSelected: boolean) {
   const config = CONSOLE_CONFIG[consoleId];
   const colorClass = isSelected ? config?.selectedColor : config?.color;
-  const defaultColor = isSelected ? 'text-white' : 'text-white/50';
+  const defaultColor = isSelected ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]';
 
   // Nintendo - use console-specific icons
   if (family === 'Nintendo') {
@@ -123,7 +123,7 @@ function getGenerationStyle(consoleId: string): string {
 
   switch (config.generation) {
     case 'current':
-      return 'ring-1 ring-white/20';
+      return 'ring-1 ring-black/10 dark:ring-white/20';
     case 'previous':
       return '';
     case 'legacy':
@@ -224,22 +224,22 @@ export function ConsoleFilter({
   }, [consoleCounts, allowedFamilies]);
 
   if (consolesWithGames.length === 0) {
-    return <p className="text-xs text-white/30">No console-specific games found</p>;
+    return <p className="text-xs text-[var(--theme-text-subtle)]">No console-specific games found</p>;
   }
 
   const getButtonStyle = (family: string, isSelected: boolean) => {
     if (!isSelected) {
-      return 'bg-white/[0.03] text-white/50 hover:text-white border-transparent hover:border-white/[0.08]';
+      return 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] border-transparent hover:border-[var(--theme-border-hover)]';
     }
     switch (family) {
       case 'PlayStation':
-        return 'bg-[#003791]/30 text-white border-[#0070cc]/40';
+        return 'bg-[#003791]/20 dark:bg-[#003791]/30 text-[#0070cc] dark:text-white border-[#0070cc]/40';
       case 'Xbox':
-        return 'bg-[#107c10]/30 text-white border-[#52b043]/40';
+        return 'bg-[#107c10]/20 dark:bg-[#107c10]/30 text-[#107c10] dark:text-white border-[#52b043]/40';
       case 'Nintendo':
-        return 'bg-[#e60012]/20 text-white border-[#e60012]/40';
+        return 'bg-[#e60012]/15 dark:bg-[#e60012]/20 text-[#e60012] dark:text-white border-[#e60012]/40';
       default:
-        return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+        return 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border-cyan-500/30';
     }
   };
 
@@ -258,7 +258,7 @@ export function ConsoleFilter({
             >
               {getConsoleIcon(console.id, family.family, isSelected)}
               <span>{console.id}</span>
-              <span className={`px-1.5 py-0.5 rounded text-[10px] ${isSelected ? 'bg-white/20' : 'bg-white/[0.06]'}`}>
+              <span className={`px-1.5 py-0.5 rounded text-[10px] ${isSelected ? 'bg-black/10 dark:bg-white/20' : 'bg-black/[0.04] dark:bg-white/[0.06]'}`}>
                 {console.count}
               </span>
             </button>

@@ -15,7 +15,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
-import { getPlatformBrandStyle } from '@/lib/constants/platforms';
+import { getPlatformBrandStyle, getPlatformBrandStyleSubtle } from '@/lib/constants/platforms';
 import { PRIORITY_CONFIG, STATUS_CONFIG, type PriorityKey, type StatusKey } from './config';
 
 interface UserLibrarySectionProps {
@@ -162,6 +162,7 @@ export function UserLibrarySection({
         <div className="grid grid-cols-3 gap-1.5">
           {PLATFORMS.filter(p => ['PC', 'Steam', 'PlayStation', 'Xbox', 'Epic Games', 'EA App', 'Nintendo', 'Battle.net', 'GOG', 'Ubisoft Connect'].includes(p.id)).sort((a, b) => a.label.localeCompare(b.label)).map((platform) => {
             const brandStyle = getPlatformBrandStyle(platform.id);
+            const subtleStyle = getPlatformBrandStyleSubtle(platform.id);
             const isSelected = selectedPlatform === platform.id;
             return (
               <button
@@ -179,7 +180,7 @@ export function UserLibrarySection({
                 className={`px-2 py-2 rounded-lg text-[11px] font-medium transition-all border ${
                   isSelected
                     ? `${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`
-                    : 'bg-[var(--theme-hover-bg)] border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
+                    : `${subtleStyle.bg} ${subtleStyle.border} ${subtleStyle.text} hover:brightness-125`
                 }`}
               >
                 {platform.label}
@@ -192,6 +193,7 @@ export function UserLibrarySection({
           <div className="mt-2 flex flex-wrap gap-1.5">
             {[...consoleOptions].sort((a, b) => a.localeCompare(b)).map((consoleName) => {
               const brandStyle = getPlatformBrandStyle(selectedPlatform);
+              const subtleStyle = getPlatformBrandStyleSubtle(selectedPlatform);
               const isSelected = selectedConsole === consoleName;
               return (
                 <button
@@ -201,7 +203,7 @@ export function UserLibrarySection({
                   className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-all border ${
                     isSelected
                       ? `${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`
-                      : 'bg-[var(--theme-hover-bg)] border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+                      : `${subtleStyle.bg} ${subtleStyle.border} ${subtleStyle.text} hover:brightness-125`
                   }`}
                 >
                   {consoleName}
@@ -228,7 +230,7 @@ export function UserLibrarySection({
                   onClick={() => setSelectedStatus(key)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
                     isSelected
-                      ? 'bg-[var(--theme-text-primary)] text-[#030304]'
+                      ? 'bg-[var(--theme-text-primary)] text-[var(--theme-bg-primary)]'
                       : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
                   }`}
                 >
@@ -254,7 +256,7 @@ export function UserLibrarySection({
                   onClick={() => setSelectedPriority(key)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
                     isSelected
-                      ? 'bg-[var(--theme-text-primary)] text-[#030304]'
+                      ? 'bg-[var(--theme-text-primary)] text-[var(--theme-bg-primary)]'
                       : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
                   }`}
                 >
@@ -283,7 +285,7 @@ export function UserLibrarySection({
             type="button"
             onClick={() => setOwnershipStatus('owned')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'owned' ? 'text-[#030304] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+              ownershipStatus === 'owned' ? 'text-[var(--theme-bg-primary)] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
             }`}
           >
             <Package className="w-3.5 h-3.5" />
@@ -293,7 +295,7 @@ export function UserLibrarySection({
             type="button"
             onClick={() => setOwnershipStatus('wishlist')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'wishlist' ? 'text-[#030304] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+              ownershipStatus === 'wishlist' ? 'text-[var(--theme-bg-primary)] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
             }`}
           >
             <Heart className={`w-3.5 h-3.5 ${ownershipStatus === 'wishlist' ? 'fill-current' : ''}`} />
@@ -303,7 +305,7 @@ export function UserLibrarySection({
             type="button"
             onClick={() => setOwnershipStatus('unowned')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'unowned' ? 'text-[#030304] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+              ownershipStatus === 'unowned' ? 'text-[var(--theme-bg-primary)] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
             }`}
           >
             <X className="w-3.5 h-3.5" />

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc, Target, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getGameSyncSource } from '@/lib/utils';
@@ -17,15 +17,33 @@ interface GameCardProps {
 
 export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }: GameCardProps) {
   const router = useRouter();
+  const cardRef = useRef<HTMLDivElement>(null);
   const [imageError, setImageError] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
   const isCompleted = game.status === 'completed' || game.status === 'finished';
   const isAdult = game.tags?.includes('adult') ?? false;
   const shouldCensor = isAdult && censorHidden && !isRevealed;
   const hasPlaytime = game.playtime_hours > 0;
+  const hasAchievements = game.achievements_total > 0;
+  const achievementPercent = hasAchievements ? Math.round((game.achievements_earned / game.achievements_total) * 100) : 0;
+  const completionPercent = game.completion_percentage || 0;
 
   const handleClick = () => {
     router.push(`/game/${game.id}`);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: y * 8, y: -x * 8 });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
   };
 
   const formatPlaytime = (hours: number) => {
@@ -34,115 +52,165 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
     return `${Math.round(hours)}h`;
   };
 
-  const getStatusColor = () => {
+  const getStatusConfig = () => {
     switch (game.status) {
-      case 'playing': return 'bg-emerald-400';
-      case 'played': return 'bg-violet-400';
-      case 'completed': return 'bg-cyan-400';
-      case 'finished': return 'bg-amber-400';
-      case 'on_hold': return 'bg-rose-400';
-      case 'dropped': return 'bg-red-400';
-      default: return 'bg-[var(--theme-text-subtle)]';
+      case 'playing': return { color: 'emerald', label: 'ACTIVE', glow: 'rgba(16, 185, 129, 0.4)' };
+      case 'played': return { color: 'violet', label: 'PLAYED', glow: 'rgba(139, 92, 246, 0.4)' };
+      case 'completed': return { color: 'cyan', label: 'CLEAR', glow: 'rgba(34, 211, 238, 0.4)' };
+      case 'finished': return { color: 'amber', label: '100%', glow: 'rgba(251, 191, 36, 0.4)' };
+      case 'on_hold': return { color: 'rose', label: 'HOLD', glow: 'rgba(251, 113, 133, 0.3)' };
+      case 'dropped': return { color: 'red', label: 'DROP', glow: 'rgba(248, 113, 113, 0.3)' };
+      default: return { color: 'gray', label: 'NEW', glow: 'transparent' };
     }
   };
 
-  // Get platform badge style matching sync badge gradients
-  const getPlatformBadgeStyle = (platform: string) => {
+  const statusConfig = getStatusConfig();
+
+  const getPlatformIcon = (platform: string) => {
     const lowerPlatform = platform.toLowerCase();
-    if (lowerPlatform.includes('steam')) {
-      return {
-        gradient: 'bg-gradient-to-br from-[#1b2838] via-[#2a475e] to-[#1b2838]',
-        border: 'border-[#66c0f4]/30',
-        text: 'text-[#66c0f4]',
-        shadow: '0 0 8px rgba(102, 192, 244, 0.2)',
-      };
-    }
-    if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps5') || lowerPlatform.includes('ps4') || lowerPlatform.includes('ps3') || lowerPlatform.includes('vita') || lowerPlatform.includes('psp')) {
-      return {
-        gradient: 'bg-gradient-to-br from-[#003087] via-[#0070d1] to-[#003087]',
-        border: 'border-[#0070d1]/40',
-        text: 'text-white',
-        shadow: '0 0 8px rgba(0, 112, 209, 0.25)',
-      };
-    }
-    if (lowerPlatform.includes('xbox')) {
-      return {
-        gradient: 'bg-gradient-to-br from-[#0e7a0d] via-[#107c10] to-[#0e7a0d]',
-        border: 'border-[#52b043]/40',
-        text: 'text-white',
-        shadow: '0 0 8px rgba(16, 124, 16, 0.3)',
-      };
-    }
-    if (lowerPlatform.includes('epic')) {
-      return {
-        gradient: 'bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1a1a1a]',
-        border: 'border-white/20',
-        text: 'text-white',
-        shadow: '0 0 8px rgba(255, 255, 255, 0.06)',
-      };
-    }
-    if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii') || lowerPlatform.includes('3ds')) {
-      return {
-        gradient: 'bg-gradient-to-br from-[#e60012] via-[#ff1a1a] to-[#e60012]',
-        border: 'border-[#ff4444]/40',
-        text: 'text-white',
-        shadow: '0 0 8px rgba(230, 0, 18, 0.3)',
-      };
-    }
-    // Default/manual
-    return {
-      gradient: 'bg-gradient-to-br from-[var(--theme-bg-secondary)] via-[var(--theme-hover-bg)] to-[var(--theme-bg-secondary)]',
-      border: 'border-[var(--theme-border)]',
-      text: 'text-[var(--theme-text-secondary)]',
-      shadow: 'none',
-    };
+    if (lowerPlatform.includes('steam')) return <SteamLogo className="w-3 h-3" />;
+    if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3 h-3" />;
+    if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3 h-3" />;
+    if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3 h-3" />;
+    return <Gamepad2 className="w-3 h-3" />;
   };
+
+  const syncSource = getGameSyncSource(game);
 
   return (
     <div
-      className="group relative cursor-pointer"
+      ref={cardRef}
+      className="group relative cursor-pointer perspective-1000"
       style={{
-        animation: `fadeIn 0.4s ease-out ${index * 0.03}s both`,
+        animation: `cardSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) ${index * 0.04}s both`,
       }}
       onClick={handleClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Main card */}
-      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] transition-all duration-300 hover:border-[var(--theme-border-hover)] hover:bg-[var(--theme-bg-tertiary)]">
-        {/* Cover image */}
-        {game.game?.cover_url && !imageError ? (
-          <img
-            src={game.game.cover_url}
-            alt={game.game.title || 'Game cover'}
-            className={`w-full h-full object-cover transition-all duration-500 ${shouldCensor ? 'blur-2xl scale-125 brightness-[0.2]' : 'group-hover:scale-105'}`}
-            loading="lazy"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className={`absolute inset-0 bg-gradient-to-br from-[var(--theme-text-primary)]/[0.03] to-transparent flex items-center justify-center ${shouldCensor ? 'blur-xl' : ''}`}>
-            <Gamepad2 className="w-12 h-12 text-[var(--theme-text-primary)]/10" />
-          </div>
-        )}
+      {/* Outer glow effect based on status */}
+      <div
+        className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+        style={{ background: statusConfig.glow }}
+      />
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg-primary)] via-[var(--theme-bg-primary)]/20 to-transparent opacity-90" />
+      {/* Main card with 3D tilt */}
+      <div
+        className="relative aspect-[2/3] rounded-xl overflow-hidden transition-transform duration-200 ease-out"
+        style={{
+          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        {/* Base card background */}
+        <div className="absolute inset-0 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl transition-all duration-300 group-hover:border-[var(--theme-border-hover)]" />
+
+        {/* HUD Corner Brackets */}
+        <div className="absolute inset-0 pointer-events-none z-30">
+          {/* Top-left bracket */}
+          <div className="absolute top-2 left-2 w-5 h-5">
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300 group-hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+            <div className="absolute top-0 left-0 h-full w-[2px] bg-gradient-to-b from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300 group-hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+          </div>
+          {/* Top-right bracket */}
+          <div className="absolute top-2 right-2 w-5 h-5">
+            <div className="absolute top-0 right-0 w-full h-[2px] bg-gradient-to-l from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+            <div className="absolute top-0 right-0 h-full w-[2px] bg-gradient-to-b from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+          </div>
+          {/* Bottom-left bracket */}
+          <div className="absolute bottom-2 left-2 w-5 h-5">
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+            <div className="absolute bottom-0 left-0 h-full w-[2px] bg-gradient-to-t from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+          </div>
+          {/* Bottom-right bracket */}
+          <div className="absolute bottom-2 right-2 w-5 h-5">
+            <div className="absolute bottom-0 right-0 w-full h-[2px] bg-gradient-to-l from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+            <div className="absolute bottom-0 right-0 h-full w-[2px] bg-gradient-to-t from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+          </div>
+        </div>
+
+        {/* Cover image with holographic effect */}
+        <div className="absolute inset-0 overflow-hidden rounded-xl">
+          {game.game?.cover_url && !imageError ? (
+            <>
+              <img
+                src={game.game.cover_url}
+                alt={game.game.title || 'Game cover'}
+                className={`w-full h-full object-cover transition-all duration-700 ${
+                  shouldCensor ? 'blur-2xl scale-125 brightness-[0.15]' : 'group-hover:scale-110'
+                }`}
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+              {/* Holographic shimmer overlay */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay"
+                style={{
+                  background: 'linear-gradient(135deg, transparent 0%, rgba(34,211,238,0.1) 25%, transparent 50%, rgba(139,92,246,0.1) 75%, transparent 100%)',
+                  backgroundSize: '200% 200%',
+                  animation: 'shimmer 3s linear infinite',
+                }}
+              />
+            </>
+          ) : (
+            <div className={`absolute inset-0 flex items-center justify-center ${shouldCensor ? 'blur-xl' : ''}`}>
+              <div className="relative">
+                <Gamepad2 className="w-16 h-16 text-[var(--theme-text-primary)]/[0.06]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Target className="w-8 h-8 text-cyan-500/20" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Scan line effect on hover */}
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none overflow-hidden"
+            style={{ mixBlendMode: 'overlay' }}
+          >
+            <div
+              className="absolute w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent"
+              style={{
+                animation: 'scanLine 2s linear infinite',
+                boxShadow: '0 0 20px 5px rgba(34,211,238,0.3)',
+              }}
+            />
+          </div>
+
+          {/* Gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg-primary)] via-[var(--theme-bg-primary)]/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.03] to-violet-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        </div>
 
         {/* Censorship Overlay */}
         {shouldCensor && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-[var(--theme-bg-primary)]/60 backdrop-blur-sm">
-            <div className="w-12 h-12 rounded-full border border-[var(--theme-border)] flex items-center justify-center mb-3">
-              <EyeOff className="w-5 h-5 text-[var(--theme-text-subtle)]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[var(--theme-bg-primary)]/80 backdrop-blur-md">
+            <div className="relative w-14 h-14 mb-4">
+              <div className="absolute inset-0 rounded-full border-2 border-[var(--theme-border)] animate-pulse" />
+              <div className="absolute inset-2 rounded-full border border-[var(--theme-text-subtle)]/30 flex items-center justify-center">
+                <EyeOff className="w-5 h-5 text-[var(--theme-text-subtle)]" />
+              </div>
             </div>
-            <span className="text-[10px] font-medium tracking-[0.2em] text-[var(--theme-text-subtle)] uppercase mb-3">Private</span>
+            <span className="text-[9px] font-bold tracking-[0.25em] text-[var(--theme-text-subtle)] uppercase mb-4">CLASSIFIED</span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsRevealed(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-full text-[10px] font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] hover:bg-cyan-500/20 border border-[var(--theme-border)] hover:border-cyan-500/50 rounded-lg text-[10px] font-bold text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all uppercase tracking-wider"
             >
-              <Eye className="w-3 h-3" />
-              Reveal
+              <Eye className="w-3.5 h-3.5" />
+              Decrypt
             </button>
+          </div>
+        )}
+
+        {/* NEW badge - top right corner */}
+        {statusConfig.label === 'NEW' && !shouldCensor && (
+          <div className="absolute top-3 right-3 z-30">
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-[var(--theme-bg-primary)]/80 backdrop-blur-md border border-[var(--theme-border)] rounded-md">
+              <span className="text-[9px] font-bold text-[var(--theme-text-secondary)] uppercase tracking-wider">NEW</span>
+            </div>
           </div>
         )}
 
@@ -153,142 +221,167 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
               e.stopPropagation();
               setIsRevealed(false);
             }}
-            className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-[var(--theme-hover-bg)] backdrop-blur-sm border border-[var(--theme-border)] hover:bg-[var(--theme-bg-tertiary)] transition-all"
-            title="Hide content"
+            className="absolute top-8 right-3 z-30 p-1.5 rounded-lg bg-[var(--theme-bg-primary)]/80 backdrop-blur-sm border border-[var(--theme-border)] hover:border-cyan-500/50 transition-all group/hide"
+            title="Re-encrypt"
           >
-            <EyeOff className="w-3 h-3 text-[var(--theme-text-muted)]" />
+            <EyeOff className="w-3 h-3 text-[var(--theme-text-muted)] group-hover/hide:text-cyan-400" />
           </button>
         )}
 
-        {/* Top badges */}
-        <div className="absolute top-0 left-0 right-0 p-2 z-10">
-          <div className="flex items-start justify-between">
-            {/* Platform badge */}
-            <div className="flex items-center gap-1">
-              {(() => {
-                const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
-                const displayPlatform = match ? match[2] : game.platform;
-                const badgeStyle = getPlatformBadgeStyle(game.platform);
-                return (
-                  <span
-                    className={`px-2.5 py-1.5 backdrop-blur-sm text-[10px] font-medium rounded-lg border uppercase tracking-wide ${badgeStyle.gradient} ${badgeStyle.text} ${badgeStyle.border}`}
-                    style={{ boxShadow: badgeStyle.shadow }}
-                  >
-                    {displayPlatform}
-                  </span>
-                );
-              })()}
-
-              {/* Sync badge */}
-              {(() => {
-                const syncSource = getGameSyncSource(game);
-                const badgeStyles: Record<string, {
-                  gradient: string;
-                  border: string;
-                  shadow: string;
-                  icon: React.ReactNode;
-                }> = {
-                  steam: {
-                    gradient: 'bg-gradient-to-br from-[#1b2838] via-[#2a475e] to-[#1b2838]',
-                    border: 'border-[#66c0f4]/30',
-                    shadow: '0 0 12px rgba(102, 192, 244, 0.25), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    icon: <SteamLogo className="w-3.5 h-3.5 text-[#66c0f4] drop-shadow-[0_0_3px_rgba(102,192,244,0.5)]" />,
-                  },
-                  psn: {
-                    gradient: 'bg-gradient-to-br from-[#003087] via-[#0070d1] to-[#003087]',
-                    border: 'border-[#0070d1]/40',
-                    shadow: '0 0 12px rgba(0, 112, 209, 0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    icon: <PlayStationLogo className="w-3.5 h-3.5 text-white drop-shadow-[0_0_3px_rgba(0,112,209,0.6)]" />,
-                  },
-                  xbox: {
-                    gradient: 'bg-gradient-to-br from-[#0e7a0d] via-[#107c10] to-[#0e7a0d]',
-                    border: 'border-[#52b043]/40',
-                    shadow: '0 0 12px rgba(16, 124, 16, 0.35), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    icon: <XboxLogo className="w-3.5 h-3.5 text-white drop-shadow-[0_0_3px_rgba(82,176,67,0.6)]" />,
-                  },
-                  epic: {
-                    gradient: 'bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1a1a1a]',
-                    border: 'border-white/20',
-                    shadow: '0 0 12px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    icon: <EpicLogo className="w-3.5 h-3.5 text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.4)]" />,
-                  },
-                };
-
-                const badge = badgeStyles[syncSource];
-                if (!badge) return null;
-
-                return (
-                  <span
-                    className={`relative p-1.5 ${badge.gradient} backdrop-blur-md rounded-lg flex items-center justify-center border ${badge.border} transition-all duration-300 hover:scale-110`}
-                    style={{ boxShadow: badge.shadow }}
-                  >
-                    {badge.icon}
-                  </span>
-                );
-              })()}
-            </div>
-
-            {/* Status indicators */}
+        {/* Top HUD Bar */}
+        <div className="absolute top-0 left-0 right-0 p-3 z-20">
+          <div className="flex items-center justify-between">
+            {/* Platform + Sync indicator + NEW badge */}
             <div className="flex items-center gap-1.5">
-              {game.is_physical && (
-                <span className="p-1.5 bg-amber-500/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-amber-500/30" title="Physical">
-                  <Disc className="w-3.5 h-3.5 text-amber-400" />
-                </span>
-              )}
-              {game.priority === 'high' && (
-                <span className="p-1.5 bg-red-500/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-red-500/30" title="High Priority">
-                  <Flame className="w-3.5 h-3.5 text-red-400" />
-                </span>
-              )}
-              {isCompleted && (
-                <span className="p-1.5 bg-cyan-500/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-cyan-500/30" title="Completed">
-                  <Trophy className="w-3.5 h-3.5 text-cyan-400" />
-                </span>
-              )}
+              {/* Platform badge - HUD style */}
+              <div className="relative">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-[var(--theme-bg-primary)]/80 backdrop-blur-md border border-[var(--theme-border)] rounded-md">
+                  {getPlatformIcon(game.platform)}
+                  <span className="text-[9px] font-bold text-[var(--theme-text-secondary)] uppercase tracking-wider">
+                    {(() => {
+                      const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
+                      return match ? match[2] : game.platform;
+                    })()}
+                  </span>
+                </div>
+                {/* Sync pulse indicator */}
+                {syncSource && (
+                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2">
+                    <div className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                    <div className="absolute inset-0 rounded-full bg-emerald-400" />
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* Status indicators - hidden when NEW badge is showing */}
+            {game.status !== 'new' && game.status !== 'backlog' && (
+              <div className="flex items-center gap-1">
+                {game.is_physical && (
+                  <div className="p-1 bg-amber-500/20 backdrop-blur-sm rounded border border-amber-500/30" title="Physical">
+                    <Disc className="w-3 h-3 text-amber-400" />
+                  </div>
+                )}
+                {game.priority === 'high' && (
+                  <div className="p-1 bg-red-500/20 backdrop-blur-sm rounded border border-red-500/30 animate-pulse" title="Priority">
+                    <Flame className="w-3 h-3 text-red-400" />
+                  </div>
+                )}
+                {isCompleted && (
+                  <div className="p-1 bg-cyan-500/20 backdrop-blur-sm rounded border border-cyan-500/30" title="Completed">
+                    <Trophy className="w-3 h-3 text-cyan-400" />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Bottom info */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-          <h3
-            className={`font-semibold text-base leading-tight line-clamp-2 mb-2 transition-colors ${shouldCensor ? 'text-[var(--theme-text-primary)]/10 blur-sm' : 'text-[var(--theme-text-primary)] group-hover:text-cyan-400'}`}
-          >
-            {game.game?.title || 'Untitled'}
+        {/* Bottom Data Panel */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 z-20 bg-gradient-to-t from-[var(--theme-bg-primary)] from-40% via-[var(--theme-bg-primary)]/95 via-70% to-transparent">
+          {/* Title with glitch effect on hover */}
+          <h3 className={`font-bold text-sm leading-tight line-clamp-2 mb-2 transition-all duration-300 ${
+            shouldCensor
+              ? 'text-[var(--theme-text-primary)]/10 blur-sm'
+              : 'text-[var(--theme-text-primary)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-violet-400'
+          }`}>
+            {game.game?.title || 'UNTITLED'}
           </h3>
 
           {!shouldCensor && (
-            <div className="flex items-center gap-2">
-              {hasPlaytime && (
-                <div className="flex items-center gap-1 text-[var(--theme-text-subtle)]">
-                  <Clock className="w-2.5 h-2.5" />
-                  <span className="text-[10px]">{formatPlaytime(game.playtime_hours)}</span>
-                </div>
-              )}
-              <div className="flex-1 h-1 bg-[var(--theme-text-primary)]/[0.06] rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${getStatusColor()} transition-all duration-500`}
-                  style={{
-                    width: game.status === 'unplayed' ? '0%' :
-                           game.status === 'playing' ? '50%' :
-                           game.status === 'played' ? '75%' :
-                           game.status === 'completed' || game.status === 'finished' ? '100%' : '25%'
-                  }}
-                />
+            <>
+              {/* Stats Row - HUD style */}
+              <div className="flex items-center gap-3 mb-2">
+                {hasPlaytime && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-cyan-400/70" />
+                    <span className="text-[10px] font-mono font-bold text-[var(--theme-text-muted)]">
+                      {formatPlaytime(game.playtime_hours)}
+                    </span>
+                  </div>
+                )}
+                {hasAchievements && (
+                  <div className="flex items-center gap-1">
+                    <Trophy className="w-3 h-3 text-amber-400/70" />
+                    <span className="text-[10px] font-mono font-bold text-[var(--theme-text-muted)]">
+                      {game.achievements_earned}/{game.achievements_total}
+                    </span>
+                  </div>
+                )}
+                {completionPercent > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-violet-400/70" />
+                    <span className="text-[10px] font-mono font-bold text-[var(--theme-text-muted)]">
+                      {completionPercent}%
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
+
+              {/* Progress bar with status indicator */}
+              <div className="relative">
+                {/* Background track */}
+                <div className="h-1 bg-[var(--theme-text-primary)]/[0.08] rounded-full overflow-hidden">
+                  {/* Completion fill */}
+                  <div
+                    className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
+                    style={{
+                      width: `${hasAchievements ? achievementPercent : (completionPercent || (game.status === 'completed' ? 100 : game.status === 'playing' ? 50 : 0))}%`,
+                      background: `linear-gradient(90deg,
+                        ${statusConfig.color === 'emerald' ? '#10b981' :
+                          statusConfig.color === 'cyan' ? '#22d3ee' :
+                          statusConfig.color === 'violet' ? '#8b5cf6' :
+                          statusConfig.color === 'amber' ? '#fbbf24' :
+                          statusConfig.color === 'rose' ? '#fb7185' :
+                          statusConfig.color === 'red' ? '#f87171' : '#6b7280'},
+                        ${statusConfig.color === 'emerald' ? '#34d399' :
+                          statusConfig.color === 'cyan' ? '#67e8f9' :
+                          statusConfig.color === 'violet' ? '#a78bfa' :
+                          statusConfig.color === 'amber' ? '#fcd34d' :
+                          statusConfig.color === 'rose' ? '#fda4af' :
+                          statusConfig.color === 'red' ? '#fca5a5' : '#9ca3af'})`,
+                    }}
+                  >
+                    {/* Animated shine */}
+                    <div
+                      className="absolute inset-0 opacity-50"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+                        animation: 'progressShine 2s ease-in-out infinite',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Status label - only show non-NEW statuses */}
+                {statusConfig.label !== 'NEW' && (
+                  <div className="absolute -top-5 right-0 flex items-center gap-1">
+                    <span className={`text-[8px] font-bold tracking-[0.15em] uppercase ${
+                      statusConfig.color === 'emerald' ? 'text-emerald-400' :
+                      statusConfig.color === 'cyan' ? 'text-cyan-400' :
+                      statusConfig.color === 'violet' ? 'text-violet-400' :
+                      statusConfig.color === 'amber' ? 'text-amber-400' :
+                      statusConfig.color === 'rose' ? 'text-rose-400' :
+                      statusConfig.color === 'red' ? 'text-red-400' : 'text-[var(--theme-text-subtle)]'
+                    }`}>
+                      {statusConfig.label}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
 
-        {/* Hover action buttons - hidden when adult content is censored */}
+        {/* Hover action buttons */}
         {!shouldCensor && (
-          <div className="absolute bottom-8 right-2 flex gap-1.5 z-20 opacity-0 group-hover:opacity-100 transition-all duration-200">
+          <div className="absolute bottom-14 right-3 flex flex-col gap-1.5 z-30 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit();
               }}
-              className="p-2 bg-[var(--theme-hover-bg)] backdrop-blur-sm rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] hover:bg-[var(--theme-bg-tertiary)] transition-all"
+              className="p-2 bg-[var(--theme-bg-primary)]/90 backdrop-blur-md rounded-lg text-[var(--theme-text-muted)] hover:text-cyan-400 border border-[var(--theme-border)] hover:border-cyan-500/50 transition-all hover:shadow-[0_0_12px_rgba(34,211,238,0.3)]"
               title="Edit"
             >
               <Edit3 className="w-3.5 h-3.5" />
@@ -298,25 +391,64 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                 e.stopPropagation();
                 onDelete();
               }}
-              className="p-2 bg-red-500/10 backdrop-blur-sm rounded-lg text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/20 transition-all"
+              className="p-2 bg-[var(--theme-bg-primary)]/90 backdrop-blur-md rounded-lg text-[var(--theme-text-muted)] hover:text-red-400 border border-[var(--theme-border)] hover:border-red-500/50 transition-all hover:shadow-[0_0_12px_rgba(248,113,113,0.3)]"
               title="Delete"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
+
+        {/* Corner accent triangles */}
+        <div className="absolute top-0 right-0 w-8 h-8 overflow-hidden pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-bl from-cyan-500/30 to-transparent rotate-45" />
+        </div>
       </div>
 
       <style jsx>{`
-        @keyframes fadeIn {
+        @keyframes cardSlideIn {
           from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(20px) scale(0.95);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
+        }
+
+        @keyframes scanLine {
+          0% {
+            top: -10%;
+          }
+          100% {
+            top: 110%;
+          }
+        }
+
+        @keyframes shimmer {
+          0% {
+            background-position: 200% 200%;
+          }
+          100% {
+            background-position: -200% -200%;
+          }
+        }
+
+        @keyframes progressShine {
+          0% {
+            transform: translateX(-100%);
+          }
+          50% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
+        .perspective-1000 {
+          perspective: 1000px;
         }
       `}</style>
     </div>

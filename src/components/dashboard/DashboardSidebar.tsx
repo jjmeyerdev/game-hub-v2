@@ -83,10 +83,11 @@ export function DashboardSidebar({
   return (
     <aside
       className={`
-        fixed h-screen bg-[var(--theme-bg-secondary)]/95 backdrop-blur-xl border-r border-[var(--theme-border)]
-        flex flex-col transition-all duration-500 ease-out z-40
+        fixed h-screen bg-[var(--theme-bg-secondary)] border-r border-[var(--theme-border)]
+        flex flex-col z-40
         ${collapsed ? 'w-20' : 'w-72'}
       `}
+      style={{ transition: 'width 400ms cubic-bezier(0.4, 0, 0.2, 1)' }}
     >
       {/* Subtle gradient at top */}
       <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[var(--theme-accent-cyan)]/[0.03] to-transparent pointer-events-none" />
@@ -107,10 +108,10 @@ export function DashboardSidebar({
       </button>
 
       {/* Logo Section */}
-      <div className={`relative px-6 py-6 transition-all duration-500 ${collapsed ? 'px-4' : 'px-6'}`}>
+      <div className={`relative py-6 ${collapsed ? 'px-4' : 'px-6'}`}>
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative flex-shrink-0">
-            <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-all duration-300">
+            <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
               <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2.5} />
             </div>
             {/* Corner brackets */}
@@ -120,8 +121,8 @@ export function DashboardSidebar({
             <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-cyan-400/50" />
           </div>
           <div
-            className={`flex flex-col transition-all duration-500 ${
-              collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+            className={`flex flex-col overflow-hidden transition-opacity duration-200 ${
+              collapsed ? 'opacity-0 w-0' : 'opacity-100'
             }`}
           >
             <span className="text-lg font-semibold tracking-wide text-[var(--theme-text-primary)] font-[family-name:var(--font-family-display)]">
@@ -138,7 +139,7 @@ export function DashboardSidebar({
       <div className="mx-6 h-px bg-gradient-to-r from-[var(--theme-accent-cyan)]/20 via-[var(--theme-border)] to-transparent" />
 
       {/* Navigation */}
-      <nav className={`flex-1 py-6 overflow-y-auto transition-all duration-500 ${collapsed ? 'px-3' : 'px-4'}`}>
+      <nav className={`flex-1 py-6 overflow-y-auto ${collapsed ? 'px-3' : 'px-4'}`}>
         {/* Main Navigation */}
         <div className="mb-8">
           {!collapsed && (
@@ -207,7 +208,10 @@ export function DashboardSidebar({
       </nav>
 
       {/* User Profile Section */}
-      <div className={`relative p-4 transition-all duration-500 ${collapsed ? 'px-3' : 'px-4'}`} ref={userMenuRef}>
+      <div
+        className={`relative p-4 ${collapsed ? 'px-3' : 'px-4'}`}
+        ref={userMenuRef}
+      >
         {/* Top divider */}
         <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent" />
 
@@ -232,8 +236,8 @@ export function DashboardSidebar({
 
           {/* User info */}
           <div
-            className={`flex-1 min-w-0 text-left transition-all duration-500 ${
-              collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+            className={`flex-1 min-w-0 text-left overflow-hidden transition-opacity duration-200 ${
+              collapsed ? 'opacity-0 w-0' : 'opacity-100'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -371,11 +375,11 @@ function NavItem({ icon: Icon, label, href, collapsed, active }: NavItemProps) {
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[var(--theme-accent-cyan)] rounded-r-full shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
       )}
 
-      <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${active ? 'text-[var(--theme-accent-cyan)]' : ''}`} />
+      <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-[var(--theme-accent-cyan)]' : ''}`} />
 
       <span
-        className={`text-sm font-medium transition-all duration-500 ${
-          collapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+        className={`text-sm font-medium overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+          collapsed ? 'opacity-0 w-0' : 'opacity-100'
         }`}
       >
         {label}

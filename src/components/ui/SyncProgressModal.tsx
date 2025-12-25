@@ -225,16 +225,32 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
   }, [progress?.current, progress?.total, displayPhaseIndex, elapsedTime, cumulativeDuration, totalEstimatedDuration]);
 
   const [displayProgress, setDisplayProgress] = useState(0);
+  const displayProgressRef = useRef(0);
 
-  // Smooth progress updates
+  // Smooth progress updates using animation frame
   useEffect(() => {
     const target = isCompleting ? 100 : calculatedProgress;
-    const diff = target - displayProgress;
-    if (Math.abs(diff) > 0.5) {
-      const step = diff * 0.15;
-      setDisplayProgress(prev => prev + step);
-    }
-  }, [calculatedProgress, isCompleting, displayProgress]);
+    let animationId: number;
+
+    const animate = () => {
+      const diff = target - displayProgressRef.current;
+      if (Math.abs(diff) > 0.5) {
+        const step = diff * 0.15;
+        displayProgressRef.current += step;
+        setDisplayProgress(displayProgressRef.current);
+        animationId = requestAnimationFrame(animate);
+      } else if (displayProgressRef.current !== target) {
+        displayProgressRef.current = target;
+        setDisplayProgress(target);
+      }
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, [calculatedProgress, isCompleting]);
 
   // Estimated time remaining based on phase timing
   const estimatedRemaining = useMemo(() => {
@@ -311,6 +327,7 @@ export function SyncProgressModal({ isOpen, platform, progress }: SyncProgressMo
       setElapsedTime(0);
       setDisplayPhaseIndex(0);
       setDisplayProgress(0);
+      displayProgressRef.current = 0;
       setProcessingRate(0);
       setWaveformData([]);
       setTipIndex(0);

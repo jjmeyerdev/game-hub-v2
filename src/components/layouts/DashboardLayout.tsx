@@ -23,7 +23,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       />
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-500 overflow-x-hidden ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}>
+      <main
+        className={`flex-1 overflow-x-hidden ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}
+        style={{ transition: 'margin-left 400ms cubic-bezier(0.4, 0, 0.2, 1)' }}
+      >
         {children}
       </main>
     </div>

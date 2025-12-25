@@ -113,8 +113,11 @@ export async function updateAllSteamCovers() {
 /**
  * Enrich all games in user's library with IGDB metadata
  * This updates cover art, descriptions, release dates, developers, publishers, and genres
+ *
+ * @param platformFilter - Optional platform to filter games (e.g., 'Steam', 'PlayStation', 'Xbox')
+ * @param consoleFilter - Optional console to filter games (e.g., 'PS5', 'Xbox Series X|S')
  */
-export async function enrichAllGamesFromIGDB() {
+export async function enrichAllGamesFromIGDB(platformFilter?: string, consoleFilter?: string) {
   let user, supabase;
   try {
     ({ user, supabase } = await requireAuth());
@@ -123,8 +126,8 @@ export async function enrichAllGamesFromIGDB() {
   }
 
   try {
-    // Get all games for the user
-    const { data: userGames, error: fetchError } = await supabase
+    // Build query based on filters
+    let query = supabase
       .from('user_games')
       .select(`
         id,
@@ -133,6 +136,17 @@ export async function enrichAllGamesFromIGDB() {
         game:games(id, title, cover_url, description, developer, publisher, release_date, genres)
       `)
       .eq('user_id', user.id);
+
+    // Apply platform filter
+    if (platformFilter && consoleFilter) {
+      // Exact match for platform with console (e.g., "PlayStation (PS5)")
+      query = query.eq('platform', `${platformFilter} (${consoleFilter})`);
+    } else if (platformFilter) {
+      // Match base platform, including with or without console
+      query = query.or(`platform.eq.${platformFilter},platform.like.${platformFilter} (%)`);
+    }
+
+    const { data: userGames, error: fetchError } = await query;
 
     if (fetchError) {
       return { error: fetchError.message };

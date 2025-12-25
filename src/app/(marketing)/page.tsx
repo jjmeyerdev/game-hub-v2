@@ -509,7 +509,7 @@ export default function HomePage() {
                   GAMEHUB
                 </span>
                 <span className="hidden sm:inline text-[10px] text-[var(--theme-text-muted)] ml-3 font-mono">
-                  v2.0.0-beta
+                  v2.0.0-pre-alpha
                 </span>
               </div>
             </div>

@@ -496,8 +496,8 @@ export default function GameFormModal({
       <style jsx global>{`
         .max-h-\\[75vh\\]::-webkit-scrollbar { width: 6px; }
         .max-h-\\[75vh\\]::-webkit-scrollbar-track { background: transparent; }
-        .max-h-\\[75vh\\]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-        .max-h-\\[75vh\\]::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+        .max-h-\\[75vh\\]::-webkit-scrollbar-thumb { background: var(--theme-scrollbar-thumb); border-radius: 3px; }
+        .max-h-\\[75vh\\]::-webkit-scrollbar-thumb:hover { background: var(--theme-scrollbar-thumb-hover); }
       `}</style>
     </BaseModal>
   );

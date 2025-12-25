@@ -131,10 +131,10 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   // Steam
   if (p.includes('steam')) {
     return {
-      bg: 'bg-[#1b2838]',
+      bg: 'bg-[#1a9fff]',
       text: 'text-white',
-      border: 'border-[#66c0f4]/30',
-      glow: 'shadow-[0_0_8px_rgba(102,192,244,0.3)]',
+      border: 'border-[#66c0f4]/50',
+      glow: 'shadow-[0_0_20px_rgba(26,159,255,0.5),0_0_40px_rgba(26,159,255,0.2)]',
     };
   }
 
@@ -143,8 +143,8 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#003087]',
       text: 'text-white',
-      border: 'border-[#0070d1]/40',
-      glow: 'shadow-[0_0_8px_rgba(0,112,209,0.35)]',
+      border: 'border-[#0070d1]/50',
+      glow: 'shadow-[0_0_20px_rgba(0,112,209,0.5),0_0_40px_rgba(0,112,209,0.2)]',
     };
   }
 
@@ -153,8 +153,8 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#107c10]',
       text: 'text-white',
-      border: 'border-[#52b043]/40',
-      glow: 'shadow-[0_0_8px_rgba(16,124,16,0.4)]',
+      border: 'border-[#52b043]/50',
+      glow: 'shadow-[0_0_20px_rgba(82,176,67,0.5),0_0_40px_rgba(82,176,67,0.2)]',
     };
   }
 
@@ -163,18 +163,18 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#e60012]',
       text: 'text-white',
-      border: 'border-[#ff4554]/40',
-      glow: 'shadow-[0_0_8px_rgba(230,0,18,0.35)]',
+      border: 'border-[#ff4554]/50',
+      glow: 'shadow-[0_0_20px_rgba(230,0,18,0.5),0_0_40px_rgba(230,0,18,0.2)]',
     };
   }
 
   // Epic Games
   if (p.includes('epic')) {
     return {
-      bg: 'bg-[#1a1a1a]',
-      text: 'text-white',
-      border: 'border-white/20',
-      glow: 'shadow-[0_0_8px_rgba(255,255,255,0.1)]',
+      bg: 'bg-[var(--theme-text-primary)]',
+      text: 'text-[var(--theme-bg-primary)]',
+      border: 'border-[var(--theme-text-primary)]/50',
+      glow: 'shadow-[0_0_20px_rgba(128,128,128,0.4),0_0_40px_rgba(128,128,128,0.15)]',
     };
   }
 
@@ -183,8 +183,8 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#ff4747]',
       text: 'text-white',
-      border: 'border-[#ff6b6b]/40',
-      glow: 'shadow-[0_0_8px_rgba(255,71,71,0.35)]',
+      border: 'border-[#ff6b6b]/50',
+      glow: 'shadow-[0_0_20px_rgba(255,71,71,0.5),0_0_40px_rgba(255,71,71,0.2)]',
     };
   }
 
@@ -193,8 +193,8 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#00aeff]',
       text: 'text-white',
-      border: 'border-[#00c8ff]/40',
-      glow: 'shadow-[0_0_8px_rgba(0,174,255,0.35)]',
+      border: 'border-[#00c8ff]/50',
+      glow: 'shadow-[0_0_20px_rgba(0,200,255,0.5),0_0_40px_rgba(0,200,255,0.2)]',
     };
   }
 
@@ -203,8 +203,8 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#a855f7]',
       text: 'text-white',
-      border: 'border-[#c084fc]/40',
-      glow: 'shadow-[0_0_8px_rgba(168,85,247,0.35)]',
+      border: 'border-[#c084fc]/50',
+      glow: 'shadow-[0_0_20px_rgba(168,85,247,0.5),0_0_40px_rgba(168,85,247,0.2)]',
     };
   }
 
@@ -213,8 +213,8 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-[#0070ff]',
       text: 'text-white',
-      border: 'border-[#3d9aff]/40',
-      glow: 'shadow-[0_0_8px_rgba(0,112,255,0.35)]',
+      border: 'border-[#3d9aff]/50',
+      glow: 'shadow-[0_0_20px_rgba(0,112,255,0.5),0_0_40px_rgba(0,112,255,0.2)]',
     };
   }
 
@@ -223,17 +223,18 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     return {
       bg: 'bg-amber-600',
       text: 'text-white',
-      border: 'border-amber-500/40',
-      glow: 'shadow-[0_0_8px_rgba(217,119,6,0.35)]',
+      border: 'border-amber-500/50',
+      glow: 'shadow-[0_0_20px_rgba(217,119,6,0.5),0_0_40px_rgba(217,119,6,0.2)]',
     };
   }
 
   // PC / Windows (default for PC platforms)
   if (p.includes('pc') || p.includes('windows')) {
     return {
-      bg: 'bg-slate-600',
+      bg: 'bg-[#0078D4]',
       text: 'text-white',
-      border: 'border-slate-500/40',
+      border: 'border-[#00a2ff]/50',
+      glow: 'shadow-[0_0_20px_rgba(0,120,212,0.5),0_0_40px_rgba(0,120,212,0.2)]',
     };
   }
 
@@ -242,6 +243,117 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
     bg: 'bg-white/10',
     text: 'text-white',
     border: 'border-white/[0.08]',
+  };
+}
+
+// Subtle brand colors for unselected state (low opacity with brand accent)
+export function getPlatformBrandStyleSubtle(platform: string): PlatformBrandStyle {
+  const p = platform.toLowerCase();
+
+  // Steam
+  if (p.includes('steam')) {
+    return {
+      bg: 'bg-[#1b2838]/30',
+      text: 'text-[#66c0f4]',
+      border: 'border-[#66c0f4]/20',
+    };
+  }
+
+  // PlayStation
+  if (p.includes('playstation') || p.includes('ps5') || p.includes('ps4') || p.includes('ps3') || p.includes('ps2') || p.includes('ps1') || p.includes('psp') || p.includes('vita') || p === 'psn') {
+    return {
+      bg: 'bg-[#003087]/20',
+      text: 'text-[#0070d1]',
+      border: 'border-[#0070d1]/20',
+    };
+  }
+
+  // Xbox
+  if (p.includes('xbox') || p.includes('series x') || p.includes('series s')) {
+    return {
+      bg: 'bg-[#107c10]/20',
+      text: 'text-[#52b043]',
+      border: 'border-[#52b043]/20',
+    };
+  }
+
+  // Nintendo
+  if (p.includes('nintendo') || p.includes('switch') || p.includes('wii') || p.includes('3ds') || p.includes('ds') || p.includes('gamecube') || p.includes('n64') || p.includes('snes') || p.includes('nes') || p.includes('game boy') || p.includes('gba')) {
+    return {
+      bg: 'bg-[#e60012]/15',
+      text: 'text-[#ff4554]',
+      border: 'border-[#ff4554]/20',
+    };
+  }
+
+  // Epic Games
+  if (p.includes('epic')) {
+    return {
+      bg: 'bg-[var(--theme-text-primary)]/10',
+      text: 'text-[var(--theme-text-secondary)]',
+      border: 'border-[var(--theme-text-primary)]/15',
+    };
+  }
+
+  // EA App
+  if (p.includes('ea app') || p.includes('origin')) {
+    return {
+      bg: 'bg-[#ff4747]/15',
+      text: 'text-[#ff6b6b]',
+      border: 'border-[#ff6b6b]/20',
+    };
+  }
+
+  // Battle.net
+  if (p.includes('battle.net') || p.includes('blizzard')) {
+    return {
+      bg: 'bg-[#00aeff]/15',
+      text: 'text-[#00c8ff]',
+      border: 'border-[#00c8ff]/20',
+    };
+  }
+
+  // GOG
+  if (p.includes('gog')) {
+    return {
+      bg: 'bg-[#a855f7]/15',
+      text: 'text-[#c084fc]',
+      border: 'border-[#c084fc]/20',
+    };
+  }
+
+  // Ubisoft Connect
+  if (p.includes('ubisoft')) {
+    return {
+      bg: 'bg-[#0070ff]/15',
+      text: 'text-[#3d9aff]',
+      border: 'border-[#3d9aff]/20',
+    };
+  }
+
+  // Physical
+  if (p.includes('physical') || p.includes('dvd') || p.includes('disc')) {
+    return {
+      bg: 'bg-amber-600/15',
+      text: 'text-amber-400',
+      border: 'border-amber-500/20',
+    };
+  }
+
+  // PC / Windows
+  if (p.includes('pc') || p.includes('windows')) {
+    return {
+      bg: 'bg-[#0078D4]/20',
+      text: 'text-[#00a2ff]',
+      border: 'border-[#0078D4]/20',
+    };
+  }
+
+  // Default fallback
+  return {
+    bg: 'bg-white/5',
+    text: 'text-[var(--theme-text-muted)]',
+    border: 'border-white/[0.05]',
   };
 }
 
