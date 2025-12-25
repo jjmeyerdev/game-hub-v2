@@ -1,6 +1,7 @@
 'use client';
 
 import { RefObject } from 'react';
+import Image from 'next/image';
 import { Search, Loader2, Gamepad2, Database } from 'lucide-react';
 import type { IGDBGame } from '@/lib/types';
 
@@ -89,9 +90,9 @@ export function IGDBSearchSection({
                       onClick={() => onSelectGame(game)}
                       className="w-full flex items-start gap-3 p-3 hover:bg-[var(--theme-hover-bg)] transition-all border-b border-[var(--theme-border)] last:border-0 group"
                     >
-                      <div className="flex-shrink-0 w-10 h-14 bg-[var(--theme-hover-bg)] rounded-lg overflow-hidden border border-[var(--theme-border)] group-hover:border-[var(--theme-border-hover)] transition-all">
+                      <div className="flex-shrink-0 w-10 h-14 bg-[var(--theme-hover-bg)] rounded-lg overflow-hidden border border-[var(--theme-border)] group-hover:border-[var(--theme-border-hover)] transition-all relative">
                         {game.cover ? (
-                          <img src={game.cover} alt={game.name} className="w-full h-full object-cover" />
+                          <Image src={game.cover} alt={game.name} fill className="object-cover" sizes="40px" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Gamepad2 className="w-4 h-4 text-[var(--theme-text-subtle)]" />

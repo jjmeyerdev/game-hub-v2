@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Layers,
   Flame,
@@ -107,7 +108,7 @@ function BacklogGameCard({
       {/* Cover Art */}
       <div className="relative flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-[var(--theme-border)] group-hover:border-white/[0.12] transition-colors">
         {coverUrl ? (
-          <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
+          <Image src={coverUrl} alt={title} fill className="object-cover" sizes="48px" />
         ) : (
           <div className="w-full h-full bg-[var(--theme-hover-bg)] flex items-center justify-center">
             <Gamepad2 className="w-5 h-5 text-[var(--theme-text-subtle)]" />

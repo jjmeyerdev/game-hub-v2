@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { X, Scan, AlertTriangle, CheckCircle, Loader2, Trash2, Gamepad2, Clock, Trophy, Layers, Sparkles, RotateCw, RefreshCcw, ChevronRight, Star, Shield, Merge, ArrowLeft, Check, Square, CheckSquare } from 'lucide-react';
 import { findDuplicateGames, mergeDuplicateGames, deleteUserGame, dismissDuplicateGroup, clearAllDismissedDuplicates } from '@/lib/actions/games';
 import type { DuplicateGroup, UserGame, Game } from '@/lib/actions/games';
@@ -579,9 +580,11 @@ export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: Dup
 
                         {/* Cover */}
                         {game?.cover_url ? (
-                          <img src={game.cover_url} alt={game.title} className="w-14 h-18 object-cover rounded-lg" />
+                          <div className="relative w-14 h-[72px] rounded-lg overflow-hidden">
+                            <Image src={game.cover_url} alt={game.title} fill className="object-cover" sizes="56px" />
+                          </div>
                         ) : (
-                          <div className="w-14 h-18 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
+                          <div className="w-14 h-[72px] rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center">
                             <Gamepad2 className="w-5 h-5 text-[var(--theme-text-primary)]/20" />
                           </div>
                         )}

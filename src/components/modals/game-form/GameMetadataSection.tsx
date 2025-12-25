@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import {
   RefreshCw,
   Loader2,
@@ -164,7 +165,7 @@ export function GameMetadataSection({
         <div className="flex-shrink-0">
           <div className="w-24 h-32 bg-[var(--theme-hover-bg)] rounded-xl overflow-hidden border border-[var(--theme-border)] relative group">
             {coverUrl ? (
-              <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
+              <Image src={coverUrl} alt="Cover" fill className="object-cover" sizes="96px" />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-[var(--theme-text-subtle)]">
                 <ImageIcon className="w-8 h-8 mb-1" />

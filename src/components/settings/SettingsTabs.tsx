@@ -42,8 +42,8 @@ interface SettingsTabsProps {
   userEmail: string;
 }
 
-const tabs: Tab[] = [
-  {
+const tabsConfig: Record<TabId, Tab> = {
+  platforms: {
     id: 'platforms',
     label: 'Platforms',
     terminalLabel: 'PLATFORM_LINKS',
@@ -51,7 +51,7 @@ const tabs: Tab[] = [
     icon: Gamepad2,
     color: 'cyan'
   },
-  {
+  account: {
     id: 'account',
     label: 'Account',
     terminalLabel: 'USER_IDENTITY',
@@ -59,7 +59,7 @@ const tabs: Tab[] = [
     icon: User,
     color: 'violet'
   },
-  {
+  notifications: {
     id: 'notifications',
     label: 'Notifications',
     terminalLabel: 'ALERT_CONFIG',
@@ -67,7 +67,7 @@ const tabs: Tab[] = [
     icon: Bell,
     color: 'amber'
   },
-  {
+  privacy: {
     id: 'privacy',
     label: 'Privacy',
     terminalLabel: 'SECURITY_LAYER',
@@ -75,7 +75,10 @@ const tabs: Tab[] = [
     icon: Shield,
     color: 'emerald'
   },
-];
+};
+
+// Derive array for iteration while keeping Record for type-safe lookups
+const tabs = Object.values(tabsConfig);
 
 const colorConfig = {
   cyan: {
@@ -110,7 +113,7 @@ const colorConfig = {
 
 export default function SettingsTabs({ profile, userEmail }: SettingsTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('platforms');
-  const activeTabData = tabs.find(t => t.id === activeTab)!;
+  const activeTabData = tabsConfig[activeTab];
   const colors = colorConfig[activeTabData.color];
 
   return (

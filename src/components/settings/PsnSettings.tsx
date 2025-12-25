@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Loader2, Link as LinkIcon, Unlink, RefreshCw, CheckCircle, XCircle, Trophy, Copy, Check, ChevronDown } from 'lucide-react';
 import { getPsnProfile, linkPsnAccount, unlinkPsnAccount, syncPsnLibrary } from '@/lib/actions/psn';
 import { SyncToast } from '@/components/ui/SyncToast';
@@ -178,7 +179,7 @@ export default function PsnSettings() {
           {/* User Row */}
           <div className="flex items-center gap-3">
             {profile.psn_avatar_url ? (
-              <img src={profile.psn_avatar_url} alt={profile.psn_online_id || 'PSN'} className="w-10 h-10 rounded-lg border border-blue-600/30" />
+              <Image src={profile.psn_avatar_url} alt={profile.psn_online_id || 'PSN'} width={40} height={40} className="rounded-lg border border-blue-600/30" />
             ) : (
               <div className="w-10 h-10 rounded-lg border border-blue-600/30 bg-blue-600/10 flex items-center justify-center">
                 <Trophy className="w-5 h-5 text-blue-400" />
