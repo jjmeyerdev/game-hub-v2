@@ -12,7 +12,7 @@ interface DeleteConfirmModalProps {
   userGame: UserGame | null;
 }
 
-export default function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGame }: DeleteConfirmModalProps) {
+export function DeleteConfirmModal({ isOpen, onClose, onSuccess, userGame }: DeleteConfirmModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

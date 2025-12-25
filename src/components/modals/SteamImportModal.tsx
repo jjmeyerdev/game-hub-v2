@@ -12,7 +12,7 @@ interface SteamImportModalProps {
   onSuccess: () => void;
 }
 
-export default function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModalProps) {
+export function SteamImportModal({ isOpen, onClose, onSuccess }: SteamImportModalProps) {
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<SteamSyncResult | null>(null);
   const [error, setError] = useState('');

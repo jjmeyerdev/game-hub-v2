@@ -15,7 +15,7 @@ interface DuplicateFinderModalProps {
 type ScanPhase = 'idle' | 'scanning' | 'complete';
 type ViewMode = 'choose' | 'merge-select';
 
-export default function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFinderModalProps) {
+export function DuplicateFinderModal({ isOpen, onClose, onSuccess }: DuplicateFinderModalProps) {
   const [phase, setPhase] = useState<ScanPhase>('idle');
   const [duplicates, setDuplicates] = useState<DuplicateGroup[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);

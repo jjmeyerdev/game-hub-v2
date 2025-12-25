@@ -27,7 +27,7 @@ interface GameFormModalProps {
   userGame?: UserGame | null;
 }
 
-export default function GameFormModal({
+export function GameFormModal({
   isOpen,
   onClose,
   onSuccess,
