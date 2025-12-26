@@ -49,9 +49,12 @@ export {
   mergeStatsAcrossCopies,
   mergeSelectedKeepRest,
   dismissDuplicateGroup,
+  getDismissedPairsCount,
+  clearDismissedPairsForGames,
+  clearAllDismissedDuplicates,
+  // Deprecated exports (kept for backward compatibility)
   getDismissedDuplicates,
   clearDismissedDuplicate,
-  clearAllDismissedDuplicates,
 } from './duplicates';
 
 // Platform scanning and sync

@@ -40,6 +40,7 @@ export interface UserGame {
   locked_fields: LockedFields | null;
   achievements_earned: number;
   achievements_total: number;
+  completed_at: string | null;
   hidden: boolean;
   owned: boolean; // Deprecated, use ownership_status
   ownership_status: OwnershipStatus;
