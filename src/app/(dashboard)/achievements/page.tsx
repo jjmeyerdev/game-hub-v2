@@ -16,6 +16,7 @@ import {
   PlatformCard,
   AlmostCompleteCard,
   GameProgressCard,
+  PerfectGameCard,
 } from '@/components/achievements';
 
 export default async function AchievementsPage() {
@@ -256,36 +257,42 @@ export default async function AchievementsPage() {
           </section>
         )}
 
-        {/* Perfect Games Section */}
-        {stats.perfectGames > 0 && (
+        {/* Completed Games - Hall of Fame */}
+        {stats.perfectGamesList.length > 0 && (
           <section className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-            <div className="relative bg-theme-secondary border border-amber-500/20 rounded-xl p-6 overflow-hidden">
+            <div className="flex items-center gap-4 mb-5">
+              <Crown className="w-4 h-4 text-amber-400" />
+              <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
+                // HALL_OF_FAME
+              </span>
+              <div className="flex-1 h-px bg-linear-to-r from-amber-500/30 to-transparent" />
+              <span className="text-[10px] font-mono text-amber-400/60 uppercase">
+                {stats.perfectGames} perfected
+              </span>
+            </div>
+
+            {/* Header card */}
+            <div className="relative bg-theme-secondary border border-amber-500/20 rounded-xl p-5 mb-5 overflow-hidden">
+              {/* Animated golden shimmer */}
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-amber-500/5 to-transparent animate-shimmer" />
+
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-amber-400/40" />
               <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-amber-400/40" />
               <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-amber-400/40" />
               <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-amber-400/40" />
 
-              {/* Subtle gradient */}
-              <div className="absolute inset-0 bg-linear-to-r from-amber-500/3 to-transparent" />
-
-              <div className="relative flex items-center gap-6">
-                <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
-                  <Crown className="w-7 h-7 text-amber-400" />
+              <div className="relative flex items-center gap-5">
+                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                  <Trophy className="w-6 h-6 text-void" />
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-bold text-white font-family-display">
-                      PERFECTIONIST
-                    </h3>
-                    <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[10px] font-mono text-amber-400 uppercase">
-                      {stats.perfectGames} games
-                    </span>
-                  </div>
+                  <h3 className="text-lg font-bold text-white font-family-display mb-0.5">
+                    COMPLETIONIST
+                  </h3>
                   <p className="text-sm text-theme-muted">
-                    You&apos;ve achieved 100% completion on {stats.perfectGames} game
-                    {stats.perfectGames !== 1 ? 's' : ''}. That&apos;s dedication!
+                    {stats.perfectGames} game{stats.perfectGames !== 1 ? 's' : ''} with 100% achievement completion
                   </p>
                 </div>
 
@@ -304,6 +311,19 @@ export default async function AchievementsPage() {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Perfect games grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {stats.perfectGamesList.map((item, index) => (
+                <PerfectGameCard
+                  key={item.userGame.id}
+                  userGame={item.userGame}
+                  totalAchievements={item.totalAchievements}
+                  index={index}
+                  variant="standard"
+                />
+              ))}
             </div>
           </section>
         )}
