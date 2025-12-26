@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Game Hub is a unified game library aggregation platform built with Next.js 16. The application solves the fragmentation problem for multi-platform gamers by providing a single dashboard to track games, achievements, playtime, and progress across Steam, PlayStation, Xbox, Epic Games, and other platforms.
 
-**Current Phase**: MVP/Landing Page - The project currently has a landing page with cyber-gaming aesthetic. Future phases will implement Steam integration, multi-platform support, backlog management, and social features.
+**Current Phase**: Phase 3 (Intelligence) - Phases 1 (Foundation) and 2 (Multi-Platform) are complete. The app has full Steam, PlayStation, and Xbox integration with library sync, achievement tracking, and cross-platform friend comparison. Phase 3 focuses on smart recommendations, priority systems, custom tags, and playtime analytics.
 
 ## Development Commands
 
@@ -148,19 +148,36 @@ Currently, the landing page demonstrates:
 - Feature stat cards with hover effects
 - Background effects (animated orbs, grid patterns) using fixed positioning
 
-## Future Architecture (from Overview.md)
+## Development Roadmap
 
-The following features are planned but not yet implemented:
+**Phase 1 (Foundation)** ✅ Complete
+- Steam library sync with playtime and achievements
+- IGDB metadata enrichment
+- Manual backlog management
+- Per-game notes and status tracking
 
-**Phase 1 (MVP)**: Steam integration, basic library display with IGDB metadata, manual backlog management, per-game notes
+**Phase 2 (Multi-Platform)** ✅ Complete
+- PlayStation Network sync with trophies
+- Xbox Live integration with achievements
+- Cross-platform friend comparison
+- Unified achievement tracking across platforms
 
-**Phase 2**: Multi-platform support (PlayStation, Xbox, Epic), cross-platform friend comparisons, achievement tracking
+**Phase 3 (Intelligence)** 🔄 In Progress
+- Smart recommendations
+- Priority queue system
+- Custom tags and lists
+- Playtime analytics
 
-**Phase 3**: Intelligent recommendations, priority system, custom tags and lists
+**Phase 4 (Social)** - Planned
+- Persistent friend lists
+- Activity feeds and leaderboards
+- Session planning
+- Release calendar and price tracking
 
-**Phase 4**: Session planning, social features, release calendar, price tracking
-
-**Phase 5**: Screenshot aggregation, gaming journal, timeline views
+**Phase 5 (Journal)** - Planned
+- Screenshot aggregation
+- Gaming journal
+- Timeline views
 
 ### Planned Data Sources
 

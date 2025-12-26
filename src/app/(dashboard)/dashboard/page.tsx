@@ -136,8 +136,8 @@ export default function DashboardPage() {
                 </span>
               </div>
               <div className="flex-1 h-px bg-linear-to-r from-border to-transparent" />
-              <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-mono font-medium text-emerald-400/80 uppercase tracking-wider">
-                Phase 2 Active
+              <span className="px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-lg text-[10px] font-mono font-medium text-cyan-400/80 uppercase tracking-wider">
+                Phase 3 Active
               </span>
             </div>
 
@@ -182,65 +182,65 @@ export default function DashboardPage() {
                   </ul>
                 </div>
 
-                {/* Phase 2 - In Progress */}
+                {/* Phase 2 - Complete */}
+                <div className="group relative p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                      <span className="text-xs font-bold text-emerald-400">2</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Multi-Platform</h4>
+                      <span className="text-[10px] font-mono text-emerald-400/60 uppercase">Complete</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-theme-muted">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      PlayStation Network sync
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      Xbox Live integration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      Cross-platform comparison
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      Achievement tracking
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Phase 3 - In Progress */}
                 <div className="group relative p-5 rounded-xl bg-cyan-500/5 border border-cyan-500/30 transition-all hover:border-cyan-500/50 ring-1 ring-cyan-500/20">
                   <div className="absolute -top-px left-4 right-4 h-px bg-linear-to-r from-transparent via-cyan-400 to-transparent" />
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center relative">
-                      <span className="text-xs font-bold text-cyan-400">2</span>
+                      <span className="text-xs font-bold text-cyan-400">3</span>
                       <div className="absolute inset-0 rounded-lg bg-cyan-400/20 animate-ping" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide">Multi-Platform</h4>
+                      <h4 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide">Intelligence</h4>
                       <span className="text-[10px] font-mono text-cyan-400/60 uppercase">In Progress</span>
                     </div>
                   </div>
                   <ul className="space-y-1.5 text-xs text-theme-muted">
                     <li className="flex items-center gap-2">
                       <div className="w-1 h-1 rounded-full bg-cyan-400" />
-                      PlayStation Network sync
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
-                      Xbox Live integration
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
-                      Cross-platform friends
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
-                      Achievement tracking
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Phase 3 - Upcoming */}
-                <div className="group relative p-5 rounded-xl bg-theme-hover border border-theme transition-all hover:border-theme-hover">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                      <span className="text-xs font-bold text-violet-400/60">3</span>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-theme-muted uppercase tracking-wide">Intelligence</h4>
-                      <span className="text-[10px] font-mono text-theme-subtle uppercase">Upcoming</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-1.5 text-xs text-theme-subtle">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
                       Smart recommendations
                     </li>
                     <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
                       Priority queue system
                     </li>
                     <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
                       Custom tags & lists
                     </li>
                     <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
                       Playtime analytics
                     </li>
                   </ul>
