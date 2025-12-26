@@ -119,7 +119,7 @@ export default function DashboardPage() {
           />
         </section>
 
-        {/* Recent Activity - Coming Soon */}
+        {/* Development Roadmap */}
         {userGames.length > 0 && (
           <section
             className="relative animate-fade-in-up"
@@ -132,44 +132,134 @@ export default function DashboardPage() {
                   <Activity className="w-3.5 h-3.5 text-amber-400" />
                 </div>
                 <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
-                  // RECENT_ACTIVITY
+                  // DEVELOPMENT_ROADMAP
                 </span>
               </div>
               <div className="flex-1 h-px bg-linear-to-r from-border to-transparent" />
-              <span className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg text-[10px] font-mono font-medium text-amber-400/80 uppercase tracking-wider">
-                Coming Soon
+              <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-[10px] font-mono font-medium text-emerald-400/80 uppercase tracking-wider">
+                Phase 2 Active
               </span>
             </div>
 
-            {/* Coming soon card */}
-            <div className="relative overflow-hidden rounded-2xl border border-theme bg-theme-secondary p-12 group hover:border-theme hover:opacity-80 transition-all duration-300">
+            {/* Roadmap card */}
+            <div className="relative overflow-hidden rounded-2xl border border-theme bg-theme-secondary p-8">
               {/* HUD corners */}
               <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/30" />
               <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/30" />
               <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/30" />
               <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/30" />
 
-              {/* Subtle gradient background */}
-              <div className="absolute inset-0 bg-linear-to-br from-amber-500/2 via-transparent to-violet-500/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-              <div className="relative flex flex-col items-center justify-center text-center">
-                <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-4">// TIMELINE_PREVIEW</span>
-                <div className="relative w-16 h-16 rounded-2xl bg-linear-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300">
-                  <Sparkles className="w-7 h-7 text-amber-400" />
-                  {/* Mini HUD corners */}
-                  <div className="absolute -top-1 -left-1 w-2 h-2 border-l border-t border-amber-400/50" />
-                  <div className="absolute -top-1 -right-1 w-2 h-2 border-r border-t border-amber-400/50" />
-                  <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l border-b border-amber-400/50" />
-                  <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r border-b border-amber-400/50" />
+              {/* Roadmap timeline */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {/* Phase 1 - Complete */}
+                <div className="group relative p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                      <span className="text-xs font-bold text-emerald-400">1</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Foundation</h4>
+                      <span className="text-[10px] font-mono text-emerald-400/60 uppercase">Complete</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-theme-muted">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      Steam library sync
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      IGDB metadata enrichment
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      Manual backlog management
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                      Per-game notes & status
+                    </li>
+                  </ul>
                 </div>
 
-                <h3 className="text-base font-bold text-theme-muted mb-2 font-family-display uppercase">
-                  Activity Tracking
-                </h3>
-                <p className="text-sm text-theme-subtle max-w-md leading-relaxed">
-                  Your achievements, milestones, and gaming moments will appear here.
-                  Track your progress and celebrate your victories.
-                </p>
+                {/* Phase 2 - In Progress */}
+                <div className="group relative p-5 rounded-xl bg-cyan-500/5 border border-cyan-500/30 transition-all hover:border-cyan-500/50 ring-1 ring-cyan-500/20">
+                  <div className="absolute -top-px left-4 right-4 h-px bg-linear-to-r from-transparent via-cyan-400 to-transparent" />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center relative">
+                      <span className="text-xs font-bold text-cyan-400">2</span>
+                      <div className="absolute inset-0 rounded-lg bg-cyan-400/20 animate-ping" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide">Multi-Platform</h4>
+                      <span className="text-[10px] font-mono text-cyan-400/60 uppercase">In Progress</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-theme-muted">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
+                      PlayStation Network sync
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
+                      Xbox Live integration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
+                      Cross-platform friends
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-cyan-400" />
+                      Achievement tracking
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Phase 3 - Upcoming */}
+                <div className="group relative p-5 rounded-xl bg-theme-hover border border-theme transition-all hover:border-theme-hover">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+                      <span className="text-xs font-bold text-violet-400/60">3</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-theme-muted uppercase tracking-wide">Intelligence</h4>
+                      <span className="text-[10px] font-mono text-theme-subtle uppercase">Upcoming</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-theme-subtle">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      Smart recommendations
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      Priority queue system
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      Custom tags & lists
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-violet-400/40" />
+                      Playtime analytics
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Future phases hint */}
+              <div className="mt-6 pt-4 border-t border-theme">
+                <div className="flex items-center justify-center gap-6 text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="w-3 h-3 text-amber-400/50" />
+                    Phase 4: Social & Planning
+                  </span>
+                  <span className="text-theme-subtle/30">•</span>
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="w-3 h-3 text-rose-400/50" />
+                    Phase 5: Gaming Journal
+                  </span>
+                </div>
               </div>
             </div>
           </section>

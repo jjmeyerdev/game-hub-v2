@@ -139,7 +139,7 @@ export function DashboardSidebar({
       <div className="mx-6 h-px bg-linear-to-r from-accent-cyan/20 via-border to-transparent" />
 
       {/* Navigation */}
-      <nav className={`flex-1 py-6 overflow-y-auto ${collapsed ? 'px-3' : 'px-4'}`}>
+      <nav className={`flex-1 py-6 overflow-y-auto scrollbar-hide ${collapsed ? 'px-3' : 'px-4'}`}>
         {/* Main Navigation */}
         <div className="mb-8">
           {!collapsed && (

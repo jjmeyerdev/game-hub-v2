@@ -1,10 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { Library, Edit3, Trash2, Eye, EyeOff, Trophy } from 'lucide-react';
+import { Library, Edit3, Trash2, Eye, EyeOff, Trophy, Gamepad2, ShieldOff, Unlock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getPlatformBrandStyle } from '@/lib/constants/platforms';
+import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
+
+const getPlatformIcon = (platform: string) => {
+  const lowerPlatform = platform.toLowerCase();
+  if (lowerPlatform.includes('steam')) return <SteamLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3.5 h-3.5" />;
+  return <Gamepad2 className="w-3.5 h-3.5" />;
+};
 
 interface NowPlayingCardProps {
   game: UserGame;
@@ -91,9 +101,14 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         {/* Platform badge */}
         {(() => {
           const brandStyle = getPlatformBrandStyle(game.platform);
+          const shortPlatform = (() => {
+            const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
+            return match ? match[2] : game.platform;
+          })();
           return (
-            <div className={`absolute top-3 left-3 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-lg backdrop-blur-sm border ${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`}>
-              {game.platform}
+            <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-lg backdrop-blur-sm border ${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`}>
+              {getPlatformIcon(game.platform)}
+              {shortPlatform}
             </div>
           );
         })()}
@@ -126,29 +141,37 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         {isRestricted && isRevealed && (
           <button
             onClick={handleHide}
-            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-theme-hover backdrop-blur-sm hover:bg-card-hover rounded-lg text-xs font-medium text-theme-muted hover:text-theme-primary transition-all border border-theme"
+            className="restricted-hide-btn absolute bottom-3 left-3"
           >
             <EyeOff className="w-3.5 h-3.5" />
-            Hide
+            Restrict
           </button>
         )}
 
         {/* Restricted overlay */}
         {showBlur && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full border border-theme-hover flex items-center justify-center mb-3">
-                <EyeOff className="w-5 h-5 text-theme-muted" />
+          <div className="absolute inset-0 restricted-overlay restricted-stripes flex items-center justify-center">
+            {/* Scanning line effect */}
+            <div className="restricted-scanline" />
+
+            <div className="flex flex-col items-center relative z-10">
+              {/* Shield icon with pulse ring */}
+              <div className="restricted-shield mb-4">
+                <ShieldOff className="w-6 h-6 text-orange-400" />
               </div>
-              <span className="text-[10px] font-medium tracking-[0.2em] text-theme-subtle uppercase mb-4">
-                Restricted
-              </span>
+
+              {/* Restricted badge */}
+              <div className="restricted-badge mb-5">
+                Restricted Content
+              </div>
+
+              {/* Reveal button */}
               <button
                 onClick={handleReveal}
-                className="flex items-center gap-2 px-4 py-2 bg-theme-hover hover:bg-card-hover border border-theme-hover rounded-full text-xs font-medium text-theme-muted hover:text-theme-primary transition-all"
+                className="restricted-reveal-btn"
               >
-                <Eye className="w-3.5 h-3.5" />
-                Reveal
+                <Unlock className="w-4 h-4" />
+                <span>Authorize</span>
               </button>
             </div>
           </div>
