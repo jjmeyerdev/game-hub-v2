@@ -18,7 +18,6 @@ import {
   Target,
   Cpu,
   Database,
-  Wifi,
   Lock,
   Activity,
   Server,
@@ -223,7 +222,7 @@ export default function FeaturesPage() {
                 >
                   <div className="absolute -inset-1 bg-linear-to-r from-cyan-500 to-violet-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
                   <div className="relative flex items-center gap-3 px-8 py-4 bg-linear-to-r from-cyan-500 to-violet-600 rounded-xl">
-                    <Zap className="w-5 h-5 text-white" />
+                    {/* <Zap className="w-5 h-5 text-white" /> */}
                     <span className="font-semibold text-white tracking-wide uppercase font-family-display">
                       Get Started
                     </span>

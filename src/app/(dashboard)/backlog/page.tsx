@@ -21,6 +21,7 @@ import {
 import { useDashboardData } from '@/lib/hooks';
 import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
 import { updateUserGame } from '@/lib/actions/games';
+import { getDisplayPlatform } from '@/lib/constants/platforms';
 import type { UserGame } from '@/lib/actions/games';
 
 type PriorityLevel = 'high' | 'medium' | 'low';
@@ -127,7 +128,7 @@ function BacklogGameCard({
           {title}
         </h4>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-theme-subtle truncate">{game.platform}</span>
+          <span className="text-xs text-theme-subtle truncate">{getDisplayPlatform(game.platform)}</span>
           {isOnHold && (
             <span className="text-[10px] px-1.5 py-0.5 bg-violet-500/10 border border-violet-500/20 rounded text-violet-400">
               On Hold
@@ -280,7 +281,11 @@ export default function BacklogPage() {
       low: [],
     };
     filteredGames.forEach((game) => {
-      const priority = (game.priority as PriorityLevel) ?? 'medium';
+      const gamePriority = game.priority as string;
+      const priority: PriorityLevel =
+        gamePriority === 'high' || gamePriority === 'medium' || gamePriority === 'low'
+          ? gamePriority
+          : 'medium';
       grouped[priority].push(game);
     });
     // Sort each group by title

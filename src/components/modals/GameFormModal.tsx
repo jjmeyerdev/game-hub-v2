@@ -145,7 +145,7 @@ export function GameFormModal({
       setSelectedPriority((userGame.priority as PriorityKey) ?? 'medium');
       setIsHidden(userGame.hidden ?? false);
       setIsAdult(userGame.tags?.includes('adult') ?? false);
-      setOwnershipStatus((userGame.ownership_status ?? (userGame.owned ? 'owned' : 'wishlist')) as 'owned' | 'wishlist' | 'unowned');
+      setOwnershipStatus((userGame.ownership_status ?? 'owned') as 'owned' | 'wishlist' | 'unowned');
       setIsPhysical(userGame.is_physical ?? false);
       setPlaytimeHours(userGame.playtime_hours?.toString() ?? '');
       setCompletionPercentage(userGame.completion_percentage?.toString() ?? '');

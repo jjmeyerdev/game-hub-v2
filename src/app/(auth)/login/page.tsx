@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { Gamepad2, ArrowLeft, Loader2, AlertCircle, Shield, Zap } from 'lucide-react';
+import { Gamepad2, ArrowLeft, Loader2, AlertCircle, Shield } from 'lucide-react';
 import { signIn } from '@/lib/actions/auth/auth';
 import {
   SteamLogo,
@@ -304,7 +304,7 @@ function SubmitButton() {
           </>
         ) : (
           <>
-            <Zap className="w-5 h-5 text-white" />
+            {/* <Zap className="w-5 h-5 text-white" /> */}
             <span className="font-semibold text-white tracking-wide uppercase font-family-display">
               Sign In
             </span>

@@ -83,6 +83,19 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'cdn.akamai.steamstatic.com',
       },
+      // Epic Games Store images
+      {
+        protocol: 'https',
+        hostname: 'cdn1.epicgames.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn2.epicgames.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.epicgames.com',
+      },
     ],
   },
 };
