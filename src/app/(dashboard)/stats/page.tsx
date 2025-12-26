@@ -50,9 +50,9 @@ export default function StatsPage() {
   ];
 
   const timeline = [
-    { phase: 'Phase 3', quarter: 'Q3 2026', title: 'Core Analytics', description: 'Basic dashboard with essential metrics', color: 'cyan', progress: 45 },
-    { phase: 'Phase 4', quarter: 'Q4 2026', title: 'Advanced Analytics', description: 'AI-powered insights and predictions', color: 'violet', progress: 15 },
-    { phase: 'Phase 5', quarter: 'Q1 2027', title: 'Social Analytics', description: 'Compare stats with friends and community', color: 'emerald', progress: 0 },
+    { phase: 'Phase 3', status: 'In Progress', title: 'Core Analytics', description: 'Playtime tracking, genre insights, completion analytics', color: 'cyan', progress: 35 },
+    { phase: 'Phase 4', status: 'Planned', title: 'Advanced Analytics', description: 'AI-powered recommendations and predictions', color: 'violet', progress: 0 },
+    { phase: 'Phase 5', status: 'Planned', title: 'Historical Analytics', description: 'Gaming journal, timeline views, activity heatmaps', color: 'emerald', progress: 0 },
   ];
 
   const accentColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
@@ -231,7 +231,7 @@ export default function StatsPage() {
                           {item.phase}
                         </span>
                         <span className="text-[10px] text-theme-subtle">•</span>
-                        <span className="text-[10px] font-mono text-theme-subtle">{item.quarter}</span>
+                        <span className={`text-[10px] font-mono ${item.status === 'In Progress' ? colors.text : 'text-theme-subtle'}`}>{item.status}</span>
                       </div>
                       <h4 className="font-semibold text-white mb-1 font-family-display">{item.title}</h4>
                       <p className="text-sm text-theme-subtle">{item.description}</p>
