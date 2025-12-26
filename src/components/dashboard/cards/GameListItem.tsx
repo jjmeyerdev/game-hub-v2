@@ -1,5 +1,6 @@
 import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar } from 'lucide-react';
 import type { UserGame } from '@/lib/actions/games';
+import { getDisplayPlatform } from '@/lib/constants/platforms';
 
 interface GameListItemProps {
   game: UserGame;
@@ -102,7 +103,7 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-theme-secondary border border-theme rounded-md text-xs font-bold text-cyan-400 uppercase tracking-wider">
                     <Gamepad2 className="w-3 h-3" />
-                    {game.platform}
+                    {getDisplayPlatform(game.platform)}
                   </span>
                   <span className={`text-sm font-bold uppercase tracking-wider ${STATUS_COLORS[game.status] || 'text-gray-400'}`}>
                     {STATUS_LABELS[game.status] || game.status}

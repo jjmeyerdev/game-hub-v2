@@ -23,7 +23,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
-import { isPcPlatform, getPlatformBrandStyle } from '@/lib/constants/platforms';
+import { isPcPlatform, getPlatformBrandStyle, getDisplayPlatform } from '@/lib/constants/platforms';
 import { getPlatformLogo, StatCard, InfoRow, AchievementsSection } from '@/components/game';
 import type { UserGame } from '@/lib/actions/games';
 import { getGameAchievements, type NormalizedAchievement } from '@/lib/actions/games';
@@ -217,14 +217,14 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
                     {getPlatformLogo(game.platform, 'w-4 h-4')}
                   </span>
                   <span className={`text-[11px] font-mono font-semibold uppercase tracking-wider ${brandStyle.text}`}>
-                    {game.platform}
+                    {getDisplayPlatform(game.platform)}
                   </span>
                 </div>
 
                 {/* Title */}
                 <div>
                   <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-2 block">// GAME_DATA</span>
-                  <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight uppercase tracking-wide font-family-display">
+                  <h1 className="text-4xl lg:text-5xl font-bold text-theme-primary leading-tight uppercase tracking-wide font-family-display">
                     {game.game?.title}
                   </h1>
                 </div>

@@ -185,6 +185,10 @@ export function ConsoleFilter({
   }, [userGames, selectedPlatforms, selectedSources]);
 
   const allowedFamilies = useMemo(() => {
+    // Manual source shows all console families since manually-added games can be from any platform
+    if (selectedSources.includes('manual')) {
+      return []; // Empty array means show all families
+    }
     const families: string[] = [];
     if (selectedPlatforms.some((p) => p.toLowerCase().includes('playstation'))) families.push('PlayStation');
     if (selectedPlatforms.some((p) => p.toLowerCase().includes('xbox'))) families.push('Xbox');

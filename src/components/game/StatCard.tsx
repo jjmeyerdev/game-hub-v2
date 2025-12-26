@@ -25,7 +25,7 @@ export function StatCard({ icon, label, value, color }: StatCardProps) {
 
       <div className={`${c.text} mb-2`}>{icon}</div>
       <div className="text-[10px] font-mono text-theme-muted mb-1 uppercase tracking-wider">{label}</div>
-      <div className="text-lg font-bold text-white font-family-display">{value}</div>
+      <div className="text-lg font-bold text-theme-primary font-family-display">{value}</div>
     </div>
   );
 }

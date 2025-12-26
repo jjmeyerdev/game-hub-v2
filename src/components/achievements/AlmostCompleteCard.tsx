@@ -50,7 +50,7 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-white truncate text-sm group-hover:text-violet-200 transition-colors">
+            <h4 className="font-medium text-theme-primary truncate text-sm group-hover:text-violet-300 transition-colors">
               {title}
             </h4>
             <div className="flex items-center gap-2 mt-1">

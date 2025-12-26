@@ -137,7 +137,7 @@ export function AchievementsSection({
             <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-amber-400/50" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wide font-family-display flex items-center gap-2">
+            <h3 className="text-lg font-bold text-theme-primary uppercase tracking-wide font-family-display flex items-center gap-2">
               {termLabel}
               <span className="text-[10px] font-mono text-theme-subtle font-normal">// {isPlayStation ? 'PSN_TROPHIES' : isXbox ? 'XBOX_ACHIEVEMENTS' : 'PROGRESS_TRACKING'}</span>
             </h3>

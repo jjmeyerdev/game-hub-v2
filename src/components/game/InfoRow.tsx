@@ -19,7 +19,7 @@ export function InfoRow({ icon, label, value, color }: InfoRowProps) {
       <span className={c.text}>{icon}</span>
       <div className="flex-1">
         <div className="text-[9px] font-mono text-theme-subtle uppercase tracking-wider">{label}</div>
-        <div className="text-sm font-medium text-white">{value}</div>
+        <div className="text-sm font-medium text-theme-primary">{value}</div>
       </div>
     </div>
   );

@@ -82,7 +82,7 @@ export default function FriendsPage() {
               <div className="flex items-start justify-between">
                 <div className="max-w-2xl">
                   <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-2 block">// COMPARE_STATS</span>
-                  <h1 className="text-4xl font-bold text-white mb-4 tracking-tight font-family-display">
+                  <h1 className="text-4xl font-bold text-theme-primary mb-4 tracking-tight font-family-display">
                     COMPARE
                   </h1>
                   <p className="text-lg text-theme-muted leading-relaxed">
@@ -183,7 +183,7 @@ export default function FriendsPage() {
             <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-4">
               <Users className="w-6 h-6 text-violet-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 font-family-display">
+            <h3 className="text-xl font-bold text-theme-primary mb-2 font-family-display">
               FULL SOCIAL FEATURES COMING SOON
             </h3>
             <p className="text-sm text-theme-muted mb-6 max-w-md mx-auto">

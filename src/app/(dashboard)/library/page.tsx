@@ -20,7 +20,7 @@ type ViewMode = 'grid' | 'list';
 const STORAGE_KEY = 'game-hub-library-sort';
 
 const PRIORITY_OPTIONS = [
-  { id: 'all', label: 'All Priorities', icon: null, color: '', activeClass: 'bg-white/10 text-white' },
+  { id: 'all', label: 'All Priorities', icon: null, color: '', activeClass: 'bg-theme-active text-theme-primary' },
   { id: 'high', label: 'High', icon: Flame, color: 'text-red-400', activeClass: 'bg-red-500/20 text-red-400 border-red-500/30' },
   { id: 'medium', label: 'Medium', icon: Clock, color: 'text-amber-400', activeClass: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
   { id: 'low', label: 'Low', icon: Coffee, color: 'text-blue-400', activeClass: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
@@ -502,8 +502,8 @@ export default function LibraryPage() {
                 </div>
 
                 {/* Console Filter */}
-                {(selectedPlatforms.some(p => p.toLowerCase().includes('playstation') || p.toLowerCase().includes('xbox')) ||
-                  selectedSources.includes('psn') || selectedSources.includes('xbox')) && (
+                {(selectedPlatforms.some(p => p.toLowerCase().includes('playstation') || p.toLowerCase().includes('xbox') || p.toLowerCase().includes('nintendo')) ||
+                  selectedSources.includes('psn') || selectedSources.includes('xbox') || selectedSources.includes('manual')) && (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Monitor className="w-3.5 h-3.5 text-theme-subtle" />

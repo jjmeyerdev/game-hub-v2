@@ -5,6 +5,7 @@ import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc, Targe
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getGameSyncSource } from '@/lib/utils';
+import { getDisplayPlatform } from '@/lib/constants/platforms';
 import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
 
 interface GameCardProps {
@@ -54,13 +55,13 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
 
   const getStatusConfig = () => {
     switch (game.status) {
-      case 'playing': return { color: 'emerald', label: 'ACTIVE', glow: 'rgba(16, 185, 129, 0.4)' };
-      case 'played': return { color: 'violet', label: 'PLAYED', glow: 'rgba(139, 92, 246, 0.4)' };
-      case 'completed': return { color: 'cyan', label: 'CLEAR', glow: 'rgba(34, 211, 238, 0.4)' };
-      case 'finished': return { color: 'amber', label: '100%', glow: 'rgba(251, 191, 36, 0.4)' };
-      case 'on_hold': return { color: 'rose', label: 'HOLD', glow: 'rgba(251, 113, 133, 0.3)' };
-      case 'dropped': return { color: 'red', label: 'DROP', glow: 'rgba(248, 113, 113, 0.3)' };
-      default: return { color: 'gray', label: 'NEW', glow: 'transparent' };
+      case 'playing': return { color: 'emerald', label: 'PLAYING', glow: 'rgba(16, 185, 129, 0.4)', bg: 'bg-emerald-500', text: 'text-emerald-50' };
+      case 'played': return { color: 'violet', label: 'PLAYED', glow: 'rgba(139, 92, 246, 0.4)', bg: 'bg-violet-500', text: 'text-violet-50' };
+      case 'completed': return { color: 'cyan', label: 'COMPLETE', glow: 'rgba(34, 211, 238, 0.4)', bg: 'bg-cyan-500', text: 'text-cyan-50' };
+      case 'finished': return { color: 'amber', label: '100%', glow: 'rgba(251, 191, 36, 0.4)', bg: 'bg-amber-500', text: 'text-amber-50' };
+      case 'on_hold': return { color: 'rose', label: 'ON HOLD', glow: 'rgba(251, 113, 133, 0.3)', bg: 'bg-rose-500', text: 'text-rose-50' };
+      case 'dropped': return { color: 'red', label: 'DROPPED', glow: 'rgba(248, 113, 113, 0.3)', bg: 'bg-red-500', text: 'text-red-50' };
+      default: return { color: 'gray', label: 'NEW', glow: 'transparent', bg: 'bg-emerald-500', text: 'text-emerald-50' };
     }
   };
 
@@ -68,11 +69,11 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
 
   const getPlatformIcon = (platform: string) => {
     const lowerPlatform = platform.toLowerCase();
-    if (lowerPlatform.includes('steam')) return <SteamLogo className="w-3 h-3" />;
-    if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3 h-3" />;
-    if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3 h-3" />;
-    if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3 h-3" />;
-    return <Gamepad2 className="w-3 h-3" />;
+    if (lowerPlatform.includes('steam')) return <SteamLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('epic')) return <EpicLogo className="w-4 h-4 text-white" />;
+    return <Gamepad2 className="w-4 h-4 text-white" />;
   };
 
   const syncSource = getGameSyncSource(game);
@@ -205,11 +206,11 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
           </div>
         )}
 
-        {/* NEW badge - top right corner */}
+        {/* NEW badge - top right corner, fades on hover to make room for action buttons */}
         {statusConfig.label === 'NEW' && !shouldCensor && (
-          <div className="absolute top-3 right-3 z-30">
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-theme-primary/80 backdrop-blur-md border border-theme rounded-md">
-              <span className="text-[9px] font-bold text-theme-secondary uppercase tracking-wider">NEW</span>
+          <div className="absolute top-3 right-3 z-30 transition-opacity duration-300 group-hover:opacity-0">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500 rounded-md shadow-lg shadow-emerald-500/30">
+              <span className="text-[9px] font-bold text-white uppercase tracking-wider">NEW</span>
             </div>
           </div>
         )}
@@ -228,160 +229,147 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
           </button>
         )}
 
-        {/* Top HUD Bar */}
-        <div className="absolute top-0 left-0 right-0 p-3 z-20">
-          <div className="flex items-center justify-between">
-            {/* Platform + Sync indicator + NEW badge */}
-            <div className="flex items-center gap-1.5">
-              {/* Platform badge - HUD style */}
-              <div className="relative">
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-theme-primary/80 backdrop-blur-md border border-theme rounded-md">
-                  {getPlatformIcon(game.platform)}
-                  <span className="text-[9px] font-bold text-theme-secondary uppercase tracking-wider">
-                    {(() => {
-                      const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
-                      return match ? match[2] : game.platform;
-                    })()}
-                  </span>
-                </div>
-                {/* Sync pulse indicator */}
-                {syncSource && (
-                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2">
-                    <div className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
-                    <div className="absolute inset-0 rounded-full bg-emerald-400" />
-                  </div>
-                )}
+        {/* Top HUD Bar - Platform badge */}
+        <div className="absolute top-0 left-0 p-3 z-20">
+          <div className="flex items-center gap-1.5">
+            {/* Platform badge - HUD style */}
+            <div className="relative">
+              <div className="flex items-center gap-2 px-2.5 py-1.5 bg-black/70 backdrop-blur-md border border-white/20 rounded-lg shadow-lg">
+                {getPlatformIcon(game.platform)}
+                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                  {getDisplayPlatform(game.platform)}
+                </span>
               </div>
+              {/* Sync pulse indicator - only show for synced games, not manual */}
+              {syncSource && syncSource !== 'manual' && (
+                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5">
+                  <div className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                  <div className="absolute inset-0 rounded-full bg-emerald-400 border border-emerald-300" />
+                </div>
+              )}
             </div>
-
-            {/* Status indicators - hidden when NEW badge is showing */}
-            {game.status !== 'new' && game.status !== 'backlog' && (
-              <div className="flex items-center gap-1">
-                {game.is_physical && (
-                  <div className="p-1 bg-amber-500/20 backdrop-blur-sm rounded border border-amber-500/30" title="Physical">
-                    <Disc className="w-3 h-3 text-amber-400" />
-                  </div>
-                )}
-                {game.priority === 'high' && (
-                  <div className="p-1 bg-red-500/20 backdrop-blur-sm rounded border border-red-500/30 animate-pulse" title="Priority">
-                    <Flame className="w-3 h-3 text-red-400" />
-                  </div>
-                )}
-                {isCompleted && (
-                  <div className="p-1 bg-cyan-500/20 backdrop-blur-sm rounded border border-cyan-500/30" title="Completed">
-                    <Trophy className="w-3 h-3 text-cyan-400" />
-                  </div>
-                )}
+            {/* Priority indicator */}
+            {game.priority === 'high' && (
+              <div className="p-1.5 bg-red-500/80 backdrop-blur-sm rounded-lg border border-red-400/30 animate-pulse shadow-lg shadow-red-500/20" title="High Priority">
+                <Flame className="w-3.5 h-3.5 text-white" />
               </div>
             )}
           </div>
         </div>
 
-        {/* Bottom Data Panel */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 z-20 bg-linear-to-t from-theme-primary from-40% via-theme-primary/95 via-70% to-transparent">
-          {/* Title with glitch effect on hover */}
-          <h3 className={`font-bold text-sm leading-tight line-clamp-2 mb-2 transition-all duration-300 ${
-            shouldCensor
-              ? 'text-theme-primary/10 blur-sm'
-              : 'text-theme-primary group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-linear-to-r group-hover:from-cyan-400 group-hover:to-violet-400'
-          }`}>
-            {game.game?.title || 'UNTITLED'}
-          </h3>
+        {/* Bottom Data Panel - Solid dark overlay for universal readability */}
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          {/* Gradient fade from image to solid panel */}
+          <div className="h-12 bg-gradient-to-t from-black/95 to-transparent" />
 
-          {!shouldCensor && (
-            <>
-              {/* Stats Row - HUD style */}
-              <div className="flex items-center gap-3 mb-2">
-                {hasPlaytime && (
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-cyan-400/70" />
-                    <span className="text-[10px] font-mono font-bold text-theme-muted">
-                      {formatPlaytime(game.playtime_hours)}
-                    </span>
-                  </div>
-                )}
-                {hasAchievements && (
-                  <div className="flex items-center gap-1">
-                    <Trophy className="w-3 h-3 text-amber-400/70" />
-                    <span className="text-[10px] font-mono font-bold text-theme-muted">
-                      {game.achievements_earned}/{game.achievements_total}
-                    </span>
-                  </div>
-                )}
-                {completionPercent > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-violet-400/70" />
-                    <span className="text-[10px] font-mono font-bold text-theme-muted">
-                      {completionPercent}%
-                    </span>
-                  </div>
-                )}
-              </div>
+          {/* Solid panel with content */}
+          <div className="bg-black/95 dark:bg-black/90 px-3 pb-3 -mt-px">
+            {/* Title - always white on dark background for maximum readability */}
+            <h3 className={`font-bold text-sm leading-tight line-clamp-2 mb-2 transition-all duration-300 ${
+              shouldCensor
+                ? 'text-white/10 blur-sm'
+                : 'text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-violet-400'
+            }`}>
+              {game.game?.title || 'UNTITLED'}
+            </h3>
 
-              {/* Progress bar with status indicator */}
-              <div className="relative">
-                {/* Background track */}
-                <div className="h-1 bg-text-primary/8 rounded-full overflow-hidden">
-                  {/* Completion fill */}
-                  <div
-                    className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
-                    style={{
-                      width: `${hasAchievements ? achievementPercent : (completionPercent || (game.status === 'completed' ? 100 : game.status === 'playing' ? 50 : 0))}%`,
-                      background: `linear-gradient(90deg,
-                        ${statusConfig.color === 'emerald' ? '#10b981' :
-                          statusConfig.color === 'cyan' ? '#22d3ee' :
-                          statusConfig.color === 'violet' ? '#8b5cf6' :
-                          statusConfig.color === 'amber' ? '#fbbf24' :
-                          statusConfig.color === 'rose' ? '#fb7185' :
-                          statusConfig.color === 'red' ? '#f87171' : '#6b7280'},
-                        ${statusConfig.color === 'emerald' ? '#34d399' :
-                          statusConfig.color === 'cyan' ? '#67e8f9' :
-                          statusConfig.color === 'violet' ? '#a78bfa' :
-                          statusConfig.color === 'amber' ? '#fcd34d' :
-                          statusConfig.color === 'rose' ? '#fda4af' :
-                          statusConfig.color === 'red' ? '#fca5a5' : '#9ca3af'})`,
-                    }}
-                  >
-                    {/* Animated shine */}
-                    <div
-                      className="absolute inset-0 opacity-50"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
-                        animation: 'progressShine 2s ease-in-out infinite',
-                      }}
-                    />
-                  </div>
+            {!shouldCensor && (
+              <>
+                {/* Stats Row - Pill badges with solid backgrounds */}
+                <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                  {hasPlaytime && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-white/15 rounded-full">
+                      <Clock className="w-3 h-3 text-cyan-400" />
+                      <span className="text-[10px] font-mono font-semibold text-white/90">
+                        {formatPlaytime(game.playtime_hours)}
+                      </span>
+                    </div>
+                  )}
+                  {hasAchievements && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-white/15 rounded-full">
+                      <Trophy className="w-3 h-3 text-amber-400" />
+                      <span className="text-[10px] font-mono font-semibold text-white/90">
+                        {game.achievements_earned}/{game.achievements_total}
+                      </span>
+                    </div>
+                  )}
+                  {completionPercent > 0 && !hasAchievements && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-white/15 rounded-full">
+                      <Zap className="w-3 h-3 text-violet-400" />
+                      <span className="text-[10px] font-mono font-semibold text-white/90">
+                        {completionPercent}%
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Status label - only show non-NEW statuses */}
-                {statusConfig.label !== 'NEW' && (
-                  <div className="absolute -top-5 right-0 flex items-center gap-1">
-                    <span className={`text-[8px] font-bold tracking-[0.15em] uppercase ${
-                      statusConfig.color === 'emerald' ? 'text-emerald-400' :
-                      statusConfig.color === 'cyan' ? 'text-cyan-400' :
-                      statusConfig.color === 'violet' ? 'text-violet-400' :
-                      statusConfig.color === 'amber' ? 'text-amber-400' :
-                      statusConfig.color === 'rose' ? 'text-rose-400' :
-                      statusConfig.color === 'red' ? 'text-red-400' : 'text-theme-subtle'
-                    }`}>
-                      {statusConfig.label}
-                    </span>
+                {/* Progress bar with status badge */}
+                <div className="relative">
+                  {/* Status badge - positioned above progress bar */}
+                  {statusConfig.label !== 'NEW' && (
+                    <div className="absolute -top-5 right-0">
+                      <span className={`inline-flex px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wider uppercase ${statusConfig.bg} ${statusConfig.text} shadow-sm`}>
+                        {statusConfig.label}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Background track */}
+                  <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    {/* Completion fill */}
+                    <div
+                      className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
+                      style={{
+                        width: `${hasAchievements ? achievementPercent : (completionPercent || (game.status === 'completed' ? 100 : game.status === 'playing' ? 50 : 0))}%`,
+                        background: `linear-gradient(90deg,
+                          ${statusConfig.color === 'emerald' ? '#10b981' :
+                            statusConfig.color === 'cyan' ? '#22d3ee' :
+                            statusConfig.color === 'violet' ? '#8b5cf6' :
+                            statusConfig.color === 'amber' ? '#fbbf24' :
+                            statusConfig.color === 'rose' ? '#fb7185' :
+                            statusConfig.color === 'red' ? '#f87171' : '#6b7280'},
+                          ${statusConfig.color === 'emerald' ? '#34d399' :
+                            statusConfig.color === 'cyan' ? '#67e8f9' :
+                            statusConfig.color === 'violet' ? '#a78bfa' :
+                            statusConfig.color === 'amber' ? '#fcd34d' :
+                            statusConfig.color === 'rose' ? '#fda4af' :
+                            statusConfig.color === 'red' ? '#fca5a5' : '#9ca3af'})`,
+                      }}
+                    >
+                      {/* Animated shine */}
+                      <div
+                        className="absolute inset-0 opacity-50"
+                        style={{
+                          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+                          animation: 'progressShine 2s ease-in-out infinite',
+                        }}
+                      />
+                    </div>
                   </div>
-                )}
-              </div>
-            </>
-          )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Hover action buttons */}
+        {/* Physical copy badge - bottom right, above the data panel */}
+        {game.is_physical && !shouldCensor && (
+          <div className="absolute bottom-[4.5rem] right-3 z-30">
+            <div className="p-1.5 bg-amber-500/20 backdrop-blur-sm rounded-lg border border-amber-500/30" title="Physical Copy">
+              <Disc className="w-3.5 h-3.5 text-amber-400" />
+            </div>
+          </div>
+        )}
+
+        {/* Hover action buttons - top right */}
         {!shouldCensor && (
-          <div className="absolute bottom-14 right-3 flex flex-col gap-1.5 z-30 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+          <div className="absolute top-3 right-3 flex items-center gap-1 z-30 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit();
               }}
-              className="p-2 bg-theme-primary/90 backdrop-blur-md rounded-lg text-theme-muted hover:text-cyan-400 border border-theme hover:border-cyan-500/50 transition-all hover:shadow-[0_0_12px_rgba(34,211,238,0.3)]"
+              className="p-1.5 bg-black/70 backdrop-blur-md rounded-md text-white/70 hover:text-cyan-400 border border-white/10 hover:border-cyan-500/50 transition-all hover:shadow-[0_0_12px_rgba(34,211,238,0.3)]"
               title="Edit"
             >
               <Edit3 className="w-3.5 h-3.5" />
@@ -391,7 +379,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                 e.stopPropagation();
                 onDelete();
               }}
-              className="p-2 bg-theme-primary/90 backdrop-blur-md rounded-lg text-theme-muted hover:text-red-400 border border-theme hover:border-red-500/50 transition-all hover:shadow-[0_0_12px_rgba(248,113,113,0.3)]"
+              className="p-1.5 bg-black/70 backdrop-blur-md rounded-md text-white/70 hover:text-red-400 border border-white/10 hover:border-red-500/50 transition-all hover:shadow-[0_0_12px_rgba(248,113,113,0.3)]"
               title="Delete"
             >
               <Trash2 className="w-3.5 h-3.5" />

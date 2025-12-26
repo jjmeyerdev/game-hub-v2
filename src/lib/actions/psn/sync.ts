@@ -140,6 +140,7 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
 
           const updateData: Record<string, unknown> = {
             updated_at: new Date().toISOString(),
+            psn_title_id: npCommId, // Ensure PSN ID is set for existing synced games
           };
 
           if (!lockedFields['completion_percentage'] && !lockedFields['achievements']) {
@@ -182,6 +183,7 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
             completion_percentage: completionPercentage,
             last_played_at: lastPlayed,
             playtime_hours: playtimeHours,
+            psn_title_id: npCommId, // Store PSN ID to identify synced games
           };
 
           // Set completed_at when inserting a 100% completed game

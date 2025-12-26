@@ -62,7 +62,7 @@ export function GameProgressCard({ userGame, percentage, index }: GameProgressCa
 
         {/* Title */}
         <div className="p-3 pt-2">
-          <h4 className="text-xs font-medium text-theme-primary truncate group-hover:text-white transition-colors">
+          <h4 className="text-xs font-medium text-theme-primary truncate group-hover:text-cyan-300 transition-colors">
             {title}
           </h4>
         </div>

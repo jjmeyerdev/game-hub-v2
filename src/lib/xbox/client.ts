@@ -403,18 +403,19 @@ export function getXboxStoreUrl(titleId: string): string {
  * backward-compatible games (e.g., Xbox 360 games playable on Xbox One)
  */
 export function normalizeXboxPlatform(devices: string[]): string {
+  // Return format: "Xbox (Console)" for proper filtering
   // Check oldest platforms first to identify original release platform
   if (devices.includes('Xbox360')) {
-    return 'Xbox 360';
+    return 'Xbox (Xbox 360)';
   }
   if (devices.includes('XboxOne')) {
-    return 'Xbox One';
+    return 'Xbox (Xbox One)';
   }
   if (devices.includes('XboxSeriesXS') || devices.includes('Scarlett')) {
-    return 'Xbox Series X|S';
+    return 'Xbox (Xbox Series X|S)';
   }
   if (devices.includes('PC')) {
-    return 'PC (Xbox)';
+    return 'PC';
   }
   return 'Xbox';
 }

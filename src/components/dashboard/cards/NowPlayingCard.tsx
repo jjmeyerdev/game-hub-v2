@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Library, Edit3, Trash2, Eye, EyeOff, Trophy, Gamepad2, ShieldOff, Unlock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
-import { getPlatformBrandStyle } from '@/lib/constants/platforms';
+import { getPlatformBrandStyle, getDisplayPlatform } from '@/lib/constants/platforms';
 import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
 
 const getPlatformIcon = (platform: string) => {
@@ -101,14 +101,10 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         {/* Platform badge */}
         {(() => {
           const brandStyle = getPlatformBrandStyle(game.platform);
-          const shortPlatform = (() => {
-            const match = game.platform.match(/^(.+?)\s*\((.+)\)$/);
-            return match ? match[2] : game.platform;
-          })();
           return (
             <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-lg backdrop-blur-sm border ${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`}>
               {getPlatformIcon(game.platform)}
-              {shortPlatform}
+              {getDisplayPlatform(game.platform)}
             </div>
           );
         })()}

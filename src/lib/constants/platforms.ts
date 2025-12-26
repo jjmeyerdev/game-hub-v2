@@ -19,6 +19,8 @@ export const CONSOLE_OPTIONS: Record<string, readonly string[]> = {
     'PS3',
     'PS2',
     'PS1',
+    'PS Vita',
+    'PSP',
   ],
   Xbox: [
     'Xbox Series X|S',

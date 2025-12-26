@@ -39,6 +39,7 @@ import {
   clearAllDismissedDuplicates,
 } from '@/lib/actions/games';
 import type { DuplicateGroup, UserGame, Game } from '@/lib/actions/games';
+import { getDisplayPlatform } from '@/lib/constants/platforms';
 
 interface DuplicateFinderModalProps {
   isOpen: boolean;
@@ -196,12 +197,6 @@ export function DuplicateFinderModal({
     setMergePrimaryId(null);
   };
 
-  // Helper to get platform display name
-  const getPlatformDisplay = (platform: string) => {
-    const match = platform.match(/^(.+?)\s*\((.+)\)$/);
-    return match ? match[2] : platform;
-  };
-
   // Add a pending action instead of executing immediately
   const addPendingAction = (action: Omit<PendingAction, 'groupIndex'>) => {
     setPendingActions((prev) => {
@@ -226,7 +221,7 @@ export function DuplicateFinderModal({
       coverUrl: game?.cover_url || null,
       actionType: 'keep_one',
       keepId,
-      keepPlatform: keepGame ? getPlatformDisplay(keepGame.platform) : undefined,
+      keepPlatform: keepGame ? getDisplayPlatform(keepGame.platform) : undefined,
       gameIds: group.games.map((g) => g.id),
       gamesCount: group.games.length,
     });
@@ -300,7 +295,7 @@ export function DuplicateFinderModal({
       coverUrl: game?.cover_url || null,
       actionType: 'merge',
       mergeIntoId: mergePrimaryId,
-      mergePlatform: primaryGame ? getPlatformDisplay(primaryGame.platform) : undefined,
+      mergePlatform: primaryGame ? getDisplayPlatform(primaryGame.platform) : undefined,
       mergeFromIds,
       gameIds: group.games.map((g) => g.id),
       gamesCount: group.games.length,
@@ -688,7 +683,7 @@ export function DuplicateFinderModal({
               <div className="grid gap-3 mb-4">
                 {currentGroup.games.map((userGame, idx) => {
                   const game = userGame.game as Game;
-                  const platform = getPlatformDisplay(userGame.platform);
+                  const platform = getDisplayPlatform(userGame.platform);
                   const isSelected = selectedIds.has(userGame.id);
 
                   return (
@@ -957,7 +952,7 @@ export function DuplicateFinderModal({
                     </p>
                     <div className="grid gap-2">
                       {selectedGames.map((userGame) => {
-                        const platform = getPlatformDisplay(userGame.platform);
+                        const platform = getDisplayPlatform(userGame.platform);
                         const isSelected = mergePrimaryId === userGame.id;
 
                         return (

@@ -71,7 +71,7 @@ export function PerfectGameCard({
                   Perfected
                 </span>
 
-                <h3 className="text-lg font-bold text-white font-family-display mb-1 group-hover:text-amber-100 transition-colors line-clamp-2">
+                <h3 className="text-lg font-bold text-theme-primary font-family-display mb-1 group-hover:text-amber-200 transition-colors line-clamp-2">
                   {title}
                 </h3>
 

@@ -214,6 +214,9 @@ CREATE TABLE IF NOT EXISTS public.user_games (
   xbox_title_id TEXT,
   xbox_last_played TIMESTAMP WITH TIME ZONE,
 
+  -- PSN-specific
+  psn_title_id TEXT,
+
   -- Timestamps
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -260,6 +263,8 @@ CREATE INDEX IF NOT EXISTS idx_user_games_steam_appid ON public.user_games(steam
 CREATE INDEX IF NOT EXISTS idx_user_games_user_steam ON public.user_games(user_id, steam_appid);
 CREATE INDEX IF NOT EXISTS idx_user_games_steam_playtime ON public.user_games(steam_playtime_minutes) WHERE steam_playtime_minutes > 0;
 CREATE INDEX IF NOT EXISTS idx_user_games_xbox_title_id ON public.user_games(xbox_title_id) WHERE xbox_title_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_user_games_psn_title_id ON public.user_games(psn_title_id) WHERE psn_title_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_user_games_user_psn ON public.user_games(user_id, psn_title_id);
 
 -- User Games: Trigger
 CREATE TRIGGER set_updated_at_user_games
@@ -270,6 +275,7 @@ CREATE TRIGGER set_updated_at_user_games
 COMMENT ON COLUMN public.user_games.ownership_status IS 'Ownership status: owned, wishlist, or unowned';
 COMMENT ON COLUMN public.user_games.is_physical IS 'Whether the user owns a physical copy';
 COMMENT ON COLUMN public.user_games.steam_appid IS 'Steam App ID - cached for fast session tracking';
+COMMENT ON COLUMN public.user_games.psn_title_id IS 'PSN Communication ID - set during PSN sync to identify synced games';
 COMMENT ON COLUMN public.user_games.locked_fields IS 'Fields locked from being overwritten during syncs/IGDB refreshes. Keys: cover, description, developer, publisher, releaseDate, genres';
 
 -- ============================================================================

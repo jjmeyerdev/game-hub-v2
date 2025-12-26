@@ -45,7 +45,7 @@ export default async function AchievementsPage() {
               <Trophy className="w-10 h-10 text-emerald-400" />
             </div>
 
-            <h1 className="text-3xl font-bold text-white mb-4 font-family-display">
+            <h1 className="text-3xl font-bold text-theme-primary mb-4 font-family-display">
               NO ACHIEVEMENTS YET
             </h1>
 
@@ -104,7 +104,7 @@ export default async function AchievementsPage() {
               <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider block mb-1">
                 // TROPHY_HUNTER
               </span>
-              <h1 className="text-3xl font-bold text-white font-family-display">
+              <h1 className="text-3xl font-bold text-theme-primary font-family-display">
                 ACHIEVEMENTS
               </h1>
             </div>
@@ -288,7 +288,7 @@ export default async function AchievementsPage() {
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-white font-family-display mb-0.5">
+                  <h3 className="text-lg font-bold text-theme-primary font-family-display mb-0.5">
                     COMPLETIONIST
                   </h3>
                   <p className="text-sm text-theme-muted">

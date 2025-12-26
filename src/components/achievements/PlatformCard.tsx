@@ -52,7 +52,7 @@ export function PlatformCard({
             <div style={{ color }}>{logo}</div>
           </div>
           <div>
-            <h3 className="font-semibold text-white font-family-display">
+            <h3 className="font-semibold text-theme-primary font-family-display">
               {name}
             </h3>
             <p className="text-[10px] font-mono text-theme-subtle uppercase">
@@ -65,7 +65,7 @@ export function PlatformCard({
           <>
             {/* Stats */}
             <div className="flex items-baseline gap-2 mb-3">
-              <span className="text-2xl font-bold font-mono text-white tabular-nums">
+              <span className="text-2xl font-bold font-mono text-theme-primary tabular-nums">
                 {stats.earned.toLocaleString()}
               </span>
               <span className="text-sm text-theme-subtle">

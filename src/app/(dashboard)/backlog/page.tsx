@@ -124,7 +124,7 @@ function BacklogGameCard({
 
       {/* Game Info */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm text-white truncate group-hover:text-white transition-colors">
+        <h4 className="font-medium text-sm text-theme-primary truncate group-hover:text-theme-primary transition-colors">
           {title}
         </h4>
         <div className="flex items-center gap-2 mt-0.5">
@@ -356,13 +356,13 @@ export default function BacklogPage() {
                 <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider block mb-1">
                   // QUEUE_MANAGEMENT
                 </span>
-                <h1 className="text-2xl font-bold text-white font-family-display">BACKLOG</h1>
+                <h1 className="text-2xl font-bold text-theme-primary font-family-display">BACKLOG</h1>
               </div>
             </div>
 
             <Link
               href="/library"
-              className="flex items-center gap-2 px-4 py-2 bg-theme-hover border border-theme rounded-xl text-sm text-theme-muted hover:text-white hover:border-white/10 transition-all group"
+              className="flex items-center gap-2 px-4 py-2 bg-theme-hover border border-theme rounded-xl text-sm text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all group"
             >
               <span>Full Library</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -388,7 +388,7 @@ export default function BacklogPage() {
                   <Layers className="w-4 h-4 text-cyan-400" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold font-mono text-white">{totalBacklog}</div>
+                  <div className="text-xl font-bold font-mono text-theme-primary">{totalBacklog}</div>
                   <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">Total</div>
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function BacklogPage() {
                   <Flame className="w-4 h-4 text-red-400" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold font-mono text-white">{highPriorityCount}</div>
+                  <div className="text-xl font-bold font-mono text-theme-primary">{highPriorityCount}</div>
                   <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">High Priority</div>
                 </div>
               </div>
@@ -418,7 +418,7 @@ export default function BacklogPage() {
                   <Pause className="w-4 h-4 text-violet-400" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold font-mono text-white">{onHoldCount}</div>
+                  <div className="text-xl font-bold font-mono text-theme-primary">{onHoldCount}</div>
                   <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">On Hold</div>
                 </div>
               </div>
@@ -433,7 +433,7 @@ export default function BacklogPage() {
                   <Sparkles className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-white truncate max-w-[120px] font-family-display">
+                  <div className="text-lg font-bold text-theme-primary truncate max-w-[120px] font-family-display">
                     {highPriorityCount > 0 ? gamesByPriority.high[0]?.game?.title?.slice(0, 12) + '...' : '—'}
                   </div>
                   <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">Play Next</div>
@@ -457,7 +457,7 @@ export default function BacklogPage() {
               placeholder="Search your backlog..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-theme-secondary border border-theme rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-theme-subtle focus:outline-hidden focus:border-cyan-400/30 focus:bg-theme-hover transition-all font-mono"
+              className="w-full bg-theme-secondary border border-theme rounded-xl pl-11 pr-4 py-3 text-sm text-theme-primary placeholder:text-theme-subtle focus:outline-hidden focus:border-cyan-400/30 focus:bg-theme-hover transition-all font-mono"
             />
           </div>
         </div>
@@ -483,7 +483,7 @@ export default function BacklogPage() {
             <div className="relative p-5 rounded-2xl bg-linear-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-emerald-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 font-family-display">BACKLOG CLEAR!</h3>
+            <h3 className="text-xl font-bold text-theme-primary mb-2 font-family-display">BACKLOG CLEAR!</h3>
             <p className="text-theme-muted mb-6">
               You don't have any unplayed games waiting.
             </p>
