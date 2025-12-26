@@ -249,12 +249,19 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
               const lockedFields = (userGame.locked_fields as Record<string, boolean>) || {};
 
               if (!lockedFields['completion_percentage'] && !lockedFields['achievements']) {
+                const updateData: Record<string, unknown> = {
+                  achievements_earned: achievementsEarned,
+                  achievements_total: achievementsTotal,
+                };
+
+                // Set completed_at when reaching 100% completion
+                if (achievementsEarned === achievementsTotal && achievementsTotal > 0) {
+                  updateData.completed_at = new Date().toISOString();
+                }
+
                 const { error: achievementUpdateError } = await supabase
                   .from('user_games')
-                  .update({
-                    achievements_earned: achievementsEarned,
-                    achievements_total: achievementsTotal,
-                  })
+                  .update(updateData)
                   .eq('id', userGame.id);
 
                 if (!achievementUpdateError) {
@@ -467,13 +474,20 @@ export async function syncSteamGame(appId: number): Promise<SteamGameSyncResult>
           const lockedFields = (userGame.locked_fields as Record<string, boolean>) || {};
 
           if (!lockedFields['completion_percentage'] && !lockedFields['achievements']) {
+            const updateData: Record<string, unknown> = {
+              achievements_earned: achievementsEarned,
+              achievements_total: achievementsTotal,
+              completion_percentage: Math.round((achievementsEarned / achievementsTotal) * 100),
+            };
+
+            // Set completed_at when reaching 100% completion
+            if (achievementsEarned === achievementsTotal && achievementsTotal > 0) {
+              updateData.completed_at = new Date().toISOString();
+            }
+
             await supabase
               .from('user_games')
-              .update({
-                achievements_earned: achievementsEarned,
-                achievements_total: achievementsTotal,
-                completion_percentage: Math.round((achievementsEarned / achievementsTotal) * 100),
-              })
+              .update(updateData)
               .eq('id', userGame.id);
           }
         }

@@ -157,6 +157,11 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
             updateData.achievements_earned = achievementsEarned;
             updateData.achievements_total = achievementsTotal;
             updateData.completion_percentage = completionPercentage;
+
+            // Set completed_at when reaching 100% completion
+            if (achievementsEarned === achievementsTotal && achievementsTotal > 0) {
+              updateData.completed_at = new Date().toISOString();
+            }
           }
 
           if (!lockedFields['last_played_at']) {
@@ -175,7 +180,7 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
             result.gamesUpdated++;
           }
         } else {
-          const { error: insertError } = await supabase.from('user_games').insert({
+          const insertData: Record<string, unknown> = {
             user_id: user.id,
             game_id: game.id,
             platform: platform,
@@ -186,7 +191,14 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
             last_played_at: lastPlayed,
             xbox_title_id: titleId,
             xbox_last_played: lastPlayed,
-          });
+          };
+
+          // Set completed_at when inserting a 100% completed game
+          if (achievementsEarned === achievementsTotal && achievementsTotal > 0) {
+            insertData.completed_at = new Date().toISOString();
+          }
+
+          const { error: insertError } = await supabase.from('user_games').insert(insertData);
 
           if (insertError) {
             result.errors.push(`Failed to add ${xboxGame.name}: ${insertError.message}`);

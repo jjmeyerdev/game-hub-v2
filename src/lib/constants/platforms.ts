@@ -72,6 +72,20 @@ export type PlatformId = (typeof PLATFORMS)[number]['id'];
 export type StatusId = (typeof STATUSES)[number]['id'];
 export type PriorityId = (typeof PRIORITIES)[number]['id'];
 
+/**
+ * Extract the display name from a platform string.
+ * If format is "Platform (Console)", returns just "Console".
+ * Otherwise returns the original platform string.
+ * Examples:
+ *   "Xbox (Xbox 360)" -> "Xbox 360"
+ *   "PlayStation (PS5)" -> "PS5"
+ *   "Steam" -> "Steam"
+ */
+export function getDisplayPlatform(platform: string): string {
+  const match = platform.match(/\(([^)]+)\)/);
+  return match ? match[1] : platform;
+}
+
 // Platforms that can have active session tracking (PC platforms)
 export const PC_PLATFORMS = ['Steam', 'Windows', 'Epic Games', 'EA App', 'Battle.net', 'GOG', 'Xbox Game Pass'] as const;
 

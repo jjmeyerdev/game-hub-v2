@@ -146,6 +146,11 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
             updateData.achievements_earned = earnedTotal;
             updateData.achievements_total = definedTotal;
             updateData.completion_percentage = completionPercentage;
+
+            // Set completed_at when reaching 100% completion
+            if (earnedTotal === definedTotal && definedTotal > 0) {
+              updateData.completed_at = new Date().toISOString();
+            }
           }
 
           if (!lockedFields['last_played_at']) {
@@ -167,7 +172,7 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
             result.gamesUpdated++;
           }
         } else {
-          const { error: insertError } = await supabase.from('user_games').insert({
+          const insertData: Record<string, unknown> = {
             user_id: user.id,
             game_id: game.id,
             platform: platform,
@@ -177,7 +182,14 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
             completion_percentage: completionPercentage,
             last_played_at: lastPlayed,
             playtime_hours: playtimeHours,
-          });
+          };
+
+          // Set completed_at when inserting a 100% completed game
+          if (earnedTotal === definedTotal && definedTotal > 0) {
+            insertData.completed_at = new Date().toISOString();
+          }
+
+          const { error: insertError } = await supabase.from('user_games').insert(insertData);
 
           if (insertError) {
             result.errors.push(`Failed to add ${psnGame.trophyTitleName}: ${insertError.message}`);
