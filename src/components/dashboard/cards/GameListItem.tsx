@@ -1,6 +1,22 @@
-import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar } from 'lucide-react';
+import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar, UserX } from 'lucide-react';
 import type { UserGame } from '@/lib/actions/games';
 import { getDisplayPlatform } from '@/lib/constants/platforms';
+import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, EALogo, WindowsLogo, NintendoLogo, GOGLogo, BattleNetLogo, UbisoftLogo } from '@/components/icons/PlatformLogos';
+
+const getPlatformIcon = (platform: string) => {
+  const lowerPlatform = platform.toLowerCase();
+  if (lowerPlatform.includes('steam')) return <SteamLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('ea app') || lowerPlatform.includes('origin')) return <EALogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii')) return <NintendoLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('gog')) return <GOGLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('battle.net') || lowerPlatform.includes('blizzard')) return <BattleNetLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('ubisoft') || lowerPlatform.includes('uplay')) return <UbisoftLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('pc') || lowerPlatform.includes('windows')) return <WindowsLogo className="w-3 h-3" />;
+  return <Gamepad2 className="w-3 h-3" />;
+};
 
 interface GameListItemProps {
   game: UserGame;
@@ -37,6 +53,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProps) {
   const isCompleted = game.status === 'completed' || game.status === 'finished';
+  const isUnowned = game.ownership_status === 'unowned';
 
   return (
     <div
@@ -45,16 +62,36 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
         animation: `fadeInUp 0.4s ease-out ${index * 0.03}s both`,
       }}
     >
+      {/* Unowned glow effect */}
+      {isUnowned && (
+        <div
+          className="absolute -inset-1 rounded-xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 blur-lg"
+          style={{ background: 'rgba(244, 63, 94, 0.2)' }}
+        />
+      )}
+
       {/* Main container with cyber border effect */}
-      <div className="relative bg-linear-to-r from-theme-secondary via-theme-secondary to-theme-secondary border-2 border-theme rounded-xl overflow-hidden transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(0,217,255,0.15)]">
+      <div className={`relative bg-linear-to-r from-theme-secondary via-theme-secondary to-theme-secondary border-2 rounded-xl overflow-hidden transition-all duration-300 ${
+        isUnowned
+          ? 'border-rose-500/40 hover:border-rose-500/60 hover:shadow-[0_0_30px_rgba(244,63,94,0.15)]'
+          : 'border-theme hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(0,217,255,0.15)]'
+      }`}>
         {/* Animated scan line effect on hover */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
           <div className="absolute inset-0 bg-linear-to-b from-transparent via-cyan-500/5 to-transparent animate-scan" />
         </div>
 
-        {/* Corner accents */}
-        <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-cyan-500/20 group-hover:border-cyan-500/60 transition-colors duration-300" />
-        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-purple-500/20 group-hover:border-purple-500/60 transition-colors duration-300" />
+        {/* Corner accents - rose for unowned */}
+        <div className={`absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 transition-colors duration-300 ${
+          isUnowned
+            ? 'border-rose-500/40 group-hover:border-rose-500/70'
+            : 'border-cyan-500/20 group-hover:border-cyan-500/60'
+        }`} />
+        <div className={`absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 transition-colors duration-300 ${
+          isUnowned
+            ? 'border-rose-500/40 group-hover:border-rose-500/70'
+            : 'border-purple-500/20 group-hover:border-purple-500/60'
+        }`} />
 
         <div className="relative flex items-center gap-6 p-5">
           {/* Cover art */}
@@ -102,12 +139,18 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                 </h3>
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-theme-secondary border border-theme rounded-md text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                    <Gamepad2 className="w-3 h-3" />
+                    {getPlatformIcon(game.platform)}
                     {getDisplayPlatform(game.platform)}
                   </span>
                   <span className={`text-sm font-bold uppercase tracking-wider ${STATUS_COLORS[game.status] || 'text-gray-400'}`}>
                     {STATUS_LABELS[game.status] || game.status}
                   </span>
+                  {isUnowned && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-500/15 border border-rose-500/30 rounded-md text-[10px] font-bold text-rose-400 uppercase tracking-wider">
+                      <UserX className="w-3 h-3" />
+                      Unowned
+                    </span>
+                  )}
                 </div>
               </div>
 

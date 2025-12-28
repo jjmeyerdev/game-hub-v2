@@ -13,6 +13,7 @@ import {
   Star,
   FileText,
   Tag,
+  History,
 } from 'lucide-react';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
 import { getPlatformBrandStyle, getPlatformBrandStyleSubtle } from '@/lib/constants/platforms';
@@ -31,6 +32,12 @@ interface UserLibrarySectionProps {
   setOwnershipStatus: (value: 'owned' | 'wishlist' | 'unowned') => void;
   isPhysical: boolean;
   setIsPhysical: (value: boolean) => void;
+  previouslyOwned: boolean;
+  setPreviouslyOwned: (value: boolean) => void;
+  myPlaytimeHours?: string;
+  setMyPlaytimeHours?: (value: string) => void;
+  myAchievementsEarned?: string;
+  setMyAchievementsEarned?: (value: string) => void;
   isAdult: boolean;
   setIsAdult: (value: boolean) => void;
   isHidden: boolean;
@@ -114,6 +121,12 @@ export function UserLibrarySection({
   setOwnershipStatus,
   isPhysical,
   setIsPhysical,
+  previouslyOwned,
+  setPreviouslyOwned,
+  myPlaytimeHours,
+  setMyPlaytimeHours,
+  myAchievementsEarned,
+  setMyAchievementsEarned,
   isAdult,
   setIsAdult,
   isHidden,
@@ -323,6 +336,51 @@ export function UserLibrarySection({
           icon={Disc}
           color="amber"
         />
+        <Toggle
+          checked={previouslyOwned}
+          onChange={setPreviouslyOwned}
+          label="Previously Owned"
+          description="Include in stats even if unowned"
+          icon={History}
+          color="violet"
+        />
+        {/* Snapshot fields - only show when Previously Owned is enabled */}
+        {previouslyOwned && (
+          <div className="ml-6 pl-3 border-l-2 border-violet-500/30 space-y-2">
+            <p className="text-[10px] text-theme-subtle">
+              Enter your stats from when you owned this game:
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="flex items-center gap-1 text-[10px] font-medium text-violet-400/80 uppercase tracking-wider mb-1">
+                  <Timer className="w-3 h-3" /> My Hours
+                </label>
+                <input
+                  type="number"
+                  value={myPlaytimeHours ?? ''}
+                  onChange={(e) => setMyPlaytimeHours?.(e.target.value)}
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                  className="w-full px-2.5 py-2 bg-violet-500/10 border border-violet-500/30 rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-violet-500/50 font-mono"
+                />
+              </div>
+              <div>
+                <label className="flex items-center gap-1 text-[10px] font-medium text-violet-400/80 uppercase tracking-wider mb-1">
+                  <Trophy className="w-3 h-3" /> My Achievements
+                </label>
+                <input
+                  type="number"
+                  value={myAchievementsEarned ?? ''}
+                  onChange={(e) => setMyAchievementsEarned?.(e.target.value)}
+                  min="0"
+                  placeholder="0"
+                  className="w-full px-2.5 py-2 bg-violet-500/10 border border-violet-500/30 rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-violet-500/50 font-mono"
+                />
+              </div>
+            </div>
+          </div>
+        )}
         <Toggle
           checked={isAdult}
           onChange={setIsAdult}

@@ -25,11 +25,12 @@ import {
 import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
 import { isPcPlatform, getPlatformBrandStyle, getDisplayPlatform } from '@/lib/constants/platforms';
 import { getPlatformLogo, StatCard, InfoRow, AchievementsSection } from '@/components/game';
-import type { UserGame } from '@/lib/actions/games';
-import { getGameAchievements, type NormalizedAchievement } from '@/lib/actions/games';
+import type { UserGame, UserAchievement } from '@/lib/actions/games';
+import { getGameAchievements, getStoredAchievements, type NormalizedAchievement } from '@/lib/actions/games';
 
 type Achievement = NormalizedAchievement & {
   icon_variant?: number;
+  storedAchievement?: UserAchievement; // Linked database record for ownership toggle
 };
 
 interface GameDetailClientProps {
@@ -55,16 +56,50 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
 
       setAchievementsLoading(true);
       try {
-        const result = await getGameAchievements(game.id);
-        if (result.success) {
-          if (result.achievements.length > 0) {
-            const achievementsWithVariants = result.achievements.map((a, i) => ({
-              ...a,
-              icon_variant: i % 8,
-            }));
-            setAchievements(achievementsWithVariants);
+        // Fetch both API achievements and stored achievements in parallel
+        const [apiResult, storedResult] = await Promise.all([
+          getGameAchievements(game.id),
+          getStoredAchievements(game.id),
+        ]);
+
+        if (apiResult.success && apiResult.achievements.length > 0) {
+          // Create a map of stored achievements by platform_achievement_id
+          const storedMap = new Map(
+            (storedResult.achievements || []).map(sa => [sa.platform_achievement_id, sa])
+          );
+
+          // Merge API achievements with stored data
+          const achievementsWithData = apiResult.achievements.map((a, i) => ({
+            ...a,
+            icon_variant: i % 8,
+            storedAchievement: storedMap.get(a.id),
+          }));
+          setAchievements(achievementsWithData);
+          setAchievementsPlatform(apiResult.platform);
+        } else if (storedResult.achievements && storedResult.achievements.length > 0) {
+          // Fallback to stored achievements if API fails (for offline viewing)
+          const achievementsFromStored = storedResult.achievements.map((sa, i) => ({
+            id: sa.platform_achievement_id,
+            name: sa.name,
+            description: sa.description || '',
+            iconUrl: sa.icon_url || undefined,
+            unlocked: sa.unlocked,
+            unlockDate: sa.unlocked_at || undefined,
+            rarity: (sa.rarity && sa.rarity <= 5 ? 'ultra_rare' :
+                    sa.rarity && sa.rarity <= 15 ? 'very_rare' :
+                    sa.rarity && sa.rarity <= 30 ? 'rare' :
+                    sa.rarity && sa.rarity <= 50 ? 'uncommon' : 'common') as Achievement['rarity'],
+            rarityPercentage: sa.rarity || undefined,
+            trophyType: sa.achievement_type as Achievement['trophyType'],
+            gamerscore: sa.points || undefined,
+            icon_variant: i % 8,
+            storedAchievement: sa,
+          }));
+          setAchievements(achievementsFromStored);
+          const storedPlatform = storedResult.achievements[0]?.platform;
+          if (storedPlatform === 'psn' || storedPlatform === 'xbox' || storedPlatform === 'steam') {
+            setAchievementsPlatform(storedPlatform);
           }
-          setAchievementsPlatform(result.platform);
         }
       } catch {
         // Achievement fetching failed, UI will show counts-only view
@@ -84,12 +119,41 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
     router.push('/dashboard');
   };
 
-  // Calculate achievement counts - use fetched data when available (more accurate)
+  // Handle achievement ownership toggle
+  const handleAchievementOwnershipChange = (achievementId: string, unlockedByMe: boolean | null) => {
+    setAchievements(prev =>
+      prev.map(a => {
+        if (a.storedAchievement?.id === achievementId) {
+          return {
+            ...a,
+            storedAchievement: {
+              ...a.storedAchievement,
+              unlocked_by_me: unlockedByMe,
+            },
+          };
+        }
+        return a;
+      })
+    );
+  };
+
+  // Calculate achievement counts - use "by me" when stored data available
   const displayAchievementsTotal = achievements.length > 0
     ? achievements.length
     : (game.achievements_total || 0);
+
+  // Helper to check if achievement is "unlocked by me"
+  const isUnlockedByMe = (a: Achievement) => {
+    if (!a.storedAchievement) return a.unlocked;
+    const unlockedByMe = a.storedAchievement.unlocked_by_me;
+    return unlockedByMe !== null && unlockedByMe !== undefined ? unlockedByMe : a.unlocked;
+  };
+
+  const hasStoredData = achievements.some(a => a.storedAchievement);
   const displayAchievementsEarned = achievements.length > 0
-    ? achievements.filter(a => a.unlocked).length
+    ? hasStoredData
+      ? achievements.filter(isUnlockedByMe).length
+      : achievements.filter(a => a.unlocked).length
     : (game.achievements_earned || 0);
 
   const canHaveActiveSession = isPcPlatform(game.platform);
@@ -234,13 +298,13 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
                   <StatCard
                     icon={<Clock className="w-4 h-4" />}
                     label="Playtime"
-                    value={`${game.playtime_hours || 0}h`}
+                    value={`${game.previously_owned && game.my_playtime_hours !== null ? game.my_playtime_hours : (game.playtime_hours || 0)}h`}
                     color="cyan"
                   />
                   <StatCard
                     icon={<TrendingUp className="w-4 h-4" />}
                     label="Progress"
-                    value={`${game.completion_percentage || 0}%`}
+                    value={`${game.previously_owned ? 0 : (game.completion_percentage || 0)}%`}
                     color="violet"
                   />
                   <StatCard
@@ -258,7 +322,7 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
                 </div>
 
                 {/* Progress Bars */}
-                {(game.completion_percentage > 0 || displayAchievementsTotal > 0) && (
+                {((!game.previously_owned && game.completion_percentage > 0) || displayAchievementsTotal > 0) && (
                   <ProgressSection
                     game={game}
                     displayAchievementsTotal={displayAchievementsTotal}
@@ -307,6 +371,7 @@ export function GameDetailClient({ game: initialGame }: GameDetailClientProps) {
               setFilter={setAchievementFilter}
               showHidden={showHiddenAchievements}
               setShowHidden={setShowHiddenAchievements}
+              onOwnershipChange={handleAchievementOwnershipChange}
             />
           )}
         </div>
@@ -359,7 +424,7 @@ function ProgressSection({
         <span className="text-[10px] font-mono text-theme-subtle">// STATS</span>
       </div>
 
-      {game.completion_percentage > 0 && (
+      {game.completion_percentage > 0 && !game.previously_owned && (
         <div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">Completion</span>
@@ -429,15 +494,22 @@ function GameInfoCard({ game }: { game: UserGame }) {
         {game.game?.publisher && (
           <InfoRow icon={<Building2 className="w-4 h-4" />} label="Publisher" value={game.game.publisher} color="violet" />
         )}
-        {game.game?.release_date && (
+        {(game.release_date || game.game?.release_date) && (
           <InfoRow
             icon={<Calendar className="w-4 h-4" />}
             label="Release Date"
-            value={new Date(game.game.release_date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+            value={(() => {
+              const dateStr = game.release_date || game.game?.release_date || '';
+              // Parse as UTC to avoid timezone shifts (YYYY-MM-DD format)
+              const [year, month, day] = dateStr.split('-').map(Number);
+              const date = new Date(Date.UTC(year, month - 1, day));
+              return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'UTC',
+              });
+            })()}
             color="emerald"
           />
         )}

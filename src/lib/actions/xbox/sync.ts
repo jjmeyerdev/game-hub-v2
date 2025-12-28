@@ -2,13 +2,95 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { getMyTitleHistory, normalizeXboxPlatform } from '@/lib/xbox/client';
+import { getMyTitleHistory, normalizeXboxPlatform, getGameAchievements } from '@/lib/xbox/client';
 import {
   XboxSyncResult,
   XboxAuthError,
   XboxPrivacyError,
+  type XboxAchievement,
 } from '@/lib/types/xbox';
 import { getValidApiKey } from './auth';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+/**
+ * Get gamerscore value from an achievement's rewards
+ */
+function getGamerscoreFromRewards(rewards: XboxAchievement['rewards']): number {
+  const gamerscoreReward = rewards.find(r => r.type === 'Gamerscore');
+  return gamerscoreReward ? parseInt(gamerscoreReward.value, 10) || 0 : 0;
+}
+
+/**
+ * Sync individual achievements for a game
+ */
+async function syncGameAchievements(
+  supabase: SupabaseClient,
+  userId: string,
+  userGameId: string,
+  apiKey: string,
+  xuid: string,
+  titleId: string
+): Promise<{ synced: number; errors: string[] }> {
+  const errors: string[] = [];
+  let synced = 0;
+
+  try {
+    const achievements = await getGameAchievements(apiKey, xuid, titleId);
+
+    if (achievements.length === 0) {
+      return { synced: 0, errors: [] };
+    }
+
+    // Get existing achievements to preserve unlocked_by_me flags
+    const { data: existingAchievements } = await supabase
+      .from('user_achievements')
+      .select('platform_achievement_id, unlocked_by_me')
+      .eq('user_game_id', userGameId);
+
+    const existingMap = new Map(
+      (existingAchievements || []).map(a => [a.platform_achievement_id, a.unlocked_by_me])
+    );
+
+    // Upsert each achievement
+    for (const achievement of achievements) {
+      const existingUnlockedByMe = existingMap.get(achievement.id);
+      const isUnlocked = achievement.progressState === 'Achieved';
+      const iconAsset = achievement.mediaAssets?.find(a => a.type === 'Icon');
+
+      const { error } = await supabase
+        .from('user_achievements')
+        .upsert({
+          user_id: userId,
+          user_game_id: userGameId,
+          platform: 'xbox',
+          platform_achievement_id: achievement.id,
+          name: achievement.name,
+          description: achievement.description || null,
+          icon_url: iconAsset?.url || null,
+          achievement_type: 'achievement',
+          points: getGamerscoreFromRewards(achievement.rewards),
+          rarity: achievement.rarity?.currentPercentage || null,
+          unlocked: isUnlocked,
+          unlocked_at: isUnlocked ? achievement.progression?.timeUnlocked || null : null,
+          // Preserve existing unlocked_by_me, otherwise leave null
+          unlocked_by_me: existingUnlockedByMe !== undefined ? existingUnlockedByMe : null,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_game_id,platform_achievement_id',
+        });
+
+      if (error) {
+        errors.push(`Achievement ${achievement.name}: ${error.message}`);
+      } else {
+        synced++;
+      }
+    }
+  } catch (error) {
+    errors.push(`Failed to sync achievements: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
+  return { synced, errors };
+}
 
 /**
  * Sync Xbox library - Import/update games from Xbox
@@ -145,7 +227,10 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
         const completionPercentage = xboxGame.achievement?.progressPercentage || 0;
         const lastPlayed = xboxGame.titleHistory?.lastTimePlayed || null;
 
+        let userGameId: string | null = null;
+
         if (existingUserGame) {
+          userGameId = existingUserGame.id;
           const lockedFields = (existingUserGame.locked_fields as Record<string, boolean>) || {};
 
           const updateData: Record<string, unknown> = {
@@ -198,12 +283,32 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
             insertData.completed_at = new Date().toISOString();
           }
 
-          const { error: insertError } = await supabase.from('user_games').insert(insertData);
+          const { data: newUserGame, error: insertError } = await supabase
+            .from('user_games')
+            .insert(insertData)
+            .select('id')
+            .single();
 
           if (insertError) {
             result.errors.push(`Failed to add ${xboxGame.name}: ${insertError.message}`);
           } else {
             result.gamesAdded++;
+            userGameId = newUserGame.id;
+          }
+        }
+
+        // Sync individual achievements for this game
+        if (userGameId && achievementsTotal > 0 && profile.xbox_xuid) {
+          const achievementResult = await syncGameAchievements(
+            supabase,
+            user.id,
+            userGameId,
+            apiKey,
+            profile.xbox_xuid,
+            titleId
+          );
+          if (achievementResult.errors.length > 0) {
+            result.errors.push(...achievementResult.errors.slice(0, 3)); // Limit achievement errors
           }
         }
 

@@ -9,14 +9,106 @@ import {
   normalizePsnPlatform,
   getPlayedGamesWithPlaytime,
   parseIsoDuration,
+  getTrophiesForTitle,
   type PsnPlayedTitle,
 } from '@/lib/psn/client';
 import {
   PsnSyncResult,
   PsnAuthError,
   PsnPrivacyError,
+  type PsnTrophy,
+  type PsnTrophyTitle,
 } from '@/lib/types/psn';
 import { getValidAccessToken } from './auth';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+/**
+ * Calculate trophy points based on type
+ * Uses standard PSN point values
+ */
+function getTrophyPoints(trophyType: string): number {
+  switch (trophyType) {
+    case 'bronze': return 15;
+    case 'silver': return 30;
+    case 'gold': return 90;
+    case 'platinum': return 180;
+    default: return 0;
+  }
+}
+
+/**
+ * Sync individual trophies for a game
+ */
+async function syncGameTrophies(
+  supabase: SupabaseClient,
+  userId: string,
+  userGameId: string,
+  accessToken: string,
+  psnGame: PsnTrophyTitle
+): Promise<{ synced: number; errors: string[] }> {
+  const errors: string[] = [];
+  let synced = 0;
+
+  try {
+    const trophies = await getTrophiesForTitle(
+      accessToken,
+      psnGame.npCommunicationId,
+      psnGame.npServiceName
+    );
+
+    if (trophies.length === 0) {
+      return { synced: 0, errors: [] };
+    }
+
+    // Get existing achievements to preserve unlocked_by_me flags
+    const { data: existingAchievements } = await supabase
+      .from('user_achievements')
+      .select('platform_achievement_id, unlocked_by_me')
+      .eq('user_game_id', userGameId);
+
+    const existingMap = new Map(
+      (existingAchievements || []).map(a => [a.platform_achievement_id, a.unlocked_by_me])
+    );
+
+    // Upsert each trophy
+    for (const trophy of trophies) {
+      const platformAchievementId = trophy.trophyId.toString();
+      const existingUnlockedByMe = existingMap.get(platformAchievementId);
+
+      const { error } = await supabase
+        .from('user_achievements')
+        .upsert({
+          user_id: userId,
+          user_game_id: userGameId,
+          platform: 'psn',
+          platform_achievement_id: platformAchievementId,
+          name: trophy.trophyName,
+          description: trophy.trophyDetail || null,
+          icon_url: trophy.trophyIconUrl || null,
+          achievement_type: trophy.trophyType,
+          points: getTrophyPoints(trophy.trophyType),
+          rarity: trophy.trophyEarnedRate ? parseFloat(trophy.trophyEarnedRate) : null,
+          unlocked: trophy.earned || false,
+          unlocked_at: trophy.earnedDateTime || null,
+          // Preserve existing unlocked_by_me, otherwise leave null
+          unlocked_by_me: existingUnlockedByMe !== undefined ? existingUnlockedByMe : null,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_game_id,platform_achievement_id',
+        });
+
+      if (error) {
+        errors.push(`Trophy ${trophy.trophyName}: ${error.message}`);
+      } else {
+        synced++;
+      }
+    }
+  } catch (error) {
+    errors.push(`Failed to sync trophies: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
+  return { synced, errors };
+}
 
 /**
  * Sync PSN library - Import/update games from PSN
@@ -135,7 +227,10 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
         const playtimeMinutes = playedGame ? parseIsoDuration(playedGame.playDuration) : 0;
         const playtimeHours = playtimeMinutes > 0 ? Math.round((playtimeMinutes / 60) * 100) / 100 : 0;
 
+        let userGameId: string | null = null;
+
         if (existingUserGame) {
+          userGameId = existingUserGame.id;
           const lockedFields = (existingUserGame.locked_fields as Record<string, boolean>) || {};
 
           const updateData: Record<string, unknown> = {
@@ -191,12 +286,31 @@ export async function syncPsnLibrary(): Promise<PsnSyncResult> {
             insertData.completed_at = new Date().toISOString();
           }
 
-          const { error: insertError } = await supabase.from('user_games').insert(insertData);
+          const { data: newUserGame, error: insertError } = await supabase
+            .from('user_games')
+            .insert(insertData)
+            .select('id')
+            .single();
 
           if (insertError) {
             result.errors.push(`Failed to add ${psnGame.trophyTitleName}: ${insertError.message}`);
           } else {
             result.gamesAdded++;
+            userGameId = newUserGame.id;
+          }
+        }
+
+        // Sync individual trophies for this game
+        if (userGameId && definedTotal > 0) {
+          const trophyResult = await syncGameTrophies(
+            supabase,
+            user.id,
+            userGameId,
+            accessToken,
+            psnGame
+          );
+          if (trophyResult.errors.length > 0) {
+            result.errors.push(...trophyResult.errors.slice(0, 3)); // Limit trophy errors
           }
         }
 

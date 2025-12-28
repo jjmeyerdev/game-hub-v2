@@ -20,6 +20,41 @@ const OPENXBL_API_BASE = 'https://xbl.io/api/v2';
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in ms
 const RATE_LIMIT_MAX_REQUESTS = 30; // 30 requests per minute
 
+// In-memory cache for expensive API calls
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+class ApiCache<T> {
+  private cache = new Map<string, CacheEntry<T>>();
+
+  get(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+    if (Date.now() - entry.timestamp > CACHE_TTL) {
+      this.cache.delete(key);
+      return null;
+    }
+    return entry.data;
+  }
+
+  set(key: string, data: T): void {
+    this.cache.set(key, { data, timestamp: Date.now() });
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+// Caches for expensive operations
+const titleHistoryCache = new ApiCache<XboxTitleHistoryItem[]>();
+const achievementsCache = new ApiCache<XboxAchievement[]>();
+const gamertagCache = new ApiCache<XboxPlayerSummary>();
+
 class RateLimiter {
   private requests: number[] = [];
 
@@ -244,13 +279,20 @@ interface XboxSearchPerson {
 }
 
 /**
- * Search for a player by gamertag
+ * Search for a player by gamertag (with caching)
  */
 export async function searchByGamertag(
   gamertag: string,
   apiKey: string
 ): Promise<XboxPlayerSummary | null> {
   const validGamertag = validateGamertag(gamertag);
+  const cacheKey = `gamertag:${validGamertag.toLowerCase()}`;
+
+  // Check cache first
+  const cached = gamertagCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
 
   try {
     // Search endpoint returns 'people' array, not 'profileUsers'
@@ -264,7 +306,7 @@ export async function searchByGamertag(
       return null;
     }
 
-    return {
+    const result: XboxPlayerSummary = {
       xuid: person.xuid,
       gamertag: person.modernGamertag || person.gamertag || '',
       gamerscore: parseInt(person.gamerScore || '0', 10),
@@ -280,6 +322,10 @@ export async function searchByGamertag(
       presenceText: person.presenceText || '',
       isXbox360Gamertag: false,
     };
+
+    // Cache the result
+    gamertagCache.set(cacheKey, result);
+    return result;
   } catch (error) {
     if (error instanceof XboxAPIError && error.statusCode === 404) {
       return null;
@@ -301,19 +347,29 @@ export async function getMyTitleHistory(apiKey: string): Promise<XboxTitleHistor
 }
 
 /**
- * Get title history (game library) for a player by XUID
+ * Get title history (game library) for a player by XUID (with caching)
  */
 export async function getTitleHistoryByXuid(
   xuid: string,
   apiKey: string
 ): Promise<XboxTitleHistoryItem[]> {
   const validXuid = validateXuid(xuid);
+  const cacheKey = `titles:${validXuid}`;
+
+  // Check cache first
+  const cached = titleHistoryCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const data = await xboxApiRequest<XboxTitleHistoryResponse>(
     `/player/titleHistory/${validXuid}`,
     apiKey
   );
 
-  return data.titles || [];
+  const titles = data.titles || [];
+  titleHistoryCache.set(cacheKey, titles);
+  return titles;
 }
 
 /**
@@ -345,7 +401,7 @@ export async function getAchievementsByXuid(
 }
 
 /**
- * Get achievements for a specific game for a player
+ * Get achievements for a specific game for a player (with caching and parallel fetching)
  *
  * Note: OpenXBL API provides detailed achievements for Xbox One/Series games,
  * but Xbox 360 games only have summary counts available (no individual achievement details).
@@ -356,38 +412,37 @@ export async function getGameAchievements(
   apiKey: string
 ): Promise<XboxAchievement[]> {
   const validXuid = validateXuid(xuid);
+  const cacheKey = `achievements:${validXuid}:${titleId}`;
 
-  // Try the title-specific endpoint (works for Xbox One/Series games)
-  try {
-    const data = await xboxApiRequest<XboxAchievementsResponse>(
-      `/achievements/player/${validXuid}/${titleId}`,
-      apiKey
-    );
-
-    if (data.achievements && data.achievements.length > 0) {
-      return data.achievements;
-    }
-  } catch {
-    // Endpoint may not exist for this title, continue to fallbacks
+  // Check cache first
+  const cached = achievementsCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
-  // Try the title achievements endpoint
-  try {
-    const titleData = await xboxApiRequest<{ achievements?: XboxAchievement[] }>(
-      `/achievements/title/${titleId}`,
-      apiKey
-    );
+  // Try both endpoints in parallel for faster response
+  const playerEndpoint = xboxApiRequest<XboxAchievementsResponse>(
+    `/achievements/player/${validXuid}/${titleId}`,
+    apiKey
+  ).then(data => data.achievements || []).catch(() => [] as XboxAchievement[]);
 
-    if (titleData.achievements && titleData.achievements.length > 0) {
-      return titleData.achievements;
-    }
-  } catch {
-    // Endpoint may not work for Xbox 360 titles
-  }
+  const titleEndpoint = xboxApiRequest<{ achievements?: XboxAchievement[] }>(
+    `/achievements/title/${titleId}`,
+    apiKey
+  ).then(data => data.achievements || []).catch(() => [] as XboxAchievement[]);
 
-  // Xbox 360 games: OpenXBL only provides summary counts, not individual achievements
-  // The user_games table has the counts from sync - UI will show "counts only" view
-  return [];
+  // Wait for both and use whichever has data
+  const [playerAchievements, titleAchievements] = await Promise.all([
+    playerEndpoint,
+    titleEndpoint,
+  ]);
+
+  // Prefer player-specific achievements (has unlock status), fallback to title schema
+  const achievements = playerAchievements.length > 0 ? playerAchievements : titleAchievements;
+
+  // Cache even empty results to avoid repeated slow lookups for Xbox 360 games
+  achievementsCache.set(cacheKey, achievements);
+  return achievements;
 }
 
 /**

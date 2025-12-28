@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trash2, AlertTriangle, Loader2, RefreshCw, Sparkles, ChevronDown, CheckCircle, XCircle } from 'lucide-react';
-import { removeSyncedGames, getSyncedGameCounts, enrichAllGamesFromIGDB } from '@/lib/actions/games';
+import { Trash2, AlertTriangle, Loader2, RefreshCw, Sparkles, ChevronDown, CheckCircle, XCircle, Calendar } from 'lucide-react';
+import { removeSyncedGames, getSyncedGameCounts, enrichAllGamesFromIGDB, refreshReleaseDatesFromIGDB } from '@/lib/actions/games';
 
 interface SyncedCounts {
   steam: number;
@@ -19,6 +19,7 @@ export default function LibraryManagement() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [enriching, setEnriching] = useState(false);
+  const [refreshingDates, setRefreshingDates] = useState(false);
   const [showPlatforms, setShowPlatforms] = useState(false);
 
   const loadCounts = async () => {
@@ -78,6 +79,24 @@ export default function LibraryManagement() {
     }
 
     setEnriching(false);
+  };
+
+  const handleRefreshReleaseDates = async () => {
+    setRefreshingDates(true);
+    setMessage(null);
+
+    const result = await refreshReleaseDatesFromIGDB();
+
+    if (result.error) {
+      setMessage({ type: 'error', text: result.error });
+    } else {
+      setMessage({
+        type: 'success',
+        text: result.message ?? `Updated release dates for ${result.updated} games`
+      });
+    }
+
+    setRefreshingDates(false);
   };
 
   const platforms = [
@@ -163,6 +182,25 @@ export default function LibraryManagement() {
         >
           {enriching ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
           {enriching ? 'Processing...' : 'Enrich'}
+        </button>
+      </div>
+
+      {/* Refresh Release Dates */}
+      <div className="flex items-center justify-between gap-3 p-3 bg-violet-500/5 border border-violet-500/20 rounded-lg">
+        <div className="flex items-center gap-3 min-w-0">
+          <Calendar className="w-4 h-4 text-violet-400 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-theme-primary truncate">Refresh Release Dates</p>
+            <p className="text-[10px] text-theme-subtle">Update to platform-specific dates</p>
+          </div>
+        </div>
+        <button
+          onClick={handleRefreshReleaseDates}
+          disabled={refreshingDates}
+          className="px-3 py-1.5 bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 rounded-lg text-xs font-semibold text-violet-400 transition-all disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+        >
+          {refreshingDates ? <Loader2 className="w-3 h-3 animate-spin" /> : <Calendar className="w-3 h-3" />}
+          {refreshingDates ? 'Updating...' : 'Refresh'}
         </button>
       </div>
 

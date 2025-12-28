@@ -1,12 +1,18 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Library, Grid3x3, List, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, ShieldOff, Shield, Copy, Link2, ChevronDown, Pencil, Disc, Monitor } from 'lucide-react';
+import { Library, Grid3x3, List, Search, ArrowUpDown, Eye, EyeOff, Flame, Clock, Coffee, Gamepad2, ShieldOff, Shield, Copy, Link2, ChevronDown, Pencil, Disc, Monitor, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Layers } from 'lucide-react';
 import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, NintendoLogo, GOGLogo, EALogo, BattleNetLogo, UbisoftLogo, WindowsLogo } from '@/components/icons/PlatformLogos';
 import { useDashboardData } from '@/lib/hooks';
 import { GameCard } from '@/components/dashboard/cards/GameCard';
 import { GameListItem } from '@/components/dashboard/cards/GameListItem';
 import { GameFormModal, DeleteConfirmModal, DuplicateFinderModal } from '@/components/modals';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ConsoleFilter } from '@/components/library/ConsoleFilter';
 import { LibraryHeader } from '@/components/library/LibraryHeader';
 import { StatBox } from '@/components/library/StatBox';
@@ -18,6 +24,13 @@ import type { UserGame } from '@/lib/actions/games';
 type ViewMode = 'grid' | 'list';
 
 const STORAGE_KEY = 'game-hub-library-sort';
+const STORAGE_KEY_PER_PAGE = 'game-hub-library-per-page';
+
+const GAMES_PER_PAGE_OPTIONS = [
+  { value: 20, label: '20 Games' },
+  { value: 40, label: '40 Games' },
+  { value: 80, label: '80 Games' },
+] as const;
 
 const PRIORITY_OPTIONS = [
   { id: 'all', label: 'All Priorities', icon: null, color: '', activeClass: 'bg-theme-active text-theme-primary' },
@@ -39,6 +52,8 @@ export default function LibraryPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [gamesPerPage, setGamesPerPage] = useState(20);
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -103,6 +118,27 @@ export default function LibraryPage() {
     localStorage.setItem(STORAGE_KEY, sortBy);
   }, [sortBy]);
 
+  // Load gamesPerPage from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY_PER_PAGE);
+    if (stored) {
+      const parsed = parseInt(stored, 10);
+      if ([20, 40, 80].includes(parsed)) {
+        setGamesPerPage(parsed);
+      }
+    }
+  }, []);
+
+  // Save gamesPerPage to localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PER_PAGE, gamesPerPage.toString());
+  }, [gamesPerPage]);
+
+  // Reset to page 1 when filters, search, or sorting changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedPlatforms, selectedPriorities, selectedSources, selectedConsoles, searchQuery, sortBy, showHiddenGames, gamesPerPage]);
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -141,6 +177,21 @@ export default function LibraryPage() {
     [userGames, showHiddenGames, selectedPlatforms, selectedPriorities, searchQuery, selectedSources, selectedConsoles, sortBy]
   );
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedGames.length / gamesPerPage);
+  const startIndex = (currentPage - 1) * gamesPerPage;
+  const endIndex = startIndex + gamesPerPage;
+  const paginatedGames = useMemo(
+    () => sortedGames.slice(startIndex, endIndex),
+    [sortedGames, startIndex, endIndex]
+  );
+
+  const goToPage = (page: number) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const hasActiveFilters = selectedPlatforms.length > 0 || selectedPriorities.length > 0 || selectedSources.length > 0 || selectedConsoles.length > 0;
 
   const sourceCounts = useMemo(() => {
@@ -153,10 +204,13 @@ export default function LibraryPage() {
     return counts;
   }, [userGames, showHiddenGames]);
 
-  const totalGames = userGames.length;
-  const nowPlayingCount = userGames.filter(g => g.status === 'playing').length;
-  const completedCount = userGames.filter(g => g.status === 'completed' || g.status === 'finished').length;
-  const totalPlaytime = Math.round(userGames.reduce((acc, g) => acc + g.playtime_hours, 0));
+  // Exclude unowned games from stats (unless previously_owned) but keep them in the list for display
+  const ownedGames = userGames.filter(g => g.ownership_status !== 'unowned' || g.previously_owned);
+  const totalGames = ownedGames.length;
+  const nowPlayingCount = ownedGames.filter(g => g.status === 'playing').length;
+  const completedCount = ownedGames.filter(g => g.status === 'completed' || g.status === 'finished').length;
+  // Use snapshot values when set, otherwise use synced values
+  const totalPlaytime = Math.round(ownedGames.reduce((acc, g) => acc + (g.my_playtime_hours ?? g.playtime_hours), 0));
   const hiddenGamesCount = userGames.filter(g => g.hidden).length;
 
   return (
@@ -625,6 +679,54 @@ export default function LibraryPage() {
                 </span>
               </button>
 
+              {/* Games Per Page Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="group relative flex items-center gap-2 px-3 py-2 overflow-hidden rounded-lg transition-all duration-300 bg-theme-hover border border-theme hover:border-cyan-500/30">
+                    {/* HUD corners */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400/0 group-hover:border-cyan-400/50 transition-all" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400/0 group-hover:border-cyan-400/50 transition-all" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-cyan-400/0 group-hover:border-cyan-400/50 transition-all" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-cyan-400/0 group-hover:border-cyan-400/50 transition-all" />
+
+                    <Layers className="w-4 h-4 text-cyan-400/70 group-hover:text-cyan-400 transition-colors" />
+                    <span className="text-xs font-mono font-medium text-theme-muted group-hover:text-theme-primary transition-colors">
+                      {gamesPerPage}
+                    </span>
+                    <ChevronDown className="w-3 h-3 text-theme-subtle group-hover:text-theme-muted transition-colors" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="min-w-[120px] bg-theme-secondary border border-theme rounded-xl overflow-hidden shadow-xl shadow-black/20"
+                >
+                  {/* HUD corners for dropdown */}
+                  <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-cyan-400/30 pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-cyan-400/30 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-cyan-400/30 pointer-events-none" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-cyan-400/30 pointer-events-none" />
+
+                  {GAMES_PER_PAGE_OPTIONS.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => setGamesPerPage(option.value)}
+                      className={`cursor-pointer px-3 py-2 text-xs font-mono transition-colors ${
+                        gamesPerPage === option.value
+                          ? 'bg-cyan-500/10 text-cyan-400'
+                          : 'text-theme-secondary hover:bg-theme-hover hover:text-theme-primary'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        {gamesPerPage === option.value && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                        )}
+                        {option.label}
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {/* View Toggle */}
               <div className="flex items-center gap-1 p-1 bg-theme-hover border border-theme rounded-xl">
                 <button
@@ -680,8 +782,8 @@ export default function LibraryPage() {
               )}
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {sortedGames.map((userGame, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+              {paginatedGames.map((userGame, index) => (
                 <GameCard
                   key={userGame.id}
                   game={userGame}
@@ -694,7 +796,7 @@ export default function LibraryPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {sortedGames.map((userGame, index) => (
+              {paginatedGames.map((userGame, index) => (
                 <GameListItem
                   key={userGame.id}
                   game={userGame}
@@ -703,6 +805,174 @@ export default function LibraryPage() {
                   onDelete={() => handleDeleteGame(userGame)}
                 />
               ))}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && sortedGames.length > 0 && (
+            <div className="mt-10 mb-4">
+              {/* Section header */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
+                <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">// NAVIGATION</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
+              </div>
+
+              {/* Pagination container */}
+              <div className="relative flex items-center justify-center">
+                {/* Background panel */}
+                <div className="relative flex items-center gap-2 px-6 py-4 bg-theme-secondary border border-theme rounded-2xl">
+                  {/* HUD corners */}
+                  <div className="absolute top-0 left-0 w-5 h-5 border-l-2 border-t-2 border-cyan-400/30" />
+                  <div className="absolute top-0 right-0 w-5 h-5 border-r-2 border-t-2 border-cyan-400/30" />
+                  <div className="absolute bottom-0 left-0 w-5 h-5 border-l-2 border-b-2 border-cyan-400/30" />
+                  <div className="absolute bottom-0 right-0 w-5 h-5 border-r-2 border-b-2 border-cyan-400/30" />
+
+                  {/* First page button */}
+                  <button
+                    onClick={() => goToPage(1)}
+                    disabled={currentPage === 1}
+                    className={`group relative p-2.5 rounded-xl transition-all duration-300 ${
+                      currentPage === 1
+                        ? 'text-theme-subtle cursor-not-allowed opacity-40'
+                        : 'text-theme-muted hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/30'
+                    }`}
+                    title="First page"
+                  >
+                    <ChevronsLeft className="w-4 h-4" />
+                  </button>
+
+                  {/* Previous page button */}
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`group relative p-2.5 rounded-xl transition-all duration-300 ${
+                      currentPage === 1
+                        ? 'text-theme-subtle cursor-not-allowed opacity-40'
+                        : 'text-theme-muted hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/30'
+                    }`}
+                    title="Previous page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  {/* Page numbers */}
+                  <div className="flex items-center gap-1 mx-2">
+                    {(() => {
+                      const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
+                      const showEllipsisStart = currentPage > 3;
+                      const showEllipsisEnd = currentPage < totalPages - 2;
+
+                      // Always show first page
+                      pages.push(1);
+
+                      if (showEllipsisStart) {
+                        pages.push('ellipsis-start');
+                      }
+
+                      // Show pages around current
+                      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                        if (!pages.includes(i)) {
+                          pages.push(i);
+                        }
+                      }
+
+                      if (showEllipsisEnd) {
+                        pages.push('ellipsis-end');
+                      }
+
+                      // Always show last page if more than 1 page
+                      if (totalPages > 1 && !pages.includes(totalPages)) {
+                        pages.push(totalPages);
+                      }
+
+                      return pages.map((page, idx) => {
+                        if (page === 'ellipsis-start' || page === 'ellipsis-end') {
+                          return (
+                            <span
+                              key={page}
+                              className="w-10 h-10 flex items-center justify-center text-theme-subtle"
+                            >
+                              <span className="flex gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-theme-subtle" />
+                                <span className="w-1 h-1 rounded-full bg-theme-subtle" />
+                                <span className="w-1 h-1 rounded-full bg-theme-subtle" />
+                              </span>
+                            </span>
+                          );
+                        }
+
+                        const isActive = page === currentPage;
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => goToPage(page)}
+                            className={`relative w-10 h-10 rounded-xl font-mono text-sm font-medium transition-all duration-300 ${
+                              isActive
+                                ? 'bg-gradient-to-br from-cyan-500/20 to-violet-500/20 text-cyan-400 border border-cyan-500/40 shadow-[0_0_20px_rgba(34,211,238,0.15)]'
+                                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent hover:border-theme-hover'
+                            }`}
+                          >
+                            {isActive && (
+                              <>
+                                {/* Active page glow */}
+                                <div className="absolute inset-0 rounded-xl bg-cyan-500/10 animate-pulse" />
+                                {/* Corner accents for active page */}
+                                <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400" />
+                                <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400" />
+                                <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-cyan-400" />
+                                <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-cyan-400" />
+                              </>
+                            )}
+                            <span className="relative">{page}</span>
+                          </button>
+                        );
+                      });
+                    })()}
+                  </div>
+
+                  {/* Next page button */}
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`group relative p-2.5 rounded-xl transition-all duration-300 ${
+                      currentPage === totalPages
+                        ? 'text-theme-subtle cursor-not-allowed opacity-40'
+                        : 'text-theme-muted hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/30'
+                    }`}
+                    title="Next page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  {/* Last page button */}
+                  <button
+                    onClick={() => goToPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={`group relative p-2.5 rounded-xl transition-all duration-300 ${
+                      currentPage === totalPages
+                        ? 'text-theme-subtle cursor-not-allowed opacity-40'
+                        : 'text-theme-muted hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/30'
+                    }`}
+                    title="Last page"
+                  >
+                    <ChevronsRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Page info */}
+              <div className="flex justify-center mt-4">
+                <div className="flex items-center gap-3 px-4 py-2 bg-theme-hover/50 rounded-lg border border-theme/50">
+                  <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
+                    PAGE <span className="text-cyan-400 font-bold">{currentPage}</span> OF <span className="text-theme-muted">{totalPages}</span>
+                  </span>
+                  <div className="w-px h-3 bg-theme" />
+                  <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">
+                    SHOWING <span className="text-cyan-400 font-bold">{startIndex + 1}-{Math.min(endIndex, sortedGames.length)}</span> OF <span className="text-theme-muted">{sortedGames.length}</span>
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>

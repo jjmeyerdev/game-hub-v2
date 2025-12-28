@@ -39,6 +39,8 @@ interface GameMetadataSectionProps {
   isEditMode: boolean;
   onUpdateCoverFromIGDB?: () => void;
   updatingCover?: boolean;
+  onUpdateCoverFromSteam?: () => void;
+  canUseSteamCover?: boolean;
 }
 
 function FieldLabel({
@@ -136,8 +138,8 @@ export function GameMetadataSection({
   onRefreshFromIGDB,
   refreshingMetadata,
   isEditMode,
-  onUpdateCoverFromIGDB,
-  updatingCover,
+  onUpdateCoverFromSteam,
+  canUseSteamCover,
 }: GameMetadataSectionProps) {
   return (
     <div className="space-y-4">
@@ -173,15 +175,14 @@ export function GameMetadataSection({
               </div>
             )}
           </div>
-          {isEditMode && onUpdateCoverFromIGDB && (
+          {isEditMode && canUseSteamCover && onUpdateCoverFromSteam && (
             <button
               type="button"
-              onClick={onUpdateCoverFromIGDB}
-              disabled={updatingCover || !title.trim()}
-              className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-theme-hover hover:bg-theme-active border border-theme rounded-lg text-[10px] font-medium text-theme-muted hover:text-theme-primary transition-all disabled:opacity-30"
+              onClick={onUpdateCoverFromSteam}
+              className="w-full mt-2 flex items-center justify-center gap-1 px-2 py-1.5 bg-[#1b2838] hover:bg-[#2a475e] border border-[#66c0f4]/30 rounded-lg text-[10px] font-medium text-[#66c0f4] hover:text-[#66c0f4] transition-all"
             >
-              {updatingCover ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-              {updatingCover ? 'Updating...' : 'Get Cover'}
+              <Sparkles className="w-3 h-3" />
+              From Steam
             </button>
           )}
         </div>

@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc, Target, Zap } from 'lucide-react';
+import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc, Target, Zap, UserX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getGameSyncSource } from '@/lib/utils';
 import { getDisplayPlatform } from '@/lib/constants/platforms';
-import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
+import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, EALogo, WindowsLogo, NintendoLogo, GOGLogo, BattleNetLogo, UbisoftLogo } from '@/components/icons/PlatformLogos';
 
 interface GameCardProps {
   game: UserGame;
@@ -24,6 +24,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const isCompleted = game.status === 'completed' || game.status === 'finished';
+  const isUnowned = game.ownership_status === 'unowned';
   const isAdult = game.tags?.includes('adult') ?? false;
   const shouldCensor = isAdult && censorHidden && !isRevealed;
   const hasPlaytime = game.playtime_hours > 0;
@@ -73,6 +74,12 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
     if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-4 h-4 text-white" />;
     if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-4 h-4 text-white" />;
     if (lowerPlatform.includes('epic')) return <EpicLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('ea app') || lowerPlatform.includes('origin')) return <EALogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii')) return <NintendoLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('gog')) return <GOGLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('battle.net') || lowerPlatform.includes('blizzard')) return <BattleNetLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('ubisoft') || lowerPlatform.includes('uplay')) return <UbisoftLogo className="w-4 h-4 text-white" />;
+    if (lowerPlatform.includes('pc') || lowerPlatform.includes('windows')) return <WindowsLogo className="w-4 h-4 text-white" />;
     return <Gamepad2 className="w-4 h-4 text-white" />;
   };
 
@@ -89,11 +96,29 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Outer glow effect based on status */}
+      {/* Outer glow effect - persistent rose glow for unowned, status-based for others */}
       <div
-        className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
-        style={{ background: statusConfig.glow }}
+        className={`absolute -inset-1 rounded-2xl transition-opacity duration-500 blur-xl ${
+          isUnowned
+            ? 'opacity-60 group-hover:opacity-80'
+            : 'opacity-0 group-hover:opacity-100'
+        }`}
+        style={{ background: isUnowned ? 'rgba(244, 63, 94, 0.25)' : statusConfig.glow }}
       />
+
+      {/* Unowned border glow ring */}
+      {isUnowned && (
+        <div
+          className="absolute -inset-[2px] rounded-2xl pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.4) 0%, rgba(190, 18, 60, 0.2) 50%, rgba(244, 63, 94, 0.4) 100%)',
+            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            maskComposite: 'xor',
+            WebkitMaskComposite: 'xor',
+            padding: '2px',
+          }}
+        />
+      )}
 
       {/* Main card with 3D tilt */}
       <div
@@ -106,27 +131,27 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
         {/* Base card background */}
         <div className="absolute inset-0 bg-theme-secondary border border-theme rounded-xl transition-all duration-300 group-hover:border-theme-hover" />
 
-        {/* HUD Corner Brackets */}
+        {/* HUD Corner Brackets - rose for unowned, cyan for owned */}
         <div className="absolute inset-0 pointer-events-none z-30">
           {/* Top-left bracket */}
           <div className="absolute top-2 left-2 w-5 h-5">
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300 group-hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-            <div className="absolute top-0 left-0 h-full w-[2px] bg-linear-to-b from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300 group-hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+            <div className={`absolute top-0 left-0 w-full h-[2px] bg-linear-to-r ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300 ${isUnowned ? 'group-hover:shadow-[0_0_8px_rgba(244,63,94,0.6)]' : 'group-hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]'}`} />
+            <div className={`absolute top-0 left-0 h-full w-[2px] bg-linear-to-b ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300 ${isUnowned ? 'group-hover:shadow-[0_0_8px_rgba(244,63,94,0.6)]' : 'group-hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]'}`} />
           </div>
           {/* Top-right bracket */}
           <div className="absolute top-2 right-2 w-5 h-5">
-            <div className="absolute top-0 right-0 w-full h-[2px] bg-linear-to-l from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
-            <div className="absolute top-0 right-0 h-full w-[2px] bg-linear-to-b from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+            <div className={`absolute top-0 right-0 w-full h-[2px] bg-linear-to-l ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300`} />
+            <div className={`absolute top-0 right-0 h-full w-[2px] bg-linear-to-b ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300`} />
           </div>
           {/* Bottom-left bracket */}
           <div className="absolute bottom-2 left-2 w-5 h-5">
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-linear-to-r from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
-            <div className="absolute bottom-0 left-0 h-full w-[2px] bg-linear-to-t from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+            <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-linear-to-r ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300`} />
+            <div className={`absolute bottom-0 left-0 h-full w-[2px] bg-linear-to-t ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300`} />
           </div>
           {/* Bottom-right bracket */}
           <div className="absolute bottom-2 right-2 w-5 h-5">
-            <div className="absolute bottom-0 right-0 w-full h-[2px] bg-linear-to-l from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
-            <div className="absolute bottom-0 right-0 h-full w-[2px] bg-linear-to-t from-cyan-400 to-transparent opacity-40 group-hover:opacity-100 transition-all duration-300" />
+            <div className={`absolute bottom-0 right-0 w-full h-[2px] bg-linear-to-l ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300`} />
+            <div className={`absolute bottom-0 right-0 h-full w-[2px] bg-linear-to-t ${isUnowned ? 'from-rose-500' : 'from-cyan-400'} to-transparent ${isUnowned ? 'opacity-70' : 'opacity-40'} group-hover:opacity-100 transition-all duration-300`} />
           </div>
         </div>
 
@@ -352,8 +377,18 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
           </div>
         </div>
 
+        {/* Unowned badge - bottom right corner, above the data panel */}
+        {isUnowned && !shouldCensor && (
+          <div className="absolute bottom-[4.5rem] right-3 z-30">
+            <div className="flex items-center gap-1 px-2 py-1 bg-rose-500/20 backdrop-blur-sm rounded-lg border border-rose-500/40" title="Not counted in stats">
+              <UserX className="w-3 h-3 text-rose-400" />
+              <span className="text-[8px] font-bold text-rose-400 uppercase tracking-wider">Unowned</span>
+            </div>
+          </div>
+        )}
+
         {/* Physical copy badge - bottom right, above the data panel */}
-        {game.is_physical && !shouldCensor && (
+        {game.is_physical && !shouldCensor && !isUnowned && (
           <div className="absolute bottom-[4.5rem] right-3 z-30">
             <div className="p-1.5 bg-amber-500/20 backdrop-blur-sm rounded-lg border border-amber-500/30" title="Physical Copy">
               <Disc className="w-3.5 h-3.5 text-amber-400" />

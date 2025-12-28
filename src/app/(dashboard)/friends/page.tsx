@@ -1,23 +1,56 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Users, ArrowRight, AlertCircle, Zap } from 'lucide-react';
+import { Users, ArrowRight, AlertCircle, Zap, Loader2 } from 'lucide-react';
 import { PlatformTabs, FriendSearchInput, ComparisonCard, CommonGamesGrid } from '@/components/compare';
 import { compareProfile, getCurrentUserComparisonData } from '@/lib/actions/compare';
 import type { ComparePlatform, ComparisonResult, ComparisonProfile } from '@/lib/types/compare';
 
-export default function FriendsPage() {
-  const [platform, setPlatform] = useState<ComparePlatform>('psn');
+function FriendsPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Read initial values from URL params
+  const urlPlatform = searchParams.get('platform') as ComparePlatform | null;
+  const urlFriend = searchParams.get('friend');
+
+  const [platform, setPlatform] = useState<ComparePlatform>(urlPlatform || 'psn');
+  const [friendIdentifier, setFriendIdentifier] = useState<string>(urlFriend || '');
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
   const [userProfile, setUserProfile] = useState<ComparisonProfile | null>(null);
+  const [hasRestoredFromUrl, setHasRestoredFromUrl] = useState(false);
+
+  // Update URL params when state changes
+  const updateUrlParams = useCallback((newPlatform: ComparePlatform, newFriend: string | null) => {
+    const params = new URLSearchParams();
+    params.set('platform', newPlatform);
+    if (newFriend) {
+      params.set('friend', newFriend);
+    }
+    router.replace(`/friends?${params.toString()}`, { scroll: false });
+  }, [router]);
+
+  // Restore comparison from URL params on mount
+  useEffect(() => {
+    if (hasRestoredFromUrl) return;
+    if (urlPlatform && urlFriend) {
+      setHasRestoredFromUrl(true);
+      // Trigger the search to restore the comparison
+      handleSearch(urlFriend);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlPlatform, urlFriend, hasRestoredFromUrl]);
 
   const handlePlatformChange = useCallback(async (newPlatform: ComparePlatform) => {
     setPlatform(newPlatform);
     setComparisonResult(null);
     setError(null);
+    setFriendIdentifier('');
+    updateUrlParams(newPlatform, null);
 
     // Pre-fetch user's data for the selected platform
     const result = await getCurrentUserComparisonData(newPlatform);
@@ -29,11 +62,13 @@ export default function FriendsPage() {
         setError(result.error);
       }
     }
-  }, []);
+  }, [updateUrlParams]);
 
   const handleSearch = useCallback(async (identifier: string) => {
     setIsSearching(true);
     setError(null);
+    setFriendIdentifier(identifier);
+    updateUrlParams(platform, identifier);
 
     try {
       const result = await compareProfile(platform, identifier);
@@ -52,12 +87,14 @@ export default function FriendsPage() {
     } finally {
       setIsSearching(false);
     }
-  }, [platform]);
+  }, [platform, updateUrlParams]);
 
   const handleClear = useCallback(() => {
     setComparisonResult(null);
     setError(null);
-  }, []);
+    setFriendIdentifier('');
+    updateUrlParams(platform, null);
+  }, [platform, updateUrlParams]);
 
   return (
     <div className="min-h-screen bg-theme-primary relative">
@@ -127,6 +164,7 @@ export default function FriendsPage() {
             onSearch={handleSearch}
             isSearching={isSearching}
             onClear={handleClear}
+            initialValue={friendIdentifier}
           />
         </div>
 
@@ -158,6 +196,9 @@ export default function FriendsPage() {
               platform={platform}
               userName={comparisonResult.user?.username}
               friendName={comparisonResult.friend?.username}
+              friendIdentifier={comparisonResult.friend?.platformId}
+              userAvatarUrl={comparisonResult.user?.avatarUrl}
+              friendAvatarUrl={comparisonResult.friend?.avatarUrl}
             />
           )}
         </div>
@@ -200,5 +241,17 @@ export default function FriendsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FriendsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-theme-primary flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+      </div>
+    }>
+      <FriendsPageContent />
+    </Suspense>
   );
 }

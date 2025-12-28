@@ -8,6 +8,7 @@ export interface ComparisonGame {
   achievementProgress: number; // percentage 0-100
   playtime: number; // hours
   platform: ComparePlatform;
+  console?: string; // e.g., "PS5", "Xbox Series X|S", "PC"
 }
 
 export interface PlatformSpecificStats {
@@ -30,6 +31,7 @@ export interface ComparisonStats {
 
 export interface ComparisonProfile {
   platform: ComparePlatform;
+  platformId: string; // Steam ID, PSN Online ID, or Xbox Gamertag for lookups
   username: string;
   avatarUrl: string | null;
   stats: ComparisonStats;
@@ -47,6 +49,7 @@ export interface ComparisonResult {
     friendProgress: number;
     userPlaytime: number;
     friendPlaytime: number;
+    console?: string; // e.g., "PS5", "Xbox Series X|S", "PC"
   }>;
   error?: string;
 }

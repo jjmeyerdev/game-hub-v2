@@ -17,6 +17,7 @@ import {
   searchByGamertag,
   getTitleHistoryByXuid,
   getMyProfile,
+  normalizeXboxPlatform,
 } from '@/lib/xbox/client';
 import {
   validateSteamId,
@@ -283,25 +284,30 @@ export async function getCurrentUserComparisonData(
       };
     }
 
-    // Get username based on platform
+    // Get username and platformId based on platform
     let username = 'You';
     let avatarUrl: string | null = null;
+    let platformId = '';
 
     if (platform === 'psn') {
       username = profile.psn_online_id || 'You';
       avatarUrl = profile.psn_avatar_url;
+      platformId = profile.psn_online_id || '';
     } else if (platform === 'xbox') {
       username = profile.xbox_gamertag || 'You';
       avatarUrl = profile.xbox_avatar_url;
+      platformId = profile.xbox_gamertag || '';
     } else {
       username = profile.steam_persona_name || 'You';
       avatarUrl = profile.steam_avatar_url;
+      platformId = profile.steam_id || '';
     }
 
     return {
       success: true,
       profile: {
         platform,
+        platformId,
         username,
         avatarUrl,
         stats,
@@ -403,6 +409,7 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
           achievementProgress: psnGame.progress || 0,
           playtime: playtimeHours,
           platform: 'psn',
+          console: psnGame.trophyTitlePlatform || 'PlayStation',
         });
 
         friendTotalAchievements += earnedTotal;
@@ -430,6 +437,7 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
 
     const friendProfile: ComparisonProfile = {
       platform: 'psn',
+      platformId: friendResult.onlineId,
       username: friendResult.onlineId,
       avatarUrl: friendResult.avatarUrl,
       stats: friendStats,
@@ -451,6 +459,7 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
           friendProgress: fg.achievementProgress,
           userPlaytime: userGame?.playtime || 0,
           friendPlaytime: fg.playtime,
+          console: fg.console || userGame?.console,
         };
       })
       .sort((a, b) => b.userProgress - a.userProgress);
@@ -535,12 +544,20 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
         const achievementsEarned = xboxGame.achievement?.currentAchievements || 0;
         const completionPercentage = xboxGame.achievement?.progressPercentage || 0;
 
+        // Use the same normalization as the library sync
+        const devices = xboxGame.devices || [];
+        const normalizedPlatform = normalizeXboxPlatform(devices);
+        // Extract console name from "Xbox (Xbox One)" format
+        const consoleMatch = normalizedPlatform.match(/\(([^)]+)\)/);
+        const consoleName = consoleMatch ? consoleMatch[1] : normalizedPlatform;
+
         friendGames.push({
           title: xboxGame.name,
           coverUrl: xboxGame.displayImage || null,
           achievementProgress: completionPercentage,
           playtime: 0, // Xbox API doesn't provide playtime in title history
           platform: 'xbox',
+          console: consoleName,
         });
 
         friendTotalAchievements += achievementsEarned;
@@ -567,6 +584,7 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
 
     const friendProfile: ComparisonProfile = {
       platform: 'xbox',
+      platformId: friendResult.gamertag,
       username: friendResult.gamertag,
       avatarUrl: friendResult.gamerPicture || null,
       stats: friendStats,
@@ -588,6 +606,7 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
           friendProgress: fg.achievementProgress,
           userPlaytime: userGame?.playtime || 0,
           friendPlaytime: fg.playtime,
+          console: fg.console || userGame?.console,
         };
       })
       .sort((a, b) => b.userProgress - a.userProgress);
@@ -731,6 +750,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
           achievementProgress: achievementData?.percentage || 0,
           playtime: playtimeHours,
           platform: 'steam',
+          console: 'PC',
         });
 
         if (achievementData) {
@@ -763,6 +783,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
 
     const friendComparisonProfile: ComparisonProfile = {
       platform: 'steam',
+      platformId: friendSteamId,
       username: friendProfile.personaname,
       avatarUrl: friendProfile.avatarfull || null,
       stats: friendStats,
@@ -784,6 +805,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
           friendProgress: fg.achievementProgress,
           userPlaytime: userGame?.playtime || 0,
           friendPlaytime: fg.playtime,
+          console: fg.console || userGame?.console,
         };
       })
       .sort((a, b) => b.userProgress - a.userProgress);

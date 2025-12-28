@@ -45,6 +45,10 @@ export interface UserGame {
   owned: boolean; // Deprecated, use ownership_status
   ownership_status: OwnershipStatus;
   is_physical: boolean;
+  previously_owned: boolean;
+  my_playtime_hours: number | null; // Manual snapshot for previously owned games
+  my_achievements_earned: number | null; // Manual snapshot for previously owned games
+  release_date: string | null; // Platform-specific release date
   created_at: string;
   updated_at: string;
   game?: Game;
@@ -85,4 +89,43 @@ export interface PlatformScanResult {
   matches: PlatformMatch[];
   scannedPlatforms: string[];
   error: string | null;
+}
+
+/**
+ * Achievement/Trophy types
+ */
+export type AchievementPlatform = 'psn' | 'xbox' | 'steam';
+
+export type TrophyType = 'bronze' | 'silver' | 'gold' | 'platinum';
+
+export interface UserAchievement {
+  id: string;
+  user_id: string;
+  user_game_id: string;
+  platform: AchievementPlatform;
+  platform_achievement_id: string;
+  name: string;
+  description: string | null;
+  icon_url: string | null;
+  icon_url_locked: string | null;
+  achievement_type: TrophyType | 'achievement' | null;
+  points: number | null; // gamerscore for Xbox, calculated for PSN
+  rarity: number | null; // percentage 0-100
+  unlocked: boolean;
+  unlocked_at: string | null;
+  unlocked_by_me: boolean | null; // null = use unlocked, true/false = override
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Achievement stats for a game
+ */
+export interface GameAchievementStats {
+  total: number;
+  unlocked: number;
+  unlockedByMe: number; // considering unlocked_by_me overrides
+  totalPoints: number;
+  earnedPoints: number;
+  earnedPointsByMe: number;
 }

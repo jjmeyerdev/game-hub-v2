@@ -16,6 +16,10 @@ interface UserGameRow {
   achievements_earned: number | null;
   achievements_total: number | null;
   last_played_at: string | null;
+  ownership_status: string | null;
+  previously_owned: boolean | null;
+  my_playtime_hours: number | null;
+  my_achievements_earned: number | null;
   game: unknown;
 }
 
@@ -186,6 +190,10 @@ export async function getStatsData(): Promise<StatsData | null> {
         achievements_earned,
         achievements_total,
         last_played_at,
+        ownership_status,
+        previously_owned,
+        my_playtime_hours,
+        my_achievements_earned,
         game:games(title, cover_url)
       `)
       .eq('user_id', user.id),
@@ -206,17 +214,26 @@ export async function getStatsData(): Promise<StatsData | null> {
       .not('duration_minutes', 'is', null),
   ]);
 
-  const userGames = (userGamesResult.data || []) as UserGameRow[];
+  const allUserGames = (userGamesResult.data || []) as UserGameRow[];
   const dailyPlaytime = dailyPlaytimeResult.data || [];
   const sessions = sessionsCountResult.data || [];
 
-  // Calculate Hero Stats
-  const totalPlaytimeHours = userGames.reduce((sum, g) => sum + (g.playtime_hours || 0), 0);
+  // Exclude unowned games from stats (unless previously_owned)
+  const userGames = allUserGames.filter(g => g.ownership_status !== 'unowned' || g.previously_owned);
+
+  // Calculate Hero Stats (use snapshot values when set)
+  const totalPlaytimeHours = userGames.reduce((sum, g) => {
+    const hours = g.my_playtime_hours ?? g.playtime_hours ?? 0;
+    return sum + hours;
+  }, 0);
   const totalGames = userGames.length;
   const completedGames = userGames.filter(g => g.status === 'completed' || g.status === 'finished').length;
   const completionRate = totalGames > 0 ? Math.round((completedGames / totalGames) * 100) : 0;
 
-  const totalAchievementsEarned = userGames.reduce((sum, g) => sum + (g.achievements_earned || 0), 0);
+  const totalAchievementsEarned = userGames.reduce((sum, g) => {
+    const earned = g.my_achievements_earned ?? g.achievements_earned ?? 0;
+    return sum + earned;
+  }, 0);
   const totalAchievementsAvailable = userGames.reduce((sum, g) => sum + (g.achievements_total || 0), 0);
   const achievementCompletionRate = totalAchievementsAvailable > 0
     ? Math.round((totalAchievementsEarned / totalAchievementsAvailable) * 100)
@@ -237,12 +254,12 @@ export async function getStatsData(): Promise<StatsData | null> {
   // Calculate Streaks
   const { current: currentStreak, longest: longestStreak } = calculateStreak(dailyActivity);
 
-  // Calculate Playtime by Platform
+  // Calculate Playtime by Platform (use snapshot values when set)
   const platformMap = new Map<string, { hours: number; count: number }>();
   for (const game of userGames) {
     const platform = game.platform || 'Unknown';
     const existing = platformMap.get(platform) || { hours: 0, count: 0 };
-    existing.hours += game.playtime_hours || 0;
+    existing.hours += game.my_playtime_hours ?? game.playtime_hours ?? 0;
     existing.count += 1;
     platformMap.set(platform, existing);
   }
@@ -284,18 +301,19 @@ export async function getStatsData(): Promise<StatsData | null> {
   // Calculate Weekly Playtime Trends
   const weeklyPlaytime = calculateWeeklyPlaytime(dailyActivity);
 
-  // Get Most Played Games (top 10)
+  // Get Most Played Games (top 10) - use snapshot values when set
   const mostPlayedGames: MostPlayedGame[] = userGames
-    .filter(g => (g.playtime_hours || 0) > 0)
-    .sort((a, b) => (b.playtime_hours || 0) - (a.playtime_hours || 0))
+    .filter(g => (g.my_playtime_hours ?? g.playtime_hours ?? 0) > 0)
+    .sort((a, b) => (b.my_playtime_hours ?? b.playtime_hours ?? 0) - (a.my_playtime_hours ?? a.playtime_hours ?? 0))
     .slice(0, 10)
     .map(g => {
       const gameInfo = g.game as GameDetails | null;
+      const hours = g.my_playtime_hours ?? g.playtime_hours ?? 0;
       return {
         gameTitle: gameInfo?.title || 'Unknown Game',
         coverUrl: gameInfo?.cover_url || null,
         platform: g.platform || 'Unknown',
-        playtimeHours: Math.round((g.playtime_hours || 0) * 10) / 10,
+        playtimeHours: Math.round(hours * 10) / 10,
         lastPlayed: g.last_played_at,
       };
     });

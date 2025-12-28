@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Loader2, X } from 'lucide-react';
 import type { ComparePlatform } from '@/lib/types/compare';
 
@@ -9,6 +9,7 @@ interface FriendSearchInputProps {
   onSearch: (identifier: string) => Promise<void>;
   isSearching: boolean;
   onClear?: () => void;
+  initialValue?: string;
 }
 
 const platformPlaceholders: Record<ComparePlatform, string> = {
@@ -35,9 +36,14 @@ const platformColors: Record<ComparePlatform, { border: string; focus: string; b
   },
 };
 
-export function FriendSearchInput({ platform, onSearch, isSearching, onClear }: FriendSearchInputProps) {
-  const [value, setValue] = useState('');
+export function FriendSearchInput({ platform, onSearch, isSearching, onClear, initialValue = '' }: FriendSearchInputProps) {
+  const [value, setValue] = useState(initialValue);
   const colors = platformColors[platform];
+
+  // Update value when initialValue changes (e.g., from URL params)
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

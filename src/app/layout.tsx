@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Rajdhani } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme';
+import { ToastProvider } from '@/components/ui/Toast';
 import './globals.css';
 
 const inter = Inter({
@@ -40,7 +41,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

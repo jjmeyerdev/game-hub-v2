@@ -3,11 +3,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Gamepad2, Loader2, Edit3 } from 'lucide-react';
 import { addGameToLibrary, editUserGame, fetchIGDBMetadata } from '@/lib/actions/games';
+import { getSteamLibraryCapsuleUrl } from '@/lib/steam';
 import type { UserGame } from '@/lib/actions/games';
 import { BaseModal } from '@/components/modals';
 import { useIGDBSearch } from '@/lib/hooks';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
-import type { IGDBGame } from '@/lib/types';
+import type { IGDBGame, PlatformReleaseDate } from '@/lib/types';
+import { getPlatformReleaseDate } from '@/lib/igdb/client';
+import { useToast } from '@/components/ui/Toast';
 import {
   PRIORITY_CONFIG,
   STATUS_CONFIG,
@@ -34,6 +37,8 @@ export function GameFormModal({
   mode,
   userGame,
 }: GameFormModalProps) {
+  const { showToast } = useToast();
+
   // Game metadata state
   const [title, setTitle] = useState('');
   const [coverUrl, setCoverUrl] = useState('');
@@ -54,6 +59,9 @@ export function GameFormModal({
   const [isAdult, setIsAdult] = useState(false);
   const [ownershipStatus, setOwnershipStatus] = useState<'owned' | 'wishlist' | 'unowned'>('owned');
   const [isPhysical, setIsPhysical] = useState(false);
+  const [previouslyOwned, setPreviouslyOwned] = useState(false);
+  const [myPlaytimeHours, setMyPlaytimeHours] = useState('');
+  const [myAchievementsEarned, setMyAchievementsEarned] = useState('');
   const [playtimeHours, setPlaytimeHours] = useState('');
   const [completionPercentage, setCompletionPercentage] = useState('');
   const [personalRating, setPersonalRating] = useState('');
@@ -65,11 +73,14 @@ export function GameFormModal({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [updatingCover, setUpdatingCover] = useState(false);
   const [refreshingMetadata, setRefreshingMetadata] = useState(false);
 
   // Locked fields - prevent overwriting on IGDB search/refresh
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
+
+  // IGDB release dates - stored to enable platform-specific date selection
+  const [igdbReleaseDates, setIgdbReleaseDates] = useState<PlatformReleaseDate[]>([]);
+  const [igdbFallbackDate, setIgdbFallbackDate] = useState<string | null>(null);
 
   const toggleFieldLock = (field: string) => {
     setLockedFields(prev => ({ ...prev, [field]: !prev[field] }));
@@ -115,6 +126,9 @@ export function GameFormModal({
     setIsAdult(false);
     setOwnershipStatus('owned');
     setIsPhysical(false);
+    setPreviouslyOwned(false);
+    setMyPlaytimeHours('');
+    setMyAchievementsEarned('');
     setPlaytimeHours('');
     setCompletionPercentage('');
     setPersonalRating('');
@@ -123,6 +137,8 @@ export function GameFormModal({
     setTagInput('');
     setRefreshingMetadata(false);
     setLockedFields({});
+    setIgdbReleaseDates([]);
+    setIgdbFallbackDate(null);
     clearResults();
   }, [clearResults]);
 
@@ -147,6 +163,9 @@ export function GameFormModal({
       setIsAdult(userGame.tags?.includes('adult') ?? false);
       setOwnershipStatus((userGame.ownership_status ?? 'owned') as 'owned' | 'wishlist' | 'unowned');
       setIsPhysical(userGame.is_physical ?? false);
+      setPreviouslyOwned(userGame.previously_owned ?? false);
+      setMyPlaytimeHours(userGame.my_playtime_hours?.toString() ?? '');
+      setMyAchievementsEarned(userGame.my_achievements_earned?.toString() ?? '');
       setPlaytimeHours(userGame.playtime_hours?.toString() ?? '');
       setCompletionPercentage(userGame.completion_percentage?.toString() ?? '');
       setPersonalRating(userGame.personal_rating?.toString() ?? '');
@@ -171,6 +190,21 @@ export function GameFormModal({
       setSelectedConsole(consoleOptions[0]);
     }
   }, [selectedPlatform, hasConsoles, consoleOptions, selectedConsole]);
+
+  // Auto-update release date when platform/console changes (if IGDB data is available)
+  useEffect(() => {
+    if (igdbReleaseDates.length > 0 && !isFieldLocked('releaseDate')) {
+      const platformDate = getPlatformReleaseDate(
+        igdbReleaseDates,
+        selectedPlatform,
+        selectedConsole || undefined,
+        igdbFallbackDate
+      );
+      if (platformDate) {
+        setReleaseDate(platformDate);
+      }
+    }
+  }, [selectedPlatform, selectedConsole, igdbReleaseDates, igdbFallbackDate, lockedFields]);
 
   // Tag management
   const addTag = useCallback((tag: string) => {
@@ -240,8 +274,23 @@ export function GameFormModal({
     if (!isFieldLocked('cover')) setCoverUrl(game.cover ?? '');
     if (!isFieldLocked('description')) setDescription(game.summary ?? '');
     if (!isFieldLocked('developer')) setDeveloper(game.developer ?? '');
-    if (!isFieldLocked('releaseDate')) setReleaseDate(game.releaseDate ?? '');
     if (!isFieldLocked('genres')) setGenres(game.genres ?? []);
+
+    // Store release dates for platform-specific selection
+    const releaseDates = game.releaseDates ?? [];
+    setIgdbReleaseDates(releaseDates);
+    setIgdbFallbackDate(game.releaseDate);
+
+    // Set platform-specific release date if available
+    if (!isFieldLocked('releaseDate')) {
+      const platformDate = getPlatformReleaseDate(
+        releaseDates,
+        selectedPlatform,
+        selectedConsole || undefined,
+        game.releaseDate
+      );
+      setReleaseDate(platformDate ?? '');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -279,6 +328,19 @@ export function GameFormModal({
     formData.set('hidden', (isAdult || isHidden).toString());
     formData.set('ownership_status', ownershipStatus);
     formData.set('is_physical', isPhysical.toString());
+    formData.set('previously_owned', previouslyOwned.toString());
+    if (myPlaytimeHours) formData.set('my_playtime_hours', myPlaytimeHours);
+    if (myAchievementsEarned) formData.set('my_achievements_earned', myAchievementsEarned);
+
+    // Auto-lock all lockable fields that have values on save
+    const autoLockedFields: Record<string, boolean> = {
+      title: !!title.trim(),
+      cover: !!coverUrl.trim(),
+      description: !!description.trim(),
+      developer: !!developer.trim(),
+      releaseDate: !!releaseDate.trim(),
+      genres: genres.length > 0,
+    };
 
     if (isEditMode && userGame) {
       formData.set('userGameId', userGame.id);
@@ -287,7 +349,10 @@ export function GameFormModal({
       formData.set('completionPercentage', completionPercentage);
       formData.set('personalRating', personalRating);
       formData.set('notes', notes);
-      formData.set('lockedFields', JSON.stringify(lockedFields));
+      formData.set('lockedFields', JSON.stringify(autoLockedFields));
+    } else {
+      // Also lock fields for new games
+      formData.set('lockedFields', JSON.stringify(autoLockedFields));
     }
 
     try {
@@ -297,10 +362,12 @@ export function GameFormModal({
 
       if (result.error) {
         setError(result.error);
+        showToast('error', result.error);
         setLoading(false);
       } else {
         setSuccess(true);
         setLoading(false);
+        showToast('success', 'Game saved — fields locked');
         onSuccess();
 
         if (isEditMode) {
@@ -309,40 +376,25 @@ export function GameFormModal({
       }
     } catch (err) {
       console.error('Save failed:', err);
-      setError(
-        err instanceof Error && err.message.includes('NetworkError')
-          ? 'Network error - please check your connection and try again'
-          : 'Failed to save game. Please try again.'
-      );
+      const errorMessage = err instanceof Error && err.message.includes('NetworkError')
+        ? 'Network error - please check your connection'
+        : 'Failed to save game. Please try again.';
+      setError(errorMessage);
+      showToast('error', errorMessage);
       setLoading(false);
     }
   };
 
-  const handleUpdateCoverFromIGDB = async () => {
-    if (!title.trim()) return;
+  const handleUpdateCoverFromSteam = () => {
+    const steamAppId = userGame?.game?.steam_appid;
+    if (!steamAppId) return;
 
-    setUpdatingCover(true);
-    setError('');
-
-    try {
-      const platformValue = hasConsoles && selectedConsole
-        ? `${selectedPlatform} (${selectedConsole})`
-        : selectedPlatform;
-
-      const result = await fetchIGDBMetadata(title, platformValue);
-      if (result.error) {
-        setError(result.error);
-      } else if (result.success && result.data?.coverUrl) {
-        setCoverUrl(result.data.coverUrl);
-      } else {
-        setError('No cover found for this game');
-      }
-    } catch {
-      setError('Failed to fetch cover art');
-    }
-
-    setUpdatingCover(false);
+    const steamCoverUrl = getSteamLibraryCapsuleUrl(steamAppId);
+    setCoverUrl(steamCoverUrl);
   };
+
+  // Check if we can use Steam cover (platform is Steam and game has steam_appid)
+  const canUseSteamCover = selectedPlatform === 'Steam' && !!userGame?.game?.steam_appid;
 
   const handleAddAnother = () => {
     setSuccess(false);
@@ -420,8 +472,8 @@ export function GameFormModal({
                 onRefreshFromIGDB={handleRefreshFromIGDB}
                 refreshingMetadata={refreshingMetadata}
                 isEditMode={isEditMode}
-                onUpdateCoverFromIGDB={handleUpdateCoverFromIGDB}
-                updatingCover={updatingCover}
+                onUpdateCoverFromSteam={handleUpdateCoverFromSteam}
+                canUseSteamCover={canUseSteamCover}
               />
 
               <UserLibrarySection
@@ -437,6 +489,12 @@ export function GameFormModal({
                 setOwnershipStatus={setOwnershipStatus}
                 isPhysical={isPhysical}
                 setIsPhysical={setIsPhysical}
+                previouslyOwned={previouslyOwned}
+                setPreviouslyOwned={setPreviouslyOwned}
+                myPlaytimeHours={myPlaytimeHours}
+                setMyPlaytimeHours={setMyPlaytimeHours}
+                myAchievementsEarned={myAchievementsEarned}
+                setMyAchievementsEarned={setMyAchievementsEarned}
                 isAdult={isAdult}
                 setIsAdult={setIsAdult}
                 isHidden={isHidden}

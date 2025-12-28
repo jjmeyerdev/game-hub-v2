@@ -5,7 +5,7 @@ import { Library, Edit3, Trash2, Eye, EyeOff, Trophy, Gamepad2, ShieldOff, Unloc
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getPlatformBrandStyle, getDisplayPlatform } from '@/lib/constants/platforms';
-import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo } from '@/components/icons/PlatformLogos';
+import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, EALogo, WindowsLogo, NintendoLogo, GOGLogo, BattleNetLogo, UbisoftLogo } from '@/components/icons/PlatformLogos';
 
 const getPlatformIcon = (platform: string) => {
   const lowerPlatform = platform.toLowerCase();
@@ -13,6 +13,12 @@ const getPlatformIcon = (platform: string) => {
   if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3.5 h-3.5" />;
   if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3.5 h-3.5" />;
   if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('ea app') || lowerPlatform.includes('origin')) return <EALogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii')) return <NintendoLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('gog')) return <GOGLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('battle.net') || lowerPlatform.includes('blizzard')) return <BattleNetLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('ubisoft') || lowerPlatform.includes('uplay')) return <UbisoftLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('pc') || lowerPlatform.includes('windows')) return <WindowsLogo className="w-3.5 h-3.5" />;
   return <Gamepad2 className="w-3.5 h-3.5" />;
 };
 
