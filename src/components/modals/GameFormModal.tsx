@@ -54,12 +54,14 @@ export function GameFormModal({
 
   // User game state
   const [selectedStatus, setSelectedStatus] = useState<StatusKey>('unplayed');
-  const [selectedPriority, setSelectedPriority] = useState<PriorityKey>('medium');
+  const [selectedPriority, setSelectedPriority] = useState<PriorityKey>('none');
   const [isHidden, setIsHidden] = useState(false);
   const [isAdult, setIsAdult] = useState(false);
   const [ownershipStatus, setOwnershipStatus] = useState<'owned' | 'wishlist' | 'unowned'>('owned');
   const [isPhysical, setIsPhysical] = useState(false);
   const [previouslyOwned, setPreviouslyOwned] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [isNotCompatible, setIsNotCompatible] = useState(false);
   const [myPlaytimeHours, setMyPlaytimeHours] = useState('');
   const [myAchievementsEarned, setMyAchievementsEarned] = useState('');
   const [playtimeHours, setPlaytimeHours] = useState('');
@@ -121,12 +123,14 @@ export function GameFormModal({
     setSelectedPlatform('Steam');
     setSelectedConsole('');
     setSelectedStatus('unplayed');
-    setSelectedPriority('medium');
+    setSelectedPriority('none');
     setIsHidden(false);
     setIsAdult(false);
     setOwnershipStatus('owned');
     setIsPhysical(false);
     setPreviouslyOwned(false);
+    setIsLocked(false);
+    setIsNotCompatible(false);
     setMyPlaytimeHours('');
     setMyAchievementsEarned('');
     setPlaytimeHours('');
@@ -164,6 +168,8 @@ export function GameFormModal({
       setOwnershipStatus((userGame.ownership_status ?? 'owned') as 'owned' | 'wishlist' | 'unowned');
       setIsPhysical(userGame.is_physical ?? false);
       setPreviouslyOwned(userGame.previously_owned ?? false);
+      setIsLocked(userGame.is_locked ?? false);
+      setIsNotCompatible(userGame.is_not_compatible ?? false);
       setMyPlaytimeHours(userGame.my_playtime_hours?.toString() ?? '');
       setMyAchievementsEarned(userGame.my_achievements_earned?.toString() ?? '');
       setPlaytimeHours(userGame.playtime_hours?.toString() ?? '');
@@ -329,6 +335,8 @@ export function GameFormModal({
     formData.set('ownership_status', ownershipStatus);
     formData.set('is_physical', isPhysical.toString());
     formData.set('previously_owned', previouslyOwned.toString());
+    formData.set('is_locked', isLocked.toString());
+    formData.set('is_not_compatible', isNotCompatible.toString());
     if (myPlaytimeHours) formData.set('my_playtime_hours', myPlaytimeHours);
     if (myAchievementsEarned) formData.set('my_achievements_earned', myAchievementsEarned);
 
@@ -408,7 +416,7 @@ export function GameFormModal({
     setSelectedPlatform('Steam');
     setSelectedConsole('');
     setSelectedStatus('unplayed');
-    setSelectedPriority('medium');
+    setSelectedPriority('none');
     setIsAdult(false);
     setTags([]);
     setTagInput('');
@@ -485,10 +493,14 @@ export function GameFormModal({
                 setSelectedStatus={setSelectedStatus}
                 selectedPriority={selectedPriority}
                 setSelectedPriority={setSelectedPriority}
+                isLocked={isLocked}
+                setIsLocked={setIsLocked}
                 ownershipStatus={ownershipStatus}
                 setOwnershipStatus={setOwnershipStatus}
                 isPhysical={isPhysical}
                 setIsPhysical={setIsPhysical}
+                isNotCompatible={isNotCompatible}
+                setIsNotCompatible={setIsNotCompatible}
                 previouslyOwned={previouslyOwned}
                 setPreviouslyOwned={setPreviouslyOwned}
                 myPlaytimeHours={myPlaytimeHours}

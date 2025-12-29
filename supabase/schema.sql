@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS public.games (
   xbox_title_id TEXT UNIQUE,
   epic_catalog_item_id TEXT UNIQUE,
   epic_namespace TEXT,
+  psn_played_id TEXT UNIQUE,
 
   -- Game metadata
   title TEXT NOT NULL,
@@ -167,6 +168,7 @@ CREATE INDEX IF NOT EXISTS idx_games_psn_communication_id ON public.games(psn_co
 CREATE INDEX IF NOT EXISTS idx_games_xbox_title_id ON public.games(xbox_title_id) WHERE xbox_title_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_games_epic_catalog_item_id ON public.games(epic_catalog_item_id) WHERE epic_catalog_item_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_games_epic_namespace ON public.games(epic_namespace) WHERE epic_namespace IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_games_psn_played_id ON public.games(psn_played_id) WHERE psn_played_id IS NOT NULL;
 
 -- Games: Trigger
 CREATE TRIGGER set_updated_at_games
@@ -186,6 +188,8 @@ CREATE TABLE IF NOT EXISTS public.user_games (
   platform TEXT NOT NULL,
   ownership_status TEXT NOT NULL DEFAULT 'owned',
   is_physical BOOLEAN NOT NULL DEFAULT false,
+  is_locked BOOLEAN NOT NULL DEFAULT false,
+  is_not_compatible BOOLEAN NOT NULL DEFAULT false,
   hidden BOOLEAN DEFAULT false,
 
   -- Progress Tracking
@@ -277,6 +281,9 @@ COMMENT ON COLUMN public.user_games.is_physical IS 'Whether the user owns a phys
 COMMENT ON COLUMN public.user_games.steam_appid IS 'Steam App ID - cached for fast session tracking';
 COMMENT ON COLUMN public.user_games.psn_title_id IS 'PSN Communication ID - set during PSN sync to identify synced games';
 COMMENT ON COLUMN public.user_games.locked_fields IS 'Fields locked from being overwritten during syncs/IGDB refreshes. Keys: cover, description, developer, publisher, releaseDate, genres';
+COMMENT ON COLUMN public.user_games.is_locked IS 'When true, sync operations will not modify this game status or priority';
+COMMENT ON COLUMN public.user_games.is_not_compatible IS 'When true, indicates game is not compatible with current hardware';
+COMMENT ON COLUMN public.games.psn_played_id IS 'PSN Played Title ID for games without trophy support (from played games API)';
 
 -- ============================================================================
 -- GAME_SESSIONS TABLE

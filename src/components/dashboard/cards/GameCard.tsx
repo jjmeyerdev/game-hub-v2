@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc, Target, Zap, UserX } from 'lucide-react';
+import { Edit3, Trash2, Trophy, EyeOff, Eye, Flame, Clock, Gamepad2, Disc, Target, Zap, UserX, Lock, Ban } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
 import { getGameSyncSource } from '@/lib/utils';
@@ -25,11 +25,24 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
 
   const isCompleted = game.status === 'completed' || game.status === 'finished';
   const isUnowned = game.ownership_status === 'unowned';
+  const isLocked = game.is_locked ?? false;
+  const isNotCompatible = game.is_not_compatible ?? false;
   const isAdult = game.tags?.includes('adult') ?? false;
   const shouldCensor = isAdult && censorHidden && !isRevealed;
-  const hasPlaytime = game.playtime_hours > 0;
-  const hasAchievements = game.achievements_total > 0;
-  const achievementPercent = hasAchievements ? Math.round((game.achievements_earned / game.achievements_total) * 100) : 0;
+
+  // Use my_playtime_hours for previously owned games (matches game detail page)
+  const displayPlaytime = game.previously_owned && game.my_playtime_hours !== null
+    ? game.my_playtime_hours
+    : (game.playtime_hours || 0);
+  const hasPlaytime = displayPlaytime > 0;
+
+  // Use my_achievements_earned for previously owned games (matches game detail page)
+  const displayAchievementsEarned = game.previously_owned && game.my_achievements_earned !== null
+    ? game.my_achievements_earned
+    : (game.achievements_earned || 0);
+  const displayAchievementsTotal = game.achievements_total || 0;
+  const hasAchievements = displayAchievementsTotal > 0;
+  const achievementPercent = hasAchievements ? Math.round((displayAchievementsEarned / displayAchievementsTotal) * 100) : 0;
   const completionPercent = game.completion_percentage || 0;
 
   const handleClick = () => {
@@ -231,6 +244,30 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
           </div>
         )}
 
+        {/* Locked Overlay - centered lock icon */}
+        {isLocked && !shouldCensor && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-xl scale-150" />
+              <div className="relative p-4 bg-black/60 backdrop-blur-sm rounded-full border-2 border-cyan-500/50 shadow-lg shadow-cyan-500/20">
+                <Lock className="w-8 h-8 text-cyan-400" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Not Compatible Overlay - centered ban icon */}
+        {isNotCompatible && !shouldCensor && !isLocked && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-rose-500/20 blur-xl scale-150" />
+              <div className="relative p-4 bg-black/60 backdrop-blur-sm rounded-full border-2 border-rose-500/50 shadow-lg shadow-rose-500/20">
+                <Ban className="w-8 h-8 text-rose-400" />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* NEW badge - top right corner, fades on hover to make room for action buttons */}
         {statusConfig.label === 'NEW' && !shouldCensor && (
           <div className="absolute top-3 right-3 z-30 transition-opacity duration-300 group-hover:opacity-0">
@@ -306,7 +343,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                     <div className="flex items-center gap-1 px-2 py-0.5 bg-white/15 rounded-full">
                       <Clock className="w-3 h-3 text-cyan-400" />
                       <span className="text-[10px] font-mono font-semibold text-white/90">
-                        {formatPlaytime(game.playtime_hours)}
+                        {formatPlaytime(displayPlaytime)}
                       </span>
                     </div>
                   )}
@@ -314,7 +351,7 @@ export function GameCard({ game, index, onEdit, onDelete, censorHidden = true }:
                     <div className="flex items-center gap-1 px-2 py-0.5 bg-white/15 rounded-full">
                       <Trophy className="w-3 h-3 text-amber-400" />
                       <span className="text-[10px] font-mono font-semibold text-white/90">
-                        {game.achievements_earned}/{game.achievements_total}
+                        {displayAchievementsEarned}/{displayAchievementsTotal}
                       </span>
                     </div>
                   )}

@@ -205,7 +205,7 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
         // Check if user_games entry exists by xbox_title_id first
         let { data: existingUserGame } = await supabase
           .from('user_games')
-          .select('id, locked_fields, platform')
+          .select('id, locked_fields, is_locked, platform')
           .eq('user_id', user.id)
           .eq('xbox_title_id', titleId)
           .single();
@@ -214,7 +214,7 @@ export async function syncXboxLibrary(): Promise<XboxSyncResult> {
         if (!existingUserGame) {
           const { data: fallbackGame } = await supabase
             .from('user_games')
-            .select('id, locked_fields, platform')
+            .select('id, locked_fields, is_locked, platform')
             .eq('user_id', user.id)
             .eq('game_id', game.id)
             .single();

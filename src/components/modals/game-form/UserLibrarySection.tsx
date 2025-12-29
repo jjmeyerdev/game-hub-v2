@@ -14,6 +14,8 @@ import {
   FileText,
   Tag,
   History,
+  Lock,
+  Ban,
 } from 'lucide-react';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
 import { getPlatformBrandStyle, getPlatformBrandStyleSubtle } from '@/lib/constants/platforms';
@@ -28,10 +30,14 @@ interface UserLibrarySectionProps {
   setSelectedStatus: (value: StatusKey) => void;
   selectedPriority: PriorityKey;
   setSelectedPriority: (value: PriorityKey) => void;
+  isLocked: boolean;
+  setIsLocked: (value: boolean) => void;
   ownershipStatus: 'owned' | 'wishlist' | 'unowned';
   setOwnershipStatus: (value: 'owned' | 'wishlist' | 'unowned') => void;
   isPhysical: boolean;
   setIsPhysical: (value: boolean) => void;
+  isNotCompatible: boolean;
+  setIsNotCompatible: (value: boolean) => void;
   previouslyOwned: boolean;
   setPreviouslyOwned: (value: boolean) => void;
   myPlaytimeHours?: string;
@@ -117,10 +123,14 @@ export function UserLibrarySection({
   setSelectedStatus,
   selectedPriority,
   setSelectedPriority,
+  isLocked,
+  setIsLocked,
   ownershipStatus,
   setOwnershipStatus,
   isPhysical,
   setIsPhysical,
+  isNotCompatible,
+  setIsNotCompatible,
   previouslyOwned,
   setPreviouslyOwned,
   myPlaytimeHours,
@@ -241,13 +251,13 @@ export function UserLibrarySection({
                   key={key}
                   type="button"
                   onClick={() => setSelectedStatus(key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                  className={`w-full h-9 flex items-center gap-2 px-3 rounded-lg text-[11px] font-medium transition-all ${
                     isSelected
                       ? 'bg-text-primary text-bg-primary'
                       : 'bg-theme-hover border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
                   {config.label}
                 </button>
               );
@@ -267,18 +277,31 @@ export function UserLibrarySection({
                   key={key}
                   type="button"
                   onClick={() => setSelectedPriority(key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                  className={`w-full h-9 flex items-center gap-2 px-3 rounded-lg text-[11px] font-medium transition-all ${
                     isSelected
                       ? 'bg-text-primary text-bg-primary'
                       : 'bg-theme-hover border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
                   {config.label}
                 </button>
               );
             })}
           </div>
+          {/* Locked */}
+          <button
+            type="button"
+            onClick={() => setIsLocked(!isLocked)}
+            className={`mt-1 w-full h-9 flex items-center gap-2 px-3 rounded-lg text-[11px] font-medium transition-all ${
+              isLocked
+                ? 'bg-text-primary text-bg-primary'
+                : 'bg-theme-hover border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5 shrink-0" />
+            Locked
+          </button>
         </div>
       </div>
 
@@ -335,6 +358,14 @@ export function UserLibrarySection({
           label="Physical Copy"
           icon={Disc}
           color="amber"
+        />
+        <Toggle
+          checked={isNotCompatible}
+          onChange={setIsNotCompatible}
+          label="Not Compatible"
+          description="Game won't run on current hardware"
+          icon={Ban}
+          color="rose"
         />
         <Toggle
           checked={previouslyOwned}

@@ -49,6 +49,8 @@ export interface UserGame {
   my_playtime_hours: number | null; // Manual snapshot for previously owned games
   my_achievements_earned: number | null; // Manual snapshot for previously owned games
   release_date: string | null; // Platform-specific release date
+  is_locked: boolean; // Priority locked - prevents priority changes
+  is_not_compatible: boolean; // Game is not compatible with current hardware
   created_at: string;
   updated_at: string;
   game?: Game;
