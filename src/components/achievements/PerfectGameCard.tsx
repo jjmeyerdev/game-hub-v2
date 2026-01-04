@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Crown, Trophy, Gamepad2, Sparkles } from 'lucide-react';
+import { Crown, Trophy, Gamepad2, Sparkles, EyeOff } from 'lucide-react';
 import type { UserGame } from '@/lib/actions/games';
 
 interface PerfectGameCardProps {
@@ -19,6 +19,7 @@ export function PerfectGameCard({
   const game = userGame.game;
   const title = game?.title || 'Unknown Game';
   const coverUrl = game?.cover_url;
+  const isAdult = userGame.tags?.includes('adult') ?? false;
 
   // Featured variant - larger, more prominent display for the top game
   if (variant === 'featured') {
@@ -42,7 +43,7 @@ export function PerfectGameCard({
                   src={coverUrl}
                   alt={title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  className={`object-cover transition-transform duration-700 ${isAdult ? 'blur-2xl scale-125 brightness-[0.15]' : 'group-hover:scale-105'}`}
                   sizes="160px"
                 />
               ) : (
@@ -54,8 +55,18 @@ export function PerfectGameCard({
               {/* Golden overlay shimmer */}
               <div className="absolute inset-0 bg-linear-to-br from-amber-400/20 via-transparent to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+              {/* Adult content overlay */}
+              {isAdult && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-theme-primary/70 z-10">
+                  <div className="w-10 h-10 rounded-full border border-theme-subtle/30 flex items-center justify-center mb-2">
+                    <EyeOff className="w-5 h-5 text-theme-subtle" />
+                  </div>
+                  <span className="text-[8px] font-mono text-theme-subtle uppercase tracking-wider">Adult</span>
+                </div>
+              )}
+
               {/* Crown badge */}
-              <div className="absolute top-2 left-2 w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <div className="absolute top-2 left-2 w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30 z-20">
                 <Crown className="w-4 h-4 text-void" />
               </div>
             </div>
@@ -114,7 +125,7 @@ export function PerfectGameCard({
               src={coverUrl}
               alt={title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className={`object-cover transition-transform duration-500 ${isAdult ? 'blur-2xl scale-125 brightness-[0.15]' : 'group-hover:scale-105'}`}
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
             />
           ) : (
@@ -129,13 +140,23 @@ export function PerfectGameCard({
           {/* Shimmer effect on hover */}
           <div className="absolute inset-0 bg-linear-to-br from-amber-400/10 via-transparent to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+          {/* Adult content overlay */}
+          {isAdult && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-theme-primary/70 z-10">
+              <div className="w-10 h-10 rounded-full border border-theme-subtle/30 flex items-center justify-center mb-2">
+                <EyeOff className="w-5 h-5 text-theme-subtle" />
+              </div>
+              <span className="text-[8px] font-mono text-theme-subtle uppercase tracking-wider">Adult</span>
+            </div>
+          )}
+
           {/* Crown badge */}
-          <div className="absolute top-2 right-2 w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+          <div className="absolute top-2 right-2 w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform z-20">
             <Crown className="w-3.5 h-3.5 text-void" />
           </div>
 
           {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
+          <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
             <div className="flex items-center justify-between">
               <span className="px-2 py-0.5 bg-amber-500/20 backdrop-blur-sm border border-amber-500/30 rounded text-[9px] font-mono text-amber-300 uppercase tracking-wider">
                 100%

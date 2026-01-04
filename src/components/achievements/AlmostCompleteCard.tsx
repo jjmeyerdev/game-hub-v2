@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Gamepad2, ArrowRight } from 'lucide-react';
+import { Gamepad2, ArrowRight, EyeOff } from 'lucide-react';
 import type { UserGame } from '@/lib/actions/games';
 
 interface AlmostCompleteCardProps {
@@ -14,6 +14,7 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
   const game = userGame.game;
   const title = game?.title || 'Unknown Game';
   const coverUrl = game?.cover_url;
+  const isAdult = userGame.tags?.includes('adult') ?? false;
 
   return (
     <Link href={`/game/${userGame.id}`}>
@@ -38,12 +39,17 @@ export function AlmostCompleteCard({ userGame, percentage, remaining, index }: A
                 src={coverUrl}
                 alt={title}
                 fill
-                className="object-cover"
+                className={`object-cover ${isAdult ? 'blur-xl scale-110 brightness-[0.2]' : ''}`}
                 sizes="56px"
               />
             ) : (
               <div className="w-full h-full bg-theme-hover flex items-center justify-center">
                 <Gamepad2 className="w-6 h-6 text-theme-subtle" />
+              </div>
+            )}
+            {isAdult && (
+              <div className="absolute inset-0 flex items-center justify-center bg-theme-primary/60">
+                <EyeOff className="w-5 h-5 text-theme-subtle" />
               </div>
             )}
           </div>
