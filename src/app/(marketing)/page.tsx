@@ -109,6 +109,9 @@ export default function HomePage() {
               <Link href="/features" className="text-sm text-theme-muted hover:text-accent-cyan transition-colors tracking-wide uppercase">
                 Features
               </Link>
+              <Link href="/faq" className="text-sm text-theme-muted hover:text-accent-cyan transition-colors tracking-wide uppercase">
+                FAQ
+              </Link>
               <Link href="/login" className="text-sm text-theme-muted hover:text-accent-cyan transition-colors tracking-wide uppercase">
                 Sign in
               </Link>
@@ -513,14 +516,20 @@ export default function HomePage() {
                 </span>
               </div>
             </div>
-            {/* <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6">
               <Link href="/features" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
                 Features
               </Link>
-              <Link href="/login" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
-                Sign in
+              <Link href="/faq" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                FAQ
               </Link>
-            </div> */}
+              <Link href="/privacy" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                Privacy
+              </Link>
+              <Link href="/terms" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                Terms
+              </Link>
+            </div>
             <div className="text-[10px] text-theme-subtle font-mono">
               &copy; {new Date().getFullYear()} GAMEHUB • ALL SYSTEMS OPERATIONAL
             </div>

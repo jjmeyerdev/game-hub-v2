@@ -126,8 +126,11 @@ export default function FeaturesPage() {
             </Link>
 
             <div className="flex items-center gap-4">
-            <Link href="/" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+              <Link href="/" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
                 Home
+              </Link>
+              <Link href="/faq" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                FAQ
               </Link>
               <ModeToggle />
             </div>
@@ -586,14 +589,20 @@ export default function FeaturesPage() {
                 </span>
               </div>
             </div>
-            {/* <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6">
               <Link href="/" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
                 Home
               </Link>
-              <Link href="/login" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
-                Sign in
+              <Link href="/faq" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                FAQ
               </Link>
-            </div> */}
+              <Link href="/privacy" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                Privacy
+              </Link>
+              <Link href="/terms" className="text-xs text-theme-muted hover:text-accent-cyan transition-colors uppercase tracking-wider">
+                Terms
+              </Link>
+            </div>
             <div className="text-[10px] text-theme-subtle font-mono">
               &copy; {new Date().getFullYear()} GAMEHUB • ALL SYSTEMS OPERATIONAL
             </div>
