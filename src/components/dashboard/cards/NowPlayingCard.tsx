@@ -1,10 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { Library, Edit3, Trash2, Eye, EyeOff, Trophy } from 'lucide-react';
+import { Library, Edit3, Trash2, Eye, EyeOff, Trophy, Gamepad2, ShieldOff, Unlock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { UserGame } from '@/lib/actions/games';
-import { getPlatformBrandStyle } from '@/lib/constants/platforms';
+import { getPlatformBrandStyle, getDisplayPlatform } from '@/lib/constants/platforms';
+import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, EALogo, WindowsLogo, NintendoLogo, GOGLogo, BattleNetLogo, UbisoftLogo } from '@/components/icons/PlatformLogos';
+
+const getPlatformIcon = (platform: string) => {
+  const lowerPlatform = platform.toLowerCase();
+  if (lowerPlatform.includes('steam')) return <SteamLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('ea app') || lowerPlatform.includes('origin')) return <EALogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii')) return <NintendoLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('gog')) return <GOGLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('battle.net') || lowerPlatform.includes('blizzard')) return <BattleNetLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('ubisoft') || lowerPlatform.includes('uplay')) return <UbisoftLogo className="w-3.5 h-3.5" />;
+  if (lowerPlatform.includes('pc') || lowerPlatform.includes('windows')) return <WindowsLogo className="w-3.5 h-3.5" />;
+  return <Gamepad2 className="w-3.5 h-3.5" />;
+};
 
 interface NowPlayingCardProps {
   game: UserGame;
@@ -60,12 +76,12 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
 
   return (
     <div
-      className="relative flex-shrink-0 w-80 lg:w-[340px] bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-2xl overflow-hidden transition-all duration-500 group cursor-pointer hover:bg-[var(--theme-hover-bg)] hover:border-[var(--theme-border-hover)]"
+      className="relative shrink-0 w-80 lg:w-[340px] bg-card border border-theme rounded-2xl overflow-hidden transition-all duration-500 group cursor-pointer hover:bg-theme-hover hover:border-theme-hover"
       style={{ animationDelay: `${index * 100}ms` }}
       onClick={handleClick}
     >
       {/* Cover Image */}
-      <div className="aspect-[16/10] bg-[var(--theme-card-bg)] relative overflow-hidden">
+      <div className="aspect-16/10 bg-card relative overflow-hidden">
         {game.game?.cover_url ? (
           <img
             src={game.game.cover_url}
@@ -82,18 +98,19 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         <div
           className={`absolute inset-0 ${game.game?.cover_url ? 'hidden' : 'flex'} items-center justify-center ${showBlur ? 'blur-xl' : ''}`}
         >
-          <Library className="w-12 h-12 text-[var(--theme-text-subtle)]" />
+          <Library className="w-12 h-12 text-theme-subtle" />
         </div>
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg-primary)] via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-linear-to-t from-theme-primary via-transparent to-transparent opacity-80" />
 
         {/* Platform badge */}
         {(() => {
           const brandStyle = getPlatformBrandStyle(game.platform);
           return (
-            <div className={`absolute top-3 left-3 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-lg backdrop-blur-sm border ${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`}>
-              {game.platform}
+            <div className={`absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-lg backdrop-blur-sm border ${brandStyle.bg} ${brandStyle.text} ${brandStyle.border} ${brandStyle.glow ?? ''}`}>
+              {getPlatformIcon(game.platform)}
+              {getDisplayPlatform(game.platform)}
             </div>
           );
         })()}
@@ -105,7 +122,7 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
               e.stopPropagation();
               onEdit();
             }}
-            className="p-2 bg-[var(--theme-hover-bg)] backdrop-blur-sm hover:bg-[var(--theme-card-hover)] rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all border border-[var(--theme-border)]"
+            className="p-2 bg-theme-hover backdrop-blur-sm hover:bg-card-hover rounded-lg text-theme-muted hover:text-theme-primary transition-all border border-theme"
             title="Edit game"
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -126,29 +143,37 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
         {isRestricted && isRevealed && (
           <button
             onClick={handleHide}
-            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--theme-hover-bg)] backdrop-blur-sm hover:bg-[var(--theme-card-hover)] rounded-lg text-xs font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all border border-[var(--theme-border)]"
+            className="restricted-hide-btn absolute bottom-3 left-3"
           >
             <EyeOff className="w-3.5 h-3.5" />
-            Hide
+            Restrict
           </button>
         )}
 
         {/* Restricted overlay */}
         {showBlur && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full border border-[var(--theme-border-hover)] flex items-center justify-center mb-3">
-                <EyeOff className="w-5 h-5 text-[var(--theme-text-muted)]" />
+          <div className="absolute inset-0 restricted-overlay restricted-stripes flex items-center justify-center">
+            {/* Scanning line effect */}
+            <div className="restricted-scanline" />
+
+            <div className="flex flex-col items-center relative z-10">
+              {/* Shield icon with pulse ring */}
+              <div className="restricted-shield mb-4">
+                <ShieldOff className="w-6 h-6 text-orange-400" />
               </div>
-              <span className="text-[10px] font-medium tracking-[0.2em] text-[var(--theme-text-subtle)] uppercase mb-4">
-                Restricted
-              </span>
+
+              {/* Restricted badge */}
+              <div className="restricted-badge mb-5">
+                Restricted Content
+              </div>
+
+              {/* Reveal button */}
               <button
                 onClick={handleReveal}
-                className="flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] hover:bg-[var(--theme-card-hover)] border border-[var(--theme-border-hover)] rounded-full text-xs font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all"
+                className="restricted-reveal-btn"
               >
-                <Eye className="w-3.5 h-3.5" />
-                Reveal
+                <Unlock className="w-4 h-4" />
+                <span>Authorize</span>
               </button>
             </div>
           </div>
@@ -157,15 +182,15 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
 
       {/* Card content */}
       <div className={`p-5 ${showBlur ? 'blur-sm' : ''}`}>
-        <h3 className="text-lg font-semibold text-[var(--theme-text-primary)] mb-3 truncate group-hover:text-cyan-400 transition-colors">
+        <h3 className="text-lg font-semibold text-theme-primary mb-3 truncate group-hover:text-cyan-400 transition-colors">
           {game.game?.title || 'Untitled'}
         </h3>
 
         <div className="flex items-center justify-between text-sm mb-4">
-          <span className="text-[var(--theme-text-subtle)]">
+          <span className="text-theme-subtle">
             {Math.round(game.playtime_hours)}h played
           </span>
-          <span className="text-[var(--theme-text-subtle)] text-xs">
+          <span className="text-theme-subtle text-xs">
             {formatLastPlayed(game.last_played_at)}
           </span>
         </div>
@@ -175,7 +200,7 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs text-[var(--theme-text-subtle)]">
+              <span className="text-xs text-theme-subtle">
                 {game.platform?.toLowerCase().includes('playstation') ? 'Trophies' : 'Achievements'}
               </span>
             </div>
@@ -183,15 +208,15 @@ export function NowPlayingCard({ game, onEdit, onDelete, index = 0 }: NowPlaying
               <span className="text-sm font-semibold text-amber-400 tabular-nums">
                 {game.achievements_earned}
               </span>
-              <span className="text-xs text-[var(--theme-text-subtle)]">/</span>
-              <span className="text-xs text-[var(--theme-text-subtle)] tabular-nums">
+              <span className="text-xs text-theme-subtle">/</span>
+              <span className="text-xs text-theme-subtle tabular-nums">
                 {game.achievements_total}
               </span>
             </div>
           </div>
-          <div className="relative w-full h-1.5 bg-[var(--theme-border)] rounded-full overflow-hidden">
+          <div className="relative w-full h-1.5 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
+              className="h-full bg-linear-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
               style={{ width: `${game.achievements_total > 0 ? (game.achievements_earned / game.achievements_total) * 100 : 0}%` }}
             />
           </div>

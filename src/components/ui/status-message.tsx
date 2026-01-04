@@ -44,7 +44,7 @@ export function StatusMessage({ type, message, className }: StatusMessageProps) 
         className
       )}
     >
-      <Icon className="w-5 h-5 flex-shrink-0" />
+      <Icon className="w-5 h-5 shrink-0" />
       <p className="text-sm">{message}</p>
     </div>
   );

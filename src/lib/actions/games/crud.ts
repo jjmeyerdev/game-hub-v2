@@ -133,9 +133,18 @@ export async function addGameToLibrary(formData: FormData) {
   // Get ownership status from form (defaults to 'owned')
   const ownershipStatus = (formData.get('ownership_status') as OwnershipStatus) || 'owned';
   const isPhysical = formData.get('is_physical') === 'true';
+  const isNotCompatible = formData.get('is_not_compatible') === 'true';
+  const previouslyOwned = formData.get('previously_owned') === 'true';
+  const isLocked = formData.get('is_locked') === 'true';
+  const myPlaytimeHoursStr = formData.get('my_playtime_hours') as string;
+  const myAchievementsEarnedStr = formData.get('my_achievements_earned') as string;
+  const myPlaytimeHours = myPlaytimeHoursStr ? parseFloat(myPlaytimeHoursStr) : null;
+  const myAchievementsEarned = myAchievementsEarnedStr ? parseInt(myAchievementsEarnedStr) : null;
   const isHidden = formData.get('hidden') === 'true';
   const tagsJson = formData.get('tags') as string;
   const tags: string[] = tagsJson ? JSON.parse(tagsJson) : [];
+  const lockedFieldsJson = formData.get('lockedFields') as string;
+  const lockedFields: LockedFields = lockedFieldsJson ? JSON.parse(lockedFieldsJson) : {};
 
   // Add to user's library
   const { error: userGameError } = await supabase.from('user_games').insert({
@@ -143,14 +152,20 @@ export async function addGameToLibrary(formData: FormData) {
     game_id: gameId,
     platform,
     status: status || 'unplayed',
-    priority: priority || 'medium',
+    priority: priority || 'none',
     completion_percentage: 0,
     playtime_hours: 0,
     last_played_at: status === 'playing' ? new Date().toISOString() : null,
     ownership_status: ownershipStatus,
     is_physical: isPhysical,
+    is_not_compatible: isNotCompatible,
+    previously_owned: previouslyOwned,
+    is_locked: isLocked,
+    my_playtime_hours: myPlaytimeHours,
+    my_achievements_earned: myAchievementsEarned,
     hidden: isHidden,
     tags: tags.length > 0 ? tags : null,
+    locked_fields: Object.keys(lockedFields).length > 0 ? lockedFields : null,
   });
 
   if (userGameError) {
@@ -228,6 +243,13 @@ export async function editUserGame(formData: FormData) {
   const hidden = formData.get('hidden') === 'true';
   const ownershipStatus = (formData.get('ownership_status') as OwnershipStatus) || 'owned';
   const isPhysical = formData.get('is_physical') === 'true';
+  const isNotCompatible = formData.get('is_not_compatible') === 'true';
+  const previouslyOwned = formData.get('previously_owned') === 'true';
+  const isLocked = formData.get('is_locked') === 'true';
+  const myPlaytimeHoursStr = formData.get('my_playtime_hours') as string;
+  const myAchievementsEarnedStr = formData.get('my_achievements_earned') as string;
+  const myPlaytimeHours = myPlaytimeHoursStr ? parseFloat(myPlaytimeHoursStr) : null;
+  const myAchievementsEarned = myAchievementsEarnedStr ? parseInt(myAchievementsEarnedStr) : null;
   const tagsJson = formData.get('tags') as string;
   const tags: string[] = tagsJson ? JSON.parse(tagsJson) : [];
   const lockedFieldsJson = formData.get('lockedFields') as string;
@@ -257,7 +279,7 @@ export async function editUserGame(formData: FormData) {
     .update({
       platform,
       status,
-      priority: priority || 'medium',
+      priority: priority || 'none',
       playtime_hours: playtimeHours ? parseFloat(playtimeHours) : 0,
       completion_percentage: completionPercentage ? parseInt(completionPercentage) : 0,
       personal_rating: personalRating ? parseInt(personalRating) : null,
@@ -267,6 +289,11 @@ export async function editUserGame(formData: FormData) {
       hidden,
       ownership_status: ownershipStatus,
       is_physical: isPhysical,
+      is_not_compatible: isNotCompatible,
+      previously_owned: previouslyOwned,
+      is_locked: isLocked,
+      my_playtime_hours: myPlaytimeHours,
+      my_achievements_earned: myAchievementsEarned,
       last_played_at: status === 'playing' ? new Date().toISOString() : undefined,
     })
     .eq('id', userGameId)

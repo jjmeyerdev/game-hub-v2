@@ -13,6 +13,9 @@ import {
   Star,
   FileText,
   Tag,
+  History,
+  Lock,
+  Ban,
 } from 'lucide-react';
 import { PLATFORMS, CONSOLE_OPTIONS } from '@/lib/constants';
 import { getPlatformBrandStyle, getPlatformBrandStyleSubtle } from '@/lib/constants/platforms';
@@ -27,10 +30,20 @@ interface UserLibrarySectionProps {
   setSelectedStatus: (value: StatusKey) => void;
   selectedPriority: PriorityKey;
   setSelectedPriority: (value: PriorityKey) => void;
+  isLocked: boolean;
+  setIsLocked: (value: boolean) => void;
   ownershipStatus: 'owned' | 'wishlist' | 'unowned';
   setOwnershipStatus: (value: 'owned' | 'wishlist' | 'unowned') => void;
   isPhysical: boolean;
   setIsPhysical: (value: boolean) => void;
+  isNotCompatible: boolean;
+  setIsNotCompatible: (value: boolean) => void;
+  previouslyOwned: boolean;
+  setPreviouslyOwned: (value: boolean) => void;
+  myPlaytimeHours?: string;
+  setMyPlaytimeHours?: (value: string) => void;
+  myAchievementsEarned?: string;
+  setMyAchievementsEarned?: (value: string) => void;
   isAdult: boolean;
   setIsAdult: (value: boolean) => void;
   isHidden: boolean;
@@ -82,20 +95,20 @@ function Toggle({
       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
         checked
           ? `${c.bgActive} border ${c.border}`
-          : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)]'
+          : 'bg-theme-hover border border-theme hover:border-theme-hover'
       }`}
     >
       <div className="flex items-center gap-2.5">
-        <Icon className={`w-4 h-4 ${checked ? c.text : 'text-[var(--theme-text-subtle)]'}`} />
+        <Icon className={`w-4 h-4 ${checked ? c.text : 'text-theme-subtle'}`} />
         <div className="text-left">
-          <span className={`text-sm font-medium ${checked ? c.text : 'text-[var(--theme-text-muted)]'}`}>{label}</span>
+          <span className={`text-sm font-medium ${checked ? c.text : 'text-theme-muted'}`}>{label}</span>
           {description && (
-            <p className="text-[10px] text-[var(--theme-text-subtle)] mt-0.5">{description}</p>
+            <p className="text-[10px] text-theme-subtle mt-0.5">{description}</p>
           )}
         </div>
       </div>
-      <div className={`w-9 h-5 rounded-full transition-all ${checked ? c.bg : 'bg-[var(--theme-hover-bg)]'}`}>
-        <div className={`w-4 h-4 rounded-full bg-[var(--theme-text-primary)] shadow-sm transform transition-all ${checked ? 'translate-x-4' : 'translate-x-0.5'} mt-0.5`} />
+      <div className={`w-9 h-5 rounded-full transition-all ${checked ? c.bg : 'bg-theme-hover'}`}>
+        <div className={`w-4 h-4 rounded-full bg-text-primary shadow-sm transition-all ${checked ? 'translate-x-4' : 'translate-x-0.5'} mt-0.5`} />
       </div>
     </button>
   );
@@ -110,10 +123,20 @@ export function UserLibrarySection({
   setSelectedStatus,
   selectedPriority,
   setSelectedPriority,
+  isLocked,
+  setIsLocked,
   ownershipStatus,
   setOwnershipStatus,
   isPhysical,
   setIsPhysical,
+  isNotCompatible,
+  setIsNotCompatible,
+  previouslyOwned,
+  setPreviouslyOwned,
+  myPlaytimeHours,
+  setMyPlaytimeHours,
+  myAchievementsEarned,
+  setMyAchievementsEarned,
   isAdult,
   setIsAdult,
   isHidden,
@@ -141,19 +164,19 @@ export function UserLibrarySection({
   return (
     <div className="space-y-4">
       {/* Section Header */}
-      <div className="pb-3 border-b border-[var(--theme-border)]">
-        <span className="text-xs font-medium text-[var(--theme-text-muted)]">Your Library</span>
+      <div className="pb-3 border-b border-theme">
+        <span className="text-xs font-medium text-theme-muted">Your Library</span>
       </div>
 
       {/* Platform Selection */}
       <div>
-        <label className="flex items-center justify-between text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2">
+        <label className="flex items-center justify-between text-[11px] font-medium text-theme-subtle uppercase tracking-wider mb-2">
           <span>Platform</span>
           {selectedPlatform && (
             <button
               type="button"
               onClick={() => { setSelectedPlatform(''); setSelectedConsole(''); }}
-              className="text-[10px] text-[var(--theme-text-subtle)] hover:text-red-400/70 transition-colors normal-case"
+              className="text-[10px] text-theme-subtle hover:text-red-400/70 transition-colors normal-case"
             >
               Clear
             </button>
@@ -218,7 +241,7 @@ export function UserLibrarySection({
       <div className="grid grid-cols-2 gap-3">
         {/* Status */}
         <div>
-          <label className="block text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2">Status</label>
+          <label className="block text-[11px] font-medium text-theme-subtle uppercase tracking-wider mb-2">Status</label>
           <div className="space-y-1">
             {(Object.entries(STATUS_CONFIG) as [StatusKey, typeof STATUS_CONFIG[StatusKey]][]).map(([key, config]) => {
               const Icon = config.Icon;
@@ -228,13 +251,13 @@ export function UserLibrarySection({
                   key={key}
                   type="button"
                   onClick={() => setSelectedStatus(key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                  className={`w-full h-9 flex items-center gap-2 px-3 rounded-lg text-[11px] font-medium transition-all ${
                     isSelected
-                      ? 'bg-[var(--theme-text-primary)] text-[var(--theme-bg-primary)]'
-                      : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
+                      ? 'bg-text-primary text-bg-primary'
+                      : 'bg-theme-hover border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
                   {config.label}
                 </button>
               );
@@ -244,7 +267,7 @@ export function UserLibrarySection({
 
         {/* Priority */}
         <div>
-          <label className="block text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2">Priority</label>
+          <label className="block text-[11px] font-medium text-theme-subtle uppercase tracking-wider mb-2">Priority</label>
           <div className="space-y-1">
             {(Object.entries(PRIORITY_CONFIG) as [PriorityKey, typeof PRIORITY_CONFIG[PriorityKey]][]).map(([key, config]) => {
               const Icon = config.Icon;
@@ -254,30 +277,43 @@ export function UserLibrarySection({
                   key={key}
                   type="button"
                   onClick={() => setSelectedPriority(key)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                  className={`w-full h-9 flex items-center gap-2 px-3 rounded-lg text-[11px] font-medium transition-all ${
                     isSelected
-                      ? 'bg-[var(--theme-text-primary)] text-[var(--theme-bg-primary)]'
-                      : 'bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
+                      ? 'bg-text-primary text-bg-primary'
+                      : 'bg-theme-hover border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
                   {config.label}
                 </button>
               );
             })}
           </div>
+          {/* Locked */}
+          <button
+            type="button"
+            onClick={() => setIsLocked(!isLocked)}
+            className={`mt-1 w-full h-9 flex items-center gap-2 px-3 rounded-lg text-[11px] font-medium transition-all ${
+              isLocked
+                ? 'bg-text-primary text-bg-primary'
+                : 'bg-theme-hover border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5 shrink-0" />
+            Locked
+          </button>
         </div>
       </div>
 
       {/* Ownership Status */}
       <div>
-        <label className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-2">
+        <label className="flex items-center gap-1.5 text-[11px] font-medium text-theme-subtle uppercase tracking-wider mb-2">
           <Package className="w-3 h-3" /> Ownership
         </label>
-        <div className="relative flex bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl p-1 overflow-hidden">
+        <div className="relative flex bg-theme-hover border border-theme rounded-xl p-1 overflow-hidden">
           {/* Sliding indicator */}
           <div
-            className={`absolute top-1 bottom-1 w-[calc(33.333%-3px)] rounded-lg transition-all duration-200 ease-out bg-[var(--theme-text-primary)] ${
+            className={`absolute top-1 bottom-1 w-[calc(33.333%-3px)] rounded-lg transition-all duration-200 ease-out bg-text-primary ${
               ownershipStatus === 'owned' ? 'left-1' : ownershipStatus === 'wishlist' ? 'left-[calc(33.333%+1px)]' : 'left-[calc(66.666%+1px)]'
             }`}
           />
@@ -285,7 +321,7 @@ export function UserLibrarySection({
             type="button"
             onClick={() => setOwnershipStatus('owned')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'owned' ? 'text-[var(--theme-bg-primary)] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+              ownershipStatus === 'owned' ? 'text-bg-primary font-semibold' : 'text-theme-muted hover:text-theme-primary'
             }`}
           >
             <Package className="w-3.5 h-3.5" />
@@ -295,7 +331,7 @@ export function UserLibrarySection({
             type="button"
             onClick={() => setOwnershipStatus('wishlist')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'wishlist' ? 'text-[var(--theme-bg-primary)] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+              ownershipStatus === 'wishlist' ? 'text-bg-primary font-semibold' : 'text-theme-muted hover:text-theme-primary'
             }`}
           >
             <Heart className={`w-3.5 h-3.5 ${ownershipStatus === 'wishlist' ? 'fill-current' : ''}`} />
@@ -305,7 +341,7 @@ export function UserLibrarySection({
             type="button"
             onClick={() => setOwnershipStatus('unowned')}
             className={`relative flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg transition-all z-10 ${
-              ownershipStatus === 'unowned' ? 'text-[var(--theme-bg-primary)] font-semibold' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)]'
+              ownershipStatus === 'unowned' ? 'text-bg-primary font-semibold' : 'text-theme-muted hover:text-theme-primary'
             }`}
           >
             <X className="w-3.5 h-3.5" />
@@ -324,6 +360,59 @@ export function UserLibrarySection({
           color="amber"
         />
         <Toggle
+          checked={isNotCompatible}
+          onChange={setIsNotCompatible}
+          label="Not Compatible"
+          description="Game won't run on current hardware"
+          icon={Ban}
+          color="rose"
+        />
+        <Toggle
+          checked={previouslyOwned}
+          onChange={setPreviouslyOwned}
+          label="Previously Owned"
+          description="Include in stats even if unowned"
+          icon={History}
+          color="violet"
+        />
+        {/* Snapshot fields - only show when Previously Owned is enabled */}
+        {previouslyOwned && (
+          <div className="ml-6 pl-3 border-l-2 border-violet-500/30 space-y-2">
+            <p className="text-[10px] text-theme-subtle">
+              Enter your stats from when you owned this game:
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="flex items-center gap-1 text-[10px] font-medium text-violet-400/80 uppercase tracking-wider mb-1">
+                  <Timer className="w-3 h-3" /> My Hours
+                </label>
+                <input
+                  type="number"
+                  value={myPlaytimeHours ?? ''}
+                  onChange={(e) => setMyPlaytimeHours?.(e.target.value)}
+                  min="0"
+                  step="0.1"
+                  placeholder="0"
+                  className="w-full px-2.5 py-2 bg-violet-500/10 border border-violet-500/30 rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-violet-500/50 font-mono"
+                />
+              </div>
+              <div>
+                <label className="flex items-center gap-1 text-[10px] font-medium text-violet-400/80 uppercase tracking-wider mb-1">
+                  <Trophy className="w-3 h-3" /> My Achievements
+                </label>
+                <input
+                  type="number"
+                  value={myAchievementsEarned ?? ''}
+                  onChange={(e) => setMyAchievementsEarned?.(e.target.value)}
+                  min="0"
+                  placeholder="0"
+                  className="w-full px-2.5 py-2 bg-violet-500/10 border border-violet-500/30 rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-violet-500/50 font-mono"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        <Toggle
           checked={isAdult}
           onChange={setIsAdult}
           label="Adult Content"
@@ -339,7 +428,7 @@ export function UserLibrarySection({
           {/* Playtime + Completion + Rating */}
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="flex items-center gap-1 text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-1.5">
+              <label className="flex items-center gap-1 text-[10px] font-medium text-theme-subtle uppercase tracking-wider mb-1.5">
                 <Timer className="w-3 h-3" /> Hours
               </label>
               <div className="relative">
@@ -350,12 +439,12 @@ export function UserLibrarySection({
                   min="0"
                   step="0.1"
                   placeholder="0"
-                  className="w-full px-3 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text-primary)] text-sm focus:outline-none focus:border-[var(--theme-border-hover)] font-mono"
+                  className="w-full px-3 py-2.5 bg-theme-hover border border-theme rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-theme-hover font-mono"
                 />
               </div>
             </div>
             <div>
-              <label className="flex items-center gap-1 text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-1.5">
+              <label className="flex items-center gap-1 text-[10px] font-medium text-theme-subtle uppercase tracking-wider mb-1.5">
                 <Trophy className="w-3 h-3" /> Complete
               </label>
               <div className="relative">
@@ -366,13 +455,13 @@ export function UserLibrarySection({
                   min="0"
                   max="100"
                   placeholder="0"
-                  className="w-full px-3 py-2.5 pr-8 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text-primary)] text-sm focus:outline-none focus:border-[var(--theme-border-hover)] font-mono"
+                  className="w-full px-3 py-2.5 pr-8 bg-theme-hover border border-theme rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-theme-hover font-mono"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-subtle)] text-xs">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-subtle text-xs">%</span>
               </div>
             </div>
             <div>
-              <label className="flex items-center gap-1 text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-1.5">
+              <label className="flex items-center gap-1 text-[10px] font-medium text-theme-subtle uppercase tracking-wider mb-1.5">
                 <Star className="w-3 h-3" /> Rating
               </label>
               <div className="relative">
@@ -383,9 +472,9 @@ export function UserLibrarySection({
                   min="1"
                   max="10"
                   placeholder="—"
-                  className="w-full px-3 py-2.5 pr-10 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text-primary)] text-sm focus:outline-none focus:border-[var(--theme-border-hover)] font-mono"
+                  className="w-full px-3 py-2.5 pr-10 bg-theme-hover border border-theme rounded-lg text-theme-primary text-sm focus:outline-hidden focus:border-theme-hover font-mono"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-subtle)] text-[10px]">/10</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-subtle text-[10px]">/10</span>
               </div>
             </div>
           </div>
@@ -401,13 +490,13 @@ export function UserLibrarySection({
 
           {/* Notes */}
           <div>
-            <label className="flex items-center justify-between text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-1.5">
+            <label className="flex items-center justify-between text-[10px] font-medium text-theme-subtle uppercase tracking-wider mb-1.5">
               <span className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Notes</span>
               {notes && (
                 <button
                   type="button"
                   onClick={() => setNotes?.('')}
-                  className="text-[var(--theme-text-subtle)] hover:text-red-400/70 transition-colors"
+                  className="text-theme-subtle hover:text-red-400/70 transition-colors"
                 >
                   Clear
                 </button>
@@ -418,28 +507,28 @@ export function UserLibrarySection({
               onChange={(e) => setNotes?.(e.target.value)}
               placeholder="Your thoughts..."
               rows={2}
-              className="w-full px-3 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text-primary)] text-sm placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-[var(--theme-border-hover)] resize-none"
+              className="w-full px-3 py-2.5 bg-theme-hover border border-theme rounded-lg text-theme-primary text-sm placeholder:text-theme-subtle focus:outline-hidden focus:border-theme-hover resize-none"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="flex items-center justify-between text-[10px] font-medium text-[var(--theme-text-subtle)] uppercase tracking-wider mb-1.5">
+            <label className="flex items-center justify-between text-[10px] font-medium text-theme-subtle uppercase tracking-wider mb-1.5">
               <span className="flex items-center gap-1.5"><Tag className="w-3 h-3" /> Tags</span>
               <span className="flex items-center gap-2">
                 {tags && tags.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setTags?.([])}
-                    className="text-[var(--theme-text-subtle)] hover:text-red-400/70 transition-colors"
+                    className="text-theme-subtle hover:text-red-400/70 transition-colors"
                   >
                     Clear all
                   </button>
                 )}
-                <span className="text-[var(--theme-text-subtle)]">{tags?.length ?? 0}/10</span>
+                <span className="text-theme-subtle">{tags?.length ?? 0}/10</span>
               </span>
             </label>
-            <div className="flex flex-wrap gap-1.5 p-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg min-h-[42px]">
+            <div className="flex flex-wrap gap-1.5 p-2.5 bg-theme-hover border border-theme rounded-lg min-h-[42px]">
               {tags?.map((tag) => (
                 <span
                   key={tag}
@@ -447,7 +536,7 @@ export function UserLibrarySection({
                 >
                   <Tag className="w-2.5 h-2.5" />
                   {tag}
-                  <button type="button" onClick={() => removeTag?.(tag)} className="hover:text-[var(--theme-text-primary)] transition-colors">
+                  <button type="button" onClick={() => removeTag?.(tag)} className="hover:text-theme-primary transition-colors">
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -462,7 +551,7 @@ export function UserLibrarySection({
                 }}
                 placeholder={!tags || tags.length === 0 ? "Add tags..." : ""}
                 disabled={tags && tags.length >= 10}
-                className="flex-1 min-w-[80px] bg-transparent text-sm text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-subtle)] outline-none disabled:cursor-not-allowed"
+                className="flex-1 min-w-[80px] bg-transparent text-sm text-theme-primary placeholder:text-theme-subtle outline-hidden disabled:cursor-not-allowed"
               />
             </div>
           </div>

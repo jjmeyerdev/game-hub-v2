@@ -27,7 +27,7 @@ export function NowPlayingSection({
             <div className="p-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20">
               <Play className="w-3.5 h-3.5 text-violet-400" fill="currentColor" />
             </div>
-            <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
+            <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">
               // NOW_PLAYING
             </span>
           </div>
@@ -37,7 +37,7 @@ export function NowPlayingSection({
         </div>
         <Link
           href="/library"
-          className="group flex items-center gap-1.5 text-[10px] font-mono font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-colors uppercase tracking-wider"
+          className="group flex items-center gap-1.5 text-[10px] font-mono font-medium text-theme-muted hover:text-theme-primary transition-colors uppercase tracking-wider"
         >
           <span>View all</span>
           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -45,19 +45,19 @@ export function NowPlayingSection({
       </div>
 
       {loading ? (
-        <div className="relative overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-16">
+        <div className="relative overflow-hidden rounded-2xl border border-theme bg-theme-secondary p-16">
           <div className="flex flex-col items-center justify-center">
             <div className="relative">
               <Play className="w-10 h-10 text-violet-400/60 animate-pulse" fill="currentColor" />
               <div className="absolute inset-0 w-10 h-10 border-2 border-violet-400/20 rounded-full animate-ping" />
             </div>
-            <span className="mt-4 text-[11px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
+            <span className="mt-4 text-[11px] font-mono text-theme-muted uppercase tracking-wider">
               // Loading games...
             </span>
           </div>
         </div>
       ) : nowPlaying.length === 0 ? (
-        <div className="relative overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] p-16">
+        <div className="relative overflow-hidden rounded-2xl border border-theme bg-theme-secondary p-16">
           {/* HUD corners */}
           <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-violet-400/30" />
           <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-violet-400/30" />
@@ -65,7 +65,7 @@ export function NowPlayingSection({
           <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-violet-400/30" />
 
           <div className="relative flex flex-col items-center justify-center text-center">
-            <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider mb-4">// NO_ACTIVE_SESSIONS</span>
+            <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider mb-4">// NO_ACTIVE_SESSIONS</span>
             <div className="relative w-16 h-16 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
               <Gamepad2 className="w-7 h-7 text-violet-400" />
               {/* Mini HUD corners */}
@@ -75,10 +75,10 @@ export function NowPlayingSection({
               <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r border-b border-violet-400/50" />
             </div>
 
-            <h3 className="text-sm font-bold text-[var(--theme-text-secondary)] mb-2 font-[family-name:var(--font-family-display)] uppercase">
+            <h3 className="text-sm font-bold text-theme-secondary mb-2 font-family-display uppercase">
               No games in progress
             </h3>
-            <p className="text-xs text-[var(--theme-text-muted)] mb-6 max-w-xs">
+            <p className="text-xs text-theme-muted mb-6 max-w-xs">
               Start playing a game from your library to see it here.
             </p>
 
@@ -86,8 +86,8 @@ export function NowPlayingSection({
               href="/library"
               className="group relative inline-flex items-center gap-2 px-5 py-2.5 overflow-hidden rounded-xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity" />
-              <span className="relative text-sm font-semibold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">Browse Library</span>
+              <div className="absolute inset-0 bg-linear-to-r from-violet-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+              <span className="relative text-sm font-semibold text-white uppercase tracking-wide font-family-display">Browse Library</span>
             </Link>
           </div>
         </div>

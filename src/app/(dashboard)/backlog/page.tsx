@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Layers,
   Flame,
@@ -20,6 +21,7 @@ import {
 import { useDashboardData } from '@/lib/hooks';
 import { GameFormModal, DeleteConfirmModal } from '@/components/modals';
 import { updateUserGame } from '@/lib/actions/games';
+import { getDisplayPlatform } from '@/lib/constants/platforms';
 import type { UserGame } from '@/lib/actions/games';
 
 type PriorityLevel = 'high' | 'medium' | 'low';
@@ -91,7 +93,7 @@ function BacklogGameCard({
 
   return (
     <div
-      className="group relative flex items-center gap-3 p-3 rounded-xl bg-[var(--theme-hover-bg)] border border-white/[0.04] hover:border-[var(--theme-border)] hover:bg-[var(--theme-hover-bg)] transition-all duration-200 cursor-pointer overflow-hidden"
+      className="group relative flex items-center gap-3 p-3 rounded-xl bg-theme-hover border border-white/4 hover:border-theme hover:bg-theme-hover transition-all duration-200 cursor-pointer overflow-hidden"
       style={{ animation: `fadeIn 0.3s ease-out ${index * 0.05}s both` }}
       onClick={onEdit}
     >
@@ -105,12 +107,12 @@ function BacklogGameCard({
       <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 rounded-r-full ${config.textColor.replace('text-', 'bg-')}`} />
 
       {/* Cover Art */}
-      <div className="relative flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-[var(--theme-border)] group-hover:border-white/[0.12] transition-colors">
+      <div className="relative shrink-0 w-12 h-12 rounded-lg overflow-hidden border border-theme group-hover:border-white/12 transition-colors">
         {coverUrl ? (
-          <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
+          <Image src={coverUrl} alt={title} fill className="object-cover" sizes="48px" />
         ) : (
-          <div className="w-full h-full bg-[var(--theme-hover-bg)] flex items-center justify-center">
-            <Gamepad2 className="w-5 h-5 text-[var(--theme-text-subtle)]" />
+          <div className="w-full h-full bg-theme-hover flex items-center justify-center">
+            <Gamepad2 className="w-5 h-5 text-theme-subtle" />
           </div>
         )}
         {isOnHold && (
@@ -122,11 +124,11 @@ function BacklogGameCard({
 
       {/* Game Info */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm text-white truncate group-hover:text-white transition-colors">
+        <h4 className="font-medium text-sm text-theme-primary truncate group-hover:text-theme-primary transition-colors">
           {title}
         </h4>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-[var(--theme-text-subtle)] truncate">{game.platform}</span>
+          <span className="text-xs text-theme-subtle truncate">{getDisplayPlatform(game.platform)}</span>
           {isOnHold && (
             <span className="text-[10px] px-1.5 py-0.5 bg-violet-500/10 border border-violet-500/20 rounded text-violet-400">
               On Hold
@@ -171,7 +173,7 @@ function PriorityColumn({
   const Icon = config.Icon;
 
   return (
-    <div className={`relative flex flex-col rounded-xl bg-[var(--theme-bg-secondary)] border ${config.borderColor} overflow-hidden transition-all duration-200`}>
+    <div className={`relative flex flex-col rounded-xl bg-theme-secondary border ${config.borderColor} overflow-hidden transition-all duration-200`}>
       {/* HUD corners */}
       <div className={`absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 ${config.borderColor.replace('/20', '/40')} z-10`} />
       <div className={`absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 ${config.borderColor.replace('/20', '/40')} z-10`} />
@@ -181,25 +183,25 @@ function PriorityColumn({
       {/* Column Header */}
       <button
         onClick={onToggleCollapse}
-        className={`flex items-center justify-between p-4 ${config.headerBg} border-b border-white/[0.04] hover:bg-opacity-80 transition-all`}
+        className={`flex items-center justify-between p-4 ${config.headerBg} border-b border-white/4 hover:bg-opacity-80 transition-all`}
       >
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-lg ${config.iconBg} border ${config.borderColor}`}>
             <Icon className={`w-4 h-4 ${config.textColor}`} />
           </div>
           <div className="text-left">
-            <h3 className={`font-semibold text-sm ${config.textColor} font-[family-name:var(--font-family-display)]`}>
+            <h3 className={`font-semibold text-sm ${config.textColor} font-family-display`}>
               {config.label}
             </h3>
-            <p className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">{config.sublabel}</p>
+            <p className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">{config.sublabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <span className={`text-lg font-bold font-mono ${config.textColor}`}>{games.length}</span>
           {isCollapsed ? (
-            <ChevronDown className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <ChevronDown className="w-4 h-4 text-theme-subtle" />
           ) : (
-            <ChevronUp className="w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <ChevronUp className="w-4 h-4 text-theme-subtle" />
           )}
         </div>
       </button>
@@ -212,8 +214,8 @@ function PriorityColumn({
               <div className={`p-3 rounded-xl ${config.iconBg} mb-3`}>
                 <Target className={`w-6 h-6 ${config.textColor} opacity-50`} />
               </div>
-              <p className="text-[var(--theme-text-subtle)] text-sm">No games at this priority</p>
-              <p className="text-[var(--theme-text-subtle)] text-xs mt-1">
+              <p className="text-theme-subtle text-sm">No games at this priority</p>
+              <p className="text-theme-subtle text-xs mt-1">
                 Edit a game to set its priority
               </p>
             </div>
@@ -279,7 +281,11 @@ export default function BacklogPage() {
       low: [],
     };
     filteredGames.forEach((game) => {
-      const priority = (game.priority as PriorityLevel) ?? 'medium';
+      const gamePriority = game.priority as string;
+      const priority: PriorityLevel =
+        gamePriority === 'high' || gamePriority === 'medium' || gamePriority === 'low'
+          ? gamePriority
+          : 'medium';
       grouped[priority].push(game);
     });
     // Sort each group by title
@@ -323,12 +329,12 @@ export default function BacklogPage() {
   const onHoldCount = backlogGames.filter((g) => g.status === 'on_hold').length;
 
   return (
-    <div className="relative min-h-screen bg-[var(--theme-bg-primary)] overflow-x-hidden">
+    <div className="relative min-h-screen bg-theme-primary overflow-x-hidden">
       {/* Ambient glow blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-red-500/[0.02] rounded-full blur-[120px] animate-breathe" />
-        <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-amber-500/[0.02] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
-        <div className="absolute -bottom-40 left-1/3 w-[400px] h-[400px] bg-blue-500/[0.02] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '4s' }} />
+        <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-red-500/2 rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-amber-500/2 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '2s' }} />
+        <div className="absolute -bottom-40 left-1/3 w-[400px] h-[400px] bg-blue-500/2 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '4s' }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 py-10">
@@ -337,7 +343,7 @@ export default function BacklogPage() {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/10 via-amber-500/10 to-blue-500/10 border border-[var(--theme-border)] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-red-500/10 via-amber-500/10 to-blue-500/10 border border-theme flex items-center justify-center">
                   <Layers className="w-6 h-6 text-amber-400" />
                 </div>
                 {/* HUD corners */}
@@ -347,16 +353,16 @@ export default function BacklogPage() {
                 <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r-2 border-b-2 border-amber-400/50" />
               </div>
               <div>
-                <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider block mb-1">
+                <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider block mb-1">
                   // QUEUE_MANAGEMENT
                 </span>
-                <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-family-display)]">BACKLOG</h1>
+                <h1 className="text-2xl font-bold text-theme-primary font-family-display">BACKLOG</h1>
               </div>
             </div>
 
             <Link
               href="/library"
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl text-sm text-[var(--theme-text-muted)] hover:text-white hover:border-white/[0.1] transition-all group"
+              className="flex items-center gap-2 px-4 py-2 bg-theme-hover border border-theme rounded-xl text-sm text-theme-muted hover:text-theme-primary hover:border-theme-hover transition-all group"
             >
               <span>Full Library</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -367,12 +373,12 @@ export default function BacklogPage() {
         {/* Stats Bar */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <Target className="w-4 h-4 text-[var(--theme-text-subtle)]" />
-            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// QUEUE_STATS</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <Target className="w-4 h-4 text-theme-subtle" />
+            <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">// QUEUE_STATS</span>
+            <div className="flex-1 h-px bg-white/6" />
           </div>
           <div className="grid grid-cols-4 gap-4">
-            <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-white/[0.1] transition-colors overflow-hidden">
+            <div className="group relative bg-theme-secondary border border-theme rounded-xl p-4 hover:border-white/10 transition-colors overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -382,12 +388,12 @@ export default function BacklogPage() {
                   <Layers className="w-4 h-4 text-cyan-400" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold font-mono text-white">{totalBacklog}</div>
-                  <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">Total</div>
+                  <div className="text-xl font-bold font-mono text-theme-primary">{totalBacklog}</div>
+                  <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">Total</div>
                 </div>
               </div>
             </div>
-            <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-white/[0.1] transition-colors overflow-hidden">
+            <div className="group relative bg-theme-secondary border border-theme rounded-xl p-4 hover:border-white/10 transition-colors overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-red-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-red-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-red-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -397,12 +403,12 @@ export default function BacklogPage() {
                   <Flame className="w-4 h-4 text-red-400" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold font-mono text-white">{highPriorityCount}</div>
-                  <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">High Priority</div>
+                  <div className="text-xl font-bold font-mono text-theme-primary">{highPriorityCount}</div>
+                  <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">High Priority</div>
                 </div>
               </div>
             </div>
-            <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-white/[0.1] transition-colors overflow-hidden">
+            <div className="group relative bg-theme-secondary border border-theme rounded-xl p-4 hover:border-white/10 transition-colors overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-violet-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-violet-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-violet-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -412,12 +418,12 @@ export default function BacklogPage() {
                   <Pause className="w-4 h-4 text-violet-400" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold font-mono text-white">{onHoldCount}</div>
-                  <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">On Hold</div>
+                  <div className="text-xl font-bold font-mono text-theme-primary">{onHoldCount}</div>
+                  <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">On Hold</div>
                 </div>
               </div>
             </div>
-            <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 hover:border-white/[0.1] transition-colors overflow-hidden">
+            <div className="group relative bg-theme-secondary border border-theme rounded-xl p-4 hover:border-white/10 transition-colors overflow-hidden">
               <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-emerald-400/50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -427,10 +433,10 @@ export default function BacklogPage() {
                   <Sparkles className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-white truncate max-w-[120px] font-[family-name:var(--font-family-display)]">
+                  <div className="text-lg font-bold text-theme-primary truncate max-w-[120px] font-family-display">
                     {highPriorityCount > 0 ? gamesByPriority.high[0]?.game?.title?.slice(0, 12) + '...' : '—'}
                   </div>
-                  <div className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">Play Next</div>
+                  <div className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">Play Next</div>
                 </div>
               </div>
             </div>
@@ -440,18 +446,18 @@ export default function BacklogPage() {
         {/* Search Bar */}
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-3">
-            <Search className="w-4 h-4 text-[var(--theme-text-subtle)]" />
-            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// SEARCH_FILTER</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
+            <Search className="w-4 h-4 text-theme-subtle" />
+            <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider">// SEARCH_FILTER</span>
+            <div className="flex-1 h-px bg-white/6" />
           </div>
           <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--theme-text-subtle)]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-subtle" />
             <input
               type="text"
               placeholder="Search your backlog..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder:text-[var(--theme-text-subtle)] focus:outline-none focus:border-cyan-400/30 focus:bg-[var(--theme-hover-bg)] transition-all font-mono"
+              className="w-full bg-theme-secondary border border-theme rounded-xl pl-11 pr-4 py-3 text-sm text-theme-primary placeholder:text-theme-subtle focus:outline-hidden focus:border-cyan-400/30 focus:bg-theme-hover transition-all font-mono"
             />
           </div>
         </div>
@@ -463,30 +469,30 @@ export default function BacklogPage() {
               <Layers className="w-12 h-12 text-amber-400/60 animate-pulse" />
               <div className="absolute inset-0 w-12 h-12 border-2 border-amber-400/20 rounded-full animate-ping" />
             </div>
-            <p className="mt-4 text-[11px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider">// Loading queue data...</p>
+            <p className="mt-4 text-[11px] font-mono text-theme-subtle uppercase tracking-wider">// Loading queue data...</p>
           </div>
         ) : totalBacklog === 0 ? (
-          <div className="relative text-center py-20 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl overflow-hidden">
+          <div className="relative text-center py-20 bg-theme-secondary border border-theme rounded-2xl overflow-hidden">
             {/* HUD corners */}
             <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-emerald-400/30" />
             <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-emerald-400/30" />
             <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-emerald-400/30" />
             <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-emerald-400/30" />
 
-            <span className="text-[10px] font-mono text-[var(--theme-text-subtle)] uppercase tracking-wider mb-4 block">// QUEUE_EMPTY</span>
-            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+            <span className="text-[10px] font-mono text-theme-subtle uppercase tracking-wider mb-4 block">// QUEUE_EMPTY</span>
+            <div className="relative p-5 rounded-2xl bg-linear-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-emerald-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2 font-[family-name:var(--font-family-display)]">BACKLOG CLEAR!</h3>
-            <p className="text-[var(--theme-text-muted)] mb-6">
+            <h3 className="text-xl font-bold text-theme-primary mb-2 font-family-display">BACKLOG CLEAR!</h3>
+            <p className="text-theme-muted mb-6">
               You don't have any unplayed games waiting.
             </p>
             <Link
               href="/library"
               className="group relative inline-flex items-center gap-2 px-6 py-3 overflow-hidden rounded-xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity" />
-              <span className="relative font-semibold text-white uppercase tracking-wide font-[family-name:var(--font-family-display)]">Browse Library</span>
+              <div className="absolute inset-0 bg-linear-to-r from-emerald-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity" />
+              <span className="relative font-semibold text-white uppercase tracking-wide font-family-display">Browse Library</span>
               <ArrowRight className="relative w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -508,7 +514,7 @@ export default function BacklogPage() {
 
         {/* Tip */}
         {totalBacklog > 0 && (
-          <div className="relative mt-8 p-4 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden">
+          <div className="relative mt-8 p-4 bg-theme-secondary border border-theme rounded-xl overflow-hidden">
             {/* HUD corners */}
             <div className="absolute top-0 left-0 w-3 h-3 border-l border-t border-cyan-400/30" />
             <div className="absolute top-0 right-0 w-3 h-3 border-r border-t border-cyan-400/30" />
@@ -516,8 +522,8 @@ export default function BacklogPage() {
             <div className="absolute bottom-0 right-0 w-3 h-3 border-r border-b border-cyan-400/30" />
 
             <div className="relative flex items-start gap-3">
-              <Target className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-[var(--theme-text-muted)]">
+              <Target className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-theme-muted">
                 <span className="text-cyan-400 font-mono text-[10px] uppercase tracking-wider">// TIP:</span>{' '}
                 Focus on your high priority games first.
                 Click the <Play className="w-3 h-3 inline mx-1 text-cyan-400" /> button to instantly start playing a game.

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/supabase/server';
-import { findBestMatch, getGameUpdateData } from '@/lib/igdb';
+import { findBestMatch, getGameUpdateData, getPlatformReleaseDate } from '@/lib/igdb';
 import { hasUpdates } from '@/lib/types/igdb';
 import type { Game } from './types';
 
@@ -133,6 +133,7 @@ export async function enrichAllGamesFromIGDB(platformFilter?: string, consoleFil
         id,
         game_id,
         platform,
+        locked_fields,
         game:games(id, title, cover_url, description, developer, publisher, release_date, genres)
       `)
       .eq('user_id', user.id);
@@ -163,11 +164,21 @@ export async function enrichAllGamesFromIGDB(platformFilter?: string, consoleFil
       };
     }
 
-    // Deduplicate by game_id to avoid enriching the same game multiple times
-    const uniqueGames = new Map<string, typeof userGames[0]>();
+    // Deduplicate by game_id, but track locked fields across all user_games for that game
+    const uniqueGames = new Map<string, { userGame: typeof userGames[0]; lockedFields: Record<string, boolean> }>();
     for (const userGame of userGames) {
+      const lockedFields = (userGame.locked_fields as Record<string, boolean>) || {};
+
       if (!uniqueGames.has(userGame.game_id)) {
-        uniqueGames.set(userGame.game_id, userGame);
+        uniqueGames.set(userGame.game_id, { userGame, lockedFields });
+      } else {
+        // Merge locked fields - if ANY user_game has a field locked, consider it locked
+        const existing = uniqueGames.get(userGame.game_id)!;
+        for (const [key, value] of Object.entries(lockedFields)) {
+          if (value) {
+            existing.lockedFields[key] = true;
+          }
+        }
       }
     }
 
@@ -176,7 +187,7 @@ export async function enrichAllGamesFromIGDB(platformFilter?: string, consoleFil
     let failed = 0;
 
     // Process each unique game
-    for (const userGame of uniqueGames.values()) {
+    for (const { userGame, lockedFields } of uniqueGames.values()) {
       const game = userGame.game as unknown as Game;
 
       if (!game) {
@@ -184,15 +195,29 @@ export async function enrichAllGamesFromIGDB(platformFilter?: string, consoleFil
         continue;
       }
 
+      // Check if all enrichable fields are locked
+      const allFieldsLocked =
+        lockedFields['cover'] &&
+        lockedFields['description'] &&
+        lockedFields['developer'] &&
+        lockedFields['releaseDate'] &&
+        lockedFields['genres'];
+
+      if (allFieldsLocked) {
+        skipped++;
+        continue;
+      }
+
       try {
-        // Use IGDB client to get update data
+        // Pass locked fields info to pretend existing data exists for locked fields
+        // This prevents getGameUpdateData from trying to update them
         const updateData = await getGameUpdateData(game.title, {
-          cover_url: game.cover_url,
-          description: game.description,
-          developer: game.developer,
+          cover_url: lockedFields['cover'] ? 'locked' : game.cover_url,
+          description: lockedFields['description'] ? 'locked' : game.description,
+          developer: lockedFields['developer'] ? 'locked' : game.developer,
           publisher: game.publisher,
-          release_date: game.release_date,
-          genres: game.genres,
+          release_date: lockedFields['releaseDate'] ? 'locked' : game.release_date,
+          genres: lockedFields['genres'] ? ['locked'] : game.genres,
         });
 
         if (!updateData || !hasUpdates(updateData)) {
@@ -313,11 +338,158 @@ export async function fetchIGDBMetadata(gameTitle: string, userPlatform?: string
         releaseDate: result.releaseDate,
         genres: result.genres,
         platform: result.platform,
+        releaseDates: result.releaseDates,
       }
     };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : 'Failed to fetch from IGDB',
+    };
+  }
+}
+
+/**
+ * Refresh release dates for all games in user's library from IGDB
+ * Updates user_games.release_date with platform-specific release dates
+ *
+ * @param platformFilter - Optional platform to filter games (e.g., 'Steam', 'PlayStation', 'Xbox')
+ */
+export async function refreshReleaseDatesFromIGDB(platformFilter?: string) {
+  let user, supabase;
+  try {
+    ({ user, supabase } = await requireAuth());
+  } catch {
+    return { error: 'Not authenticated' };
+  }
+
+  try {
+    // Build query to fetch all user games with their game titles
+    let query = supabase
+      .from('user_games')
+      .select(`
+        id,
+        game_id,
+        platform,
+        release_date,
+        locked_fields,
+        game:games(id, title, release_date)
+      `)
+      .eq('user_id', user.id);
+
+    // Apply platform filter if provided
+    if (platformFilter) {
+      query = query.or(`platform.eq.${platformFilter},platform.like.${platformFilter} (%)`);
+    }
+
+    const { data: userGames, error: fetchError } = await query;
+
+    if (fetchError) {
+      return { error: fetchError.message };
+    }
+
+    if (!userGames || userGames.length === 0) {
+      return {
+        success: true,
+        message: 'No games found in library',
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+        total: 0
+      };
+    }
+
+    let updated = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    // Group games by title to minimize IGDB API calls
+    const gamesByTitle = new Map<string, typeof userGames>();
+    for (const userGame of userGames) {
+      const game = userGame.game as unknown as Game;
+      if (!game?.title) continue;
+
+      const existing = gamesByTitle.get(game.title) ?? [];
+      existing.push(userGame);
+      gamesByTitle.set(game.title, existing);
+    }
+
+    // Process each unique game title
+    for (const [title, games] of gamesByTitle) {
+      try {
+        // Find the best matching game from IGDB
+        const igdbGame = await findBestMatch(title);
+
+        if (!igdbGame) {
+          skipped += games.length;
+          continue;
+        }
+
+        const releaseDates = igdbGame.releaseDates ?? [];
+        const fallbackDate = igdbGame.releaseDate;
+
+        // Update each user_game with its platform-specific release date
+        for (const userGame of games) {
+          // Check if releaseDate is locked - skip if so
+          const lockedFields = (userGame.locked_fields as Record<string, boolean>) || {};
+          if (lockedFields['releaseDate']) {
+            skipped++;
+            continue;
+          }
+
+          // Extract console from platform (e.g., "PlayStation (PS5)" -> "PS5")
+          const platformMatch = userGame.platform.match(/^(.+?)\s*(?:\((.+)\))?$/);
+          const basePlatform = platformMatch?.[1] ?? userGame.platform;
+          const consoleName = platformMatch?.[2];
+
+          const platformDate = getPlatformReleaseDate(
+            releaseDates,
+            basePlatform,
+            consoleName,
+            fallbackDate
+          );
+
+          if (platformDate) {
+            const { error: updateError } = await supabase
+              .from('user_games')
+              .update({
+                release_date: platformDate,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', userGame.id);
+
+            if (updateError) {
+              failed++;
+            } else {
+              updated++;
+            }
+          } else {
+            skipped++;
+          }
+        }
+
+        // Add a small delay to avoid IGDB rate limiting
+        await new Promise(resolve => setTimeout(resolve, 250));
+      } catch {
+        failed += games.length;
+      }
+    }
+
+    revalidatePath('/dashboard');
+    revalidatePath('/library');
+    revalidatePath('/backlog');
+    revalidatePath('/game/[id]', 'page');
+
+    return {
+      success: true,
+      message: `Updated release dates for ${updated} games (skipped ${skipped}, failed ${failed})`,
+      updated,
+      skipped,
+      failed,
+      total: userGames.length
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : 'Failed to refresh release dates from IGDB',
     };
   }
 }

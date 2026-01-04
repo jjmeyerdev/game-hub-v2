@@ -6,6 +6,7 @@ import { getTrophiesForTitle } from '@/lib/psn';
 import { getGameAchievements as getXboxGameAchievements } from '@/lib/xbox';
 import { getValidAccessToken } from '@/lib/actions/psn/auth';
 import { getValidApiKey as getXboxApiKey } from '@/lib/actions/xbox/auth';
+import type { UserAchievement, GameAchievementStats } from './types';
 
 // Normalized achievement type that works across all platforms
 export interface NormalizedAchievement {
@@ -286,4 +287,271 @@ async function fetchXboxAchievements(
     console.error('Error fetching Xbox achievements:', error);
     return { success: false, achievements: [], platform: 'xbox', error: 'Failed to fetch achievements' };
   }
+}
+
+// ============================================================================
+// Database-backed achievement management functions
+// ============================================================================
+
+/**
+ * Get all stored achievements for a specific user game from the database
+ */
+export async function getStoredAchievements(userGameId: string): Promise<{
+  achievements: UserAchievement[];
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { achievements: [], error: 'Not authenticated' };
+  }
+
+  // Verify user owns this game entry
+  const { data: userGame } = await supabase
+    .from('user_games')
+    .select('id')
+    .eq('id', userGameId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!userGame) {
+    return { achievements: [], error: 'Game not found' };
+  }
+
+  const { data: achievements, error } = await supabase
+    .from('user_achievements')
+    .select('*')
+    .eq('user_game_id', userGameId)
+    .order('unlocked', { ascending: false })
+    .order('name', { ascending: true });
+
+  if (error) {
+    return { achievements: [], error: error.message };
+  }
+
+  return { achievements: achievements as UserAchievement[], error: null };
+}
+
+/**
+ * Update the unlocked_by_me flag for an achievement
+ * @param achievementId - The achievement ID
+ * @param unlockedByMe - true = I unlocked this, false = someone else did, null = use synced status
+ */
+export async function updateAchievementOwnership(
+  achievementId: string,
+  unlockedByMe: boolean | null
+): Promise<{ success: boolean; error: string | null }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  // Verify user owns this achievement
+  const { data: achievement } = await supabase
+    .from('user_achievements')
+    .select('id')
+    .eq('id', achievementId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!achievement) {
+    return { success: false, error: 'Achievement not found' };
+  }
+
+  const { error } = await supabase
+    .from('user_achievements')
+    .update({
+      unlocked_by_me: unlockedByMe,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', achievementId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true, error: null };
+}
+
+/**
+ * Bulk update unlocked_by_me for multiple achievements
+ */
+export async function bulkUpdateAchievementOwnership(
+  achievementIds: string[],
+  unlockedByMe: boolean | null
+): Promise<{ success: boolean; updated: number; error: string | null }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, updated: 0, error: 'Not authenticated' };
+  }
+
+  // Verify user owns all these achievements
+  const { data: achievements } = await supabase
+    .from('user_achievements')
+    .select('id')
+    .in('id', achievementIds)
+    .eq('user_id', user.id);
+
+  if (!achievements || achievements.length !== achievementIds.length) {
+    return { success: false, updated: 0, error: 'Some achievements not found' };
+  }
+
+  const { error, count } = await supabase
+    .from('user_achievements')
+    .update({
+      unlocked_by_me: unlockedByMe,
+      updated_at: new Date().toISOString(),
+    })
+    .in('id', achievementIds);
+
+  if (error) {
+    return { success: false, updated: 0, error: error.message };
+  }
+
+  return { success: true, updated: count ?? achievementIds.length, error: null };
+}
+
+/**
+ * Get achievement stats for a game, considering unlocked_by_me overrides
+ */
+export async function getAchievementStats(userGameId: string): Promise<{
+  stats: GameAchievementStats | null;
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { stats: null, error: 'Not authenticated' };
+  }
+
+  const { data: achievements, error } = await supabase
+    .from('user_achievements')
+    .select('unlocked, unlocked_by_me, points')
+    .eq('user_game_id', userGameId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    return { stats: null, error: error.message };
+  }
+
+  if (!achievements || achievements.length === 0) {
+    return { stats: null, error: null };
+  }
+
+  const stats: GameAchievementStats = {
+    total: achievements.length,
+    unlocked: 0,
+    unlockedByMe: 0,
+    totalPoints: 0,
+    earnedPoints: 0,
+    earnedPointsByMe: 0,
+  };
+
+  for (const achievement of achievements) {
+    const points = achievement.points ?? 0;
+    stats.totalPoints += points;
+
+    if (achievement.unlocked) {
+      stats.unlocked++;
+      stats.earnedPoints += points;
+    }
+
+    // Calculate "by me" stats:
+    // - If unlocked_by_me is explicitly set, use that value
+    // - If unlocked_by_me is null, fall back to unlocked status
+    const isUnlockedByMe = achievement.unlocked_by_me ?? achievement.unlocked;
+    if (isUnlockedByMe) {
+      stats.unlockedByMe++;
+      stats.earnedPointsByMe += points;
+    }
+  }
+
+  return { stats, error: null };
+}
+
+/**
+ * Mark all unlocked achievements as "unlocked by me" for a game
+ */
+export async function markAllUnlockedAsOwned(userGameId: string): Promise<{
+  success: boolean;
+  updated: number;
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, updated: 0, error: 'Not authenticated' };
+  }
+
+  const { error, count } = await supabase
+    .from('user_achievements')
+    .update({
+      unlocked_by_me: true,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_game_id', userGameId)
+    .eq('user_id', user.id)
+    .eq('unlocked', true);
+
+  if (error) {
+    return { success: false, updated: 0, error: error.message };
+  }
+
+  return { success: true, updated: count ?? 0, error: null };
+}
+
+/**
+ * Clear all unlocked_by_me overrides for a game (reset to synced status)
+ */
+export async function resetAchievementOwnership(userGameId: string): Promise<{
+  success: boolean;
+  updated: number;
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, updated: 0, error: 'Not authenticated' };
+  }
+
+  const { error, count } = await supabase
+    .from('user_achievements')
+    .update({
+      unlocked_by_me: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_game_id', userGameId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    return { success: false, updated: 0, error: error.message };
+  }
+
+  return { success: true, updated: count ?? 0, error: null };
 }

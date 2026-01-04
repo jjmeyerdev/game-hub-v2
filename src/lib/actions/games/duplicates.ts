@@ -225,6 +225,38 @@ function calculateSimilarity(titleA: string, titleB: string): number {
 // DUPLICATE DETECTION
 // ============================================================================
 
+// Helper: Generate all pairs from game IDs with normalized ordering (smaller UUID first)
+function generatePairs(gameIds: string[]): Array<{ gameIdA: string; gameIdB: string }> {
+  const pairs: Array<{ gameIdA: string; gameIdB: string }> = [];
+  for (let i = 0; i < gameIds.length; i++) {
+    for (let j = i + 1; j < gameIds.length; j++) {
+      // Normalize order: smaller UUID goes first
+      const [gameIdA, gameIdB] = gameIds[i] < gameIds[j]
+        ? [gameIds[i], gameIds[j]]
+        : [gameIds[j], gameIds[i]];
+      pairs.push({ gameIdA, gameIdB });
+    }
+  }
+  return pairs;
+}
+
+// Helper: Check if all pairs in a group are dismissed
+function areAllPairsDismissed(
+  gameIds: string[],
+  dismissedPairs: Set<string>
+): boolean {
+  const pairs = generatePairs(gameIds);
+  if (pairs.length === 0) return true;
+
+  for (const { gameIdA, gameIdB } of pairs) {
+    const pairKey = `${gameIdA}:${gameIdB}`;
+    if (!dismissedPairs.has(pairKey)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * Find duplicate games in user's library
  */
@@ -236,7 +268,7 @@ export async function findDuplicateGames(): Promise<{ data: DuplicateGroup[] | n
     return { data: null, error: 'Not authenticated' };
   }
 
-  // Fetch user games and dismissed duplicates in parallel
+  // Fetch user games and dismissed pairs in parallel
   const [gamesResult, dismissedResult] = await Promise.all([
     supabase
       .from('user_games')
@@ -246,8 +278,8 @@ export async function findDuplicateGames(): Promise<{ data: DuplicateGroup[] | n
       `)
       .eq('user_id', user.id),
     supabase
-      .from('dismissed_duplicates')
-      .select('normalized_title')
+      .from('dismissed_game_pairs')
+      .select('game_id_a, game_id_b')
       .eq('user_id', user.id),
   ]);
 
@@ -255,15 +287,16 @@ export async function findDuplicateGames(): Promise<{ data: DuplicateGroup[] | n
     return { data: null, error: gamesResult.error.message };
   }
 
-  // Check for dismissed duplicates error (table might not exist)
-  if (dismissedResult.error) {
-    console.log('[Duplicate Scanner] Warning: Could not fetch dismissed duplicates:', dismissedResult.error.message);
+  // Build a set of dismissed pair keys for O(1) lookup
+  const dismissedPairs = new Set<string>();
+  if (!dismissedResult.error && dismissedResult.data) {
+    for (const pair of dismissedResult.data) {
+      // Keys are already normalized (game_id_a < game_id_b) in the database
+      dismissedPairs.add(`${pair.game_id_a}:${pair.game_id_b}`);
+    }
   }
 
   const userGames = gamesResult.data;
-  const dismissedTitles = new Set(
-    dismissedResult.data?.map(d => d.normalized_title) || []
-  );
 
   if (!userGames || userGames.length === 0) {
     return { data: [], error: null };
@@ -375,10 +408,11 @@ export async function findDuplicateGames(): Promise<{ data: DuplicateGroup[] | n
     }
   }
 
-  // Filter out dismissed duplicates
-  const filteredDuplicates = duplicates.filter(
-    group => !dismissedTitles.has(group.normalizedTitle)
-  );
+  // Filter out groups where ALL pairs are dismissed
+  const filteredDuplicates = duplicates.filter(group => {
+    const gameIds = group.games.map(g => g.id);
+    return !areAllPairsDismissed(gameIds, dismissedPairs);
+  });
 
   // Sort by confidence (highest first), then by match type, then by count
   filteredDuplicates.sort((a, b) => {
@@ -726,10 +760,11 @@ export async function mergeSelectedKeepRest(selectedIds: string[]) {
 }
 
 /**
- * Dismiss a duplicate group
+ * Dismiss a duplicate group by storing all pairs
+ * This creates entries for all pair combinations in the group
  */
 export async function dismissDuplicateGroup(
-  normalizedTitle: string,
+  _normalizedTitle: string, // Kept for API compatibility, but no longer used
   gameIds: string[]
 ): Promise<{ success: boolean; error: string | null }> {
   let user, supabase;
@@ -739,16 +774,26 @@ export async function dismissDuplicateGroup(
     return { success: false, error: 'Not authenticated' };
   }
 
+  if (gameIds.length < 2) {
+    return { success: false, error: 'Need at least 2 games to dismiss as a group' };
+  }
+
   try {
+    // Generate all pairs with normalized ordering
+    const pairs = generatePairs(gameIds);
+
+    // Insert all pairs (using upsert to handle duplicates gracefully)
+    const pairsToInsert = pairs.map(({ gameIdA, gameIdB }) => ({
+      user_id: user.id,
+      game_id_a: gameIdA,
+      game_id_b: gameIdB,
+    }));
+
     const { error } = await supabase
-      .from('dismissed_duplicates')
-      .upsert({
-        user_id: user.id,
-        normalized_title: normalizedTitle,
-        game_ids: gameIds,
-        created_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id,normalized_title',
+      .from('dismissed_game_pairs')
+      .upsert(pairsToInsert, {
+        onConflict: 'user_id,game_id_a,game_id_b',
+        ignoreDuplicates: true,
       });
 
     if (error) {
@@ -762,7 +807,105 @@ export async function dismissDuplicateGroup(
 }
 
 /**
- * Get all dismissed duplicate groups for the current user
+ * Get count of dismissed pairs for the current user
+ */
+export async function getDismissedPairsCount(): Promise<{ count: number; error: string | null }> {
+  let user, supabase;
+  try {
+    ({ user, supabase } = await requireAuth());
+  } catch {
+    return { count: 0, error: 'Not authenticated' };
+  }
+
+  try {
+    const { count, error } = await supabase
+      .from('dismissed_game_pairs')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    if (error) {
+      return { count: 0, error: error.message };
+    }
+
+    return { count: count || 0, error: null };
+  } catch (error) {
+    return { count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Clear dismissed pairs for specific games
+ * Useful when you want to re-review specific games
+ */
+export async function clearDismissedPairsForGames(gameIds: string[]): Promise<{ success: boolean; error: string | null }> {
+  let user, supabase;
+  try {
+    ({ user, supabase } = await requireAuth());
+  } catch {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  if (gameIds.length === 0) {
+    return { success: true, error: null };
+  }
+
+  try {
+    // Delete any pairs where either game_id_a or game_id_b is in the list
+    const { error } = await supabase
+      .from('dismissed_game_pairs')
+      .delete()
+      .eq('user_id', user.id)
+      .or(`game_id_a.in.(${gameIds.join(',')}),game_id_b.in.(${gameIds.join(',')})`);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Clear ALL dismissed pairs
+ */
+export async function clearAllDismissedDuplicates(): Promise<{ success: boolean; count: number; error: string | null }> {
+  let user, supabase;
+  try {
+    ({ user, supabase } = await requireAuth());
+  } catch {
+    return { success: false, count: 0, error: 'Not authenticated' };
+  }
+
+  try {
+    const { count } = await supabase
+      .from('dismissed_game_pairs')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    const { error } = await supabase
+      .from('dismissed_game_pairs')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (error) {
+      return { success: false, count: 0, error: error.message };
+    }
+
+    return { success: true, count: count || 0, error: null };
+  } catch (error) {
+    return { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+// ============================================================================
+// DEPRECATED FUNCTIONS (kept for backward compatibility)
+// These use the old dismissed_duplicates table and should not be used
+// ============================================================================
+
+/**
+ * @deprecated Use getDismissedPairsCount instead
  */
 export async function getDismissedDuplicates(): Promise<{ data: string[] | null; error: string | null }> {
   let user, supabase;
@@ -789,7 +932,7 @@ export async function getDismissedDuplicates(): Promise<{ data: string[] | null;
 }
 
 /**
- * Clear a dismissed duplicate
+ * @deprecated Use clearDismissedPairsForGames instead
  */
 export async function clearDismissedDuplicate(normalizedTitle: string): Promise<{ success: boolean; error: string | null }> {
   let user, supabase;
@@ -813,37 +956,5 @@ export async function clearDismissedDuplicate(normalizedTitle: string): Promise<
     return { success: true, error: null };
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-  }
-}
-
-/**
- * Clear ALL dismissed duplicates
- */
-export async function clearAllDismissedDuplicates(): Promise<{ success: boolean; count: number; error: string | null }> {
-  let user, supabase;
-  try {
-    ({ user, supabase } = await requireAuth());
-  } catch {
-    return { success: false, count: 0, error: 'Not authenticated' };
-  }
-
-  try {
-    const { count } = await supabase
-      .from('dismissed_duplicates')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
-
-    const { error } = await supabase
-      .from('dismissed_duplicates')
-      .delete()
-      .eq('user_id', user.id);
-
-    if (error) {
-      return { success: false, count: 0, error: error.message };
-    }
-
-    return { success: true, count: count || 0, error: null };
-  } catch (error) {
-    return { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }

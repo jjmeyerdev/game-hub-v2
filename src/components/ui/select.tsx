@@ -37,10 +37,10 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-full items-center justify-between gap-2 rounded-lg border px-4 py-2.5 text-sm whitespace-nowrap transition-all outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-10 data-[size=sm]:h-8",
-        "bg-[var(--theme-bg-secondary)] border-[var(--theme-border)] text-[var(--theme-text-primary)] hover:border-cyan-500/50 hover:bg-[var(--theme-hover-bg)]",
+        "flex w-full items-center justify-between gap-2 rounded-lg border px-4 py-2.5 text-sm whitespace-nowrap transition-all outline-hidden disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-10 data-[size=sm]:h-8",
+        "bg-theme-secondary border-theme text-theme-primary hover:border-cyan-500/50 hover:bg-theme-hover",
         "focus-visible:border-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500/20",
-        "data-[placeholder]:text-[var(--theme-text-subtle)]",
+        "data-[placeholder]:text-theme-subtle",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg]:text-cyan-400",
         className
       )}
@@ -67,7 +67,7 @@ function SelectContent({
         data-slot="select-content"
         className={cn(
           "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border shadow-2xl",
-          "bg-[var(--theme-bg-secondary)] border-cyan-500/30 backdrop-blur-xl",
+          "bg-theme-secondary border-cyan-500/30 backdrop-blur-xl",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
@@ -82,7 +82,7 @@ function SelectContent({
           className={cn(
             "p-1",
             position === "popper" &&
-              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
+              "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width) scroll-my-1"
           )}
         >
           {children}
@@ -116,7 +116,7 @@ function SelectItem({
       data-slot="select-item"
       className={cn(
         "relative flex w-full cursor-pointer items-center gap-2 rounded-md py-2.5 pr-8 pl-3 text-sm outline-hidden select-none transition-colors",
-        "text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-cyan-500/10 focus:bg-cyan-500/10 focus:text-[var(--theme-text-primary)]",
+        "text-theme-muted hover:text-theme-primary hover:bg-cyan-500/10 focus:bg-cyan-500/10 focus:text-theme-primary",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className

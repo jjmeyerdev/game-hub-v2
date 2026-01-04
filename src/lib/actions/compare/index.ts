@@ -17,6 +17,7 @@ import {
   searchByGamertag,
   getTitleHistoryByXuid,
   getMyProfile,
+  normalizeXboxPlatform,
 } from '@/lib/xbox/client';
 import {
   validateSteamId,
@@ -283,25 +284,30 @@ export async function getCurrentUserComparisonData(
       };
     }
 
-    // Get username based on platform
+    // Get username and platformId based on platform
     let username = 'You';
     let avatarUrl: string | null = null;
+    let platformId = '';
 
     if (platform === 'psn') {
       username = profile.psn_online_id || 'You';
       avatarUrl = profile.psn_avatar_url;
+      platformId = profile.psn_online_id || '';
     } else if (platform === 'xbox') {
       username = profile.xbox_gamertag || 'You';
       avatarUrl = profile.xbox_avatar_url;
+      platformId = profile.xbox_gamertag || '';
     } else {
-      username = profile.steam_username || 'You';
+      username = profile.steam_persona_name || 'You';
       avatarUrl = profile.steam_avatar_url;
+      platformId = profile.steam_id || '';
     }
 
     return {
       success: true,
       profile: {
         platform,
+        platformId,
         username,
         avatarUrl,
         stats,
@@ -332,11 +338,26 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
     return { success: false, error: 'PSN account not connected. Please link your PSN account first.' };
   }
 
+  // Get current user's PSN ID to check for self-comparison
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('psn_online_id')
+    .eq('id', user.id)
+    .single();
+
   try {
     // Search for the friend
     const friendResult = await searchPsnUser(accessToken, username);
     if (!friendResult) {
       return { success: false, error: `No PSN user found with username "${username}"` };
+    }
+
+    // Check if comparing with self
+    if (profile?.psn_online_id && friendResult.onlineId.toLowerCase() === profile.psn_online_id.toLowerCase()) {
+      return {
+        success: false,
+        error: "You can't compare with yourself! Try searching for a friend's PSN profile instead."
+      };
     }
 
     // Get current user's data
@@ -388,6 +409,7 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
           achievementProgress: psnGame.progress || 0,
           playtime: playtimeHours,
           platform: 'psn',
+          console: psnGame.trophyTitlePlatform || 'PlayStation',
         });
 
         friendTotalAchievements += earnedTotal;
@@ -415,6 +437,7 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
 
     const friendProfile: ComparisonProfile = {
       platform: 'psn',
+      platformId: friendResult.onlineId,
       username: friendResult.onlineId,
       avatarUrl: friendResult.avatarUrl,
       stats: friendStats,
@@ -436,6 +459,7 @@ export async function comparePsnProfile(username: string): Promise<ComparisonRes
           friendProgress: fg.achievementProgress,
           userPlaytime: userGame?.playtime || 0,
           friendPlaytime: fg.playtime,
+          console: fg.console || userGame?.console,
         };
       })
       .sort((a, b) => b.userProgress - a.userProgress);
@@ -470,6 +494,13 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
     return { success: false, error: 'Xbox account not connected. Please link your Xbox account first.' };
   }
 
+  // Get current user's Xbox gamertag to check for self-comparison
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('xbox_gamertag')
+    .eq('id', user.id)
+    .single();
+
   try {
     // Search for the friend
     const friendResult = await searchByGamertag(gamertag, apiKey);
@@ -477,6 +508,14 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
       return {
         success: false,
         error: `No Xbox user found with gamertag "${gamertag}". Make sure you're entering the exact gamertag (case-insensitive). If they have a suffix like #1234, try without it first.`
+      };
+    }
+
+    // Check if comparing with self
+    if (profile?.xbox_gamertag && friendResult.gamertag.toLowerCase() === profile.xbox_gamertag.toLowerCase()) {
+      return {
+        success: false,
+        error: "You can't compare with yourself! Try searching for a friend's Xbox profile instead."
       };
     }
 
@@ -505,12 +544,20 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
         const achievementsEarned = xboxGame.achievement?.currentAchievements || 0;
         const completionPercentage = xboxGame.achievement?.progressPercentage || 0;
 
+        // Use the same normalization as the library sync
+        const devices = xboxGame.devices || [];
+        const normalizedPlatform = normalizeXboxPlatform(devices);
+        // Extract console name from "Xbox (Xbox One)" format
+        const consoleMatch = normalizedPlatform.match(/\(([^)]+)\)/);
+        const consoleName = consoleMatch ? consoleMatch[1] : normalizedPlatform;
+
         friendGames.push({
           title: xboxGame.name,
           coverUrl: xboxGame.displayImage || null,
           achievementProgress: completionPercentage,
           playtime: 0, // Xbox API doesn't provide playtime in title history
           platform: 'xbox',
+          console: consoleName,
         });
 
         friendTotalAchievements += achievementsEarned;
@@ -537,6 +584,7 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
 
     const friendProfile: ComparisonProfile = {
       platform: 'xbox',
+      platformId: friendResult.gamertag,
       username: friendResult.gamertag,
       avatarUrl: friendResult.gamerPicture || null,
       stats: friendStats,
@@ -558,6 +606,7 @@ export async function compareXboxProfile(gamertag: string): Promise<ComparisonRe
           friendProgress: fg.achievementProgress,
           userPlaytime: userGame?.playtime || 0,
           friendPlaytime: fg.playtime,
+          console: fg.console || userGame?.console,
         };
       })
       .sort((a, b) => b.userProgress - a.userProgress);
@@ -590,7 +639,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
   // Check if current user has Steam linked
   const { data: profile } = await supabase
     .from('profiles')
-    .select('steam_id')
+    .select('steam_id, steam_persona_name, steam_avatar_url')
     .eq('id', user.id)
     .single();
 
@@ -608,6 +657,14 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
         return { success: false, error: error.message };
       }
       throw error;
+    }
+
+    // Check if comparing with self
+    if (friendSteamId === profile.steam_id) {
+      return {
+        success: false,
+        error: "You can't compare with yourself! Try searching for a friend's Steam profile instead."
+      };
     }
 
     // Get friend's profile
@@ -693,6 +750,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
           achievementProgress: achievementData?.percentage || 0,
           playtime: playtimeHours,
           platform: 'steam',
+          console: 'PC',
         });
 
         if (achievementData) {
@@ -725,6 +783,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
 
     const friendComparisonProfile: ComparisonProfile = {
       platform: 'steam',
+      platformId: friendSteamId,
       username: friendProfile.personaname,
       avatarUrl: friendProfile.avatarfull || null,
       stats: friendStats,
@@ -746,6 +805,7 @@ export async function compareSteamProfile(steamIdOrUrl: string): Promise<Compari
           friendProgress: fg.achievementProgress,
           userPlaytime: userGame?.playtime || 0,
           friendPlaytime: fg.playtime,
+          console: fg.console || userGame?.console,
         };
       })
       .sort((a, b) => b.userProgress - a.userProgress);

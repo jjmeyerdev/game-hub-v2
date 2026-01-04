@@ -66,7 +66,7 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: '*.s-microsoft.com',
       },
-      // Steam avatar images
+      // Steam avatar and game images
       {
         protocol: 'https',
         hostname: 'avatars.steamstatic.com',
@@ -74,6 +74,27 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'steamcdn-a.akamaihd.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.cloudflare.steamstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.akamai.steamstatic.com',
+      },
+      // Epic Games Store images
+      {
+        protocol: 'https',
+        hostname: 'cdn1.epicgames.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn2.epicgames.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.epicgames.com',
       },
     ],
   },

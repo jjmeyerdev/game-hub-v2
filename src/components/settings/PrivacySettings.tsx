@@ -164,7 +164,7 @@ export default function PrivacySettings() {
       <div className="relative">
         <div className="flex items-center gap-4 mb-2">
           <div className="relative">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
               <Shield className="w-6 h-6 text-emerald-400" />
             </div>
             {/* Shield glow effect */}
@@ -175,26 +175,26 @@ export default function PrivacySettings() {
             </div>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-[var(--theme-text-primary)] tracking-wide">Privacy Settings</h2>
-            <p className="text-[var(--theme-text-muted)] text-sm">Control your data and who sees your gaming activity</p>
+            <h2 className="text-2xl font-bold text-theme-primary tracking-wide">Privacy Settings</h2>
+            <p className="text-theme-muted text-sm">Control your data and who sees your gaming activity</p>
           </div>
         </div>
-        <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+        <div className="absolute -bottom-4 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/50 to-transparent" />
       </div>
 
       {/* Success Message */}
       {success && (
         <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center gap-3 animate-fade-in">
-          <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
           <p className="text-sm text-emerald-400">Privacy settings saved successfully</p>
         </div>
       )}
 
       {/* Privacy Overview Card */}
       <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 via-cyan-500/10 to-emerald-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border border-[var(--theme-border)] rounded-2xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+        <div className="absolute -inset-0.5 bg-linear-to-r from-emerald-500/20 via-cyan-500/10 to-emerald-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative bg-theme-secondary backdrop-blur-sm border border-theme rounded-2xl overflow-hidden">
+          <div className="h-1 bg-linear-to-r from-transparent via-emerald-500 to-transparent" />
           <div className="p-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               {visibilityOptions.map((option) => {
@@ -225,8 +225,8 @@ export default function PrivacySettings() {
 
       {/* Privacy Controls */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-[var(--theme-text-primary)] flex items-center gap-3">
-          <span className="w-1 h-5 bg-gradient-to-b from-emerald-400 to-cyan-500 rounded-full" />
+        <h3 className="text-lg font-bold text-theme-primary flex items-center gap-3">
+          <span className="w-1 h-5 bg-linear-to-b from-emerald-400 to-cyan-500 rounded-full" />
           Visibility Controls
         </h3>
 
@@ -239,20 +239,20 @@ export default function PrivacySettings() {
                 className="relative group"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className={`absolute -inset-0.5 bg-gradient-to-r from-${color}-500/10 via-transparent to-${color}-500/10 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                <div className="relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border border-[var(--theme-border)] rounded-xl overflow-hidden">
-                  <div className={`h-0.5 bg-gradient-to-r from-transparent via-${color}-500/50 to-transparent`} />
+                <div className={`absolute -inset-0.5 bg-linear-to-r from-${color}-500/10 via-transparent to-${color}-500/10 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className="relative bg-theme-secondary backdrop-blur-sm border border-theme rounded-xl overflow-hidden">
+                  <div className={`h-0.5 bg-linear-to-r from-transparent via-${color}-500/50 to-transparent`} />
                   <div className="p-5">
                     <div className="flex items-start gap-4">
                       {/* Icon */}
-                      <div className="w-10 h-10 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-theme-hover border border-theme flex items-center justify-center shrink-0">
                         {setting.icon}
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-[var(--theme-text-primary)] mb-1">{setting.title}</h4>
-                        <p className="text-sm text-[var(--theme-text-muted)] mb-4">{setting.description}</p>
+                        <h4 className="font-semibold text-theme-primary mb-1">{setting.title}</h4>
+                        <p className="text-sm text-theme-muted mb-4">{setting.description}</p>
 
                         {/* Visibility Selector */}
                         <div className="flex gap-2">
@@ -270,7 +270,7 @@ export default function PrivacySettings() {
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                                   isSelected
                                     ? bgColors[option.color as keyof typeof bgColors]
-                                    : 'bg-[var(--theme-hover-bg)] text-[var(--theme-text-muted)] border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] hover:text-[var(--theme-text-primary)]'
+                                    : 'bg-theme-hover text-theme-muted border-theme hover:border-theme-hover hover:text-theme-primary'
                                 }`}
                               >
                                 {option.icon}
@@ -312,33 +312,33 @@ export default function PrivacySettings() {
 
       {/* Data Management Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-[var(--theme-text-primary)] flex items-center gap-3">
-          <span className="w-1 h-5 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-full" />
+        <h3 className="text-lg font-bold text-theme-primary flex items-center gap-3">
+          <span className="w-1 h-5 bg-linear-to-b from-cyan-400 to-purple-500 rounded-full" />
           Data Management
         </h3>
 
         <div className="grid md:grid-cols-2 gap-4">
           {/* Download Data Card */}
           <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 via-transparent to-cyan-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border border-[var(--theme-border)] rounded-xl overflow-hidden h-full">
-              <div className="h-0.5 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+            <div className="absolute -inset-0.5 bg-linear-to-r from-cyan-500/20 via-transparent to-cyan-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative bg-theme-secondary backdrop-blur-sm border border-theme rounded-xl overflow-hidden h-full">
+              <div className="h-0.5 bg-linear-to-r from-transparent via-cyan-500/50 to-transparent" />
               <div className="p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
                     <Download className="w-5 h-5 text-cyan-400" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[var(--theme-text-primary)]">Export Your Data</h4>
-                    <p className="text-xs text-[var(--theme-text-subtle)]">Download a copy of your data</p>
+                    <h4 className="font-semibold text-theme-primary">Export Your Data</h4>
+                    <p className="text-xs text-theme-subtle">Download a copy of your data</p>
                   </div>
                 </div>
-                <p className="text-sm text-[var(--theme-text-muted)] mb-4">
+                <p className="text-sm text-theme-muted mb-4">
                   Get a complete export of your gaming library, achievements, playtime, and preferences.
                 </p>
                 <button
                   onClick={() => setShowDataModal(true)}
-                  className="w-full px-4 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-cyan-500/50 hover:bg-cyan-500/10 rounded-lg font-medium text-[var(--theme-text-muted)] hover:text-cyan-400 transition-all flex items-center justify-center gap-2"
+                  className="w-full px-4 py-2.5 bg-theme-hover border border-theme hover:border-cyan-500/50 hover:bg-cyan-500/10 rounded-lg font-medium text-theme-muted hover:text-cyan-400 transition-all flex items-center justify-center gap-2"
                 >
                   <FileText className="w-4 h-4" />
                   Request Data Export
@@ -349,9 +349,9 @@ export default function PrivacySettings() {
 
           {/* Delete Data Card */}
           <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500/20 via-transparent to-red-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border border-red-500/20 rounded-xl overflow-hidden h-full">
-              <div className="h-0.5 bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+            <div className="absolute -inset-0.5 bg-linear-to-r from-red-500/20 via-transparent to-red-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative bg-theme-secondary backdrop-blur-sm border border-red-500/20 rounded-xl overflow-hidden h-full">
+              <div className="h-0.5 bg-linear-to-r from-transparent via-red-500/50 to-transparent" />
               <div className="p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center">
@@ -359,10 +359,10 @@ export default function PrivacySettings() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-red-400">Delete All Data</h4>
-                    <p className="text-xs text-[var(--theme-text-subtle)]">Permanently remove your data</p>
+                    <p className="text-xs text-theme-subtle">Permanently remove your data</p>
                   </div>
                 </div>
-                <p className="text-sm text-[var(--theme-text-muted)] mb-4">
+                <p className="text-sm text-theme-muted mb-4">
                   Request deletion of all your personal data from our servers. This action cannot be undone.
                 </p>
                 <button className="w-full px-4 py-2.5 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 rounded-lg font-medium text-red-400 transition-all flex items-center justify-center gap-2">
@@ -377,37 +377,37 @@ export default function PrivacySettings() {
 
       {/* Third-Party Connections */}
       <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 via-emerald-500/10 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border border-[var(--theme-border)] rounded-2xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
+        <div className="absolute -inset-0.5 bg-linear-to-r from-purple-500/20 via-emerald-500/10 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative bg-theme-secondary backdrop-blur-sm border border-theme rounded-2xl overflow-hidden">
+          <div className="h-1 bg-linear-to-r from-transparent via-purple-500 to-transparent" />
           <div className="p-6">
             <div className="flex items-center gap-4 mb-5">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 flex items-center justify-center">
                 <Globe className="w-6 h-6 text-purple-400" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[var(--theme-text-primary)]">Third-Party Data Sharing</h3>
-                <p className="text-sm text-[var(--theme-text-subtle)]">Control how your data is shared with connected platforms</p>
+                <h3 className="text-lg font-bold text-theme-primary">Third-Party Data Sharing</h3>
+                <p className="text-sm text-theme-subtle">Control how your data is shared with connected platforms</p>
               </div>
             </div>
 
             <div className="space-y-3">
               {loadingPlatforms ? (
                 <div className="flex items-center justify-center py-4">
-                  <Loader2 className="w-5 h-5 text-[var(--theme-text-muted)] animate-spin" />
+                  <Loader2 className="w-5 h-5 text-theme-muted animate-spin" />
                 </div>
               ) : connectedPlatforms.map((platform) => (
                 <div
                   key={platform.name}
-                  className="flex items-center justify-between p-4 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl"
+                  className="flex items-center justify-between p-4 bg-theme-hover border border-theme rounded-xl"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-2 h-2 rounded-full ${platform.enabled ? 'bg-emerald-500' : 'bg-gray-500'}`} />
-                    <span className={`font-medium ${platform.enabled ? 'text-[var(--theme-text-primary)]' : 'text-[var(--theme-text-muted)]'}`}>
+                    <span className={`font-medium ${platform.enabled ? 'text-theme-primary' : 'text-theme-muted'}`}>
                       {platform.name}
                     </span>
                     {!platform.enabled && (
-                      <span className="text-xs text-[var(--theme-text-subtle)]">(Not connected)</span>
+                      <span className="text-xs text-theme-subtle">(Not connected)</span>
                     )}
                   </div>
                   {platform.enabled && (
@@ -417,7 +417,7 @@ export default function PrivacySettings() {
               ))}
             </div>
 
-            <p className="mt-4 text-xs text-[var(--theme-text-muted)] flex items-center gap-2">
+            <p className="mt-4 text-xs text-theme-muted flex items-center gap-2">
               <Shield className="w-3.5 h-3.5 text-emerald-400" />
               Your data is encrypted and only shared with your explicit consent
             </p>
@@ -430,9 +430,9 @@ export default function PrivacySettings() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="relative px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 rounded-xl font-semibold text-[var(--theme-bg-primary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 overflow-hidden group/btn"
+          className="relative px-6 py-2.5 bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 rounded-xl font-semibold text-bg-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 overflow-hidden group/btn"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
           {saving ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -450,15 +450,15 @@ export default function PrivacySettings() {
       {/* Data Export Modal */}
       {showDataModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="absolute inset-0 bg-[var(--theme-bg-primary)]/80 backdrop-blur-sm" onClick={() => setShowDataModal(false)} />
-          <div className="relative bg-[var(--theme-bg-secondary)] border border-cyan-500/30 rounded-2xl p-6 max-w-md w-full animate-modal-slide-in">
+          <div className="absolute inset-0 bg-theme-primary/80 backdrop-blur-sm" onClick={() => setShowDataModal(false)} />
+          <div className="relative bg-theme-secondary border border-cyan-500/30 rounded-2xl p-6 max-w-md w-full animate-modal-slide-in">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
                 <Download className="w-6 h-6 text-cyan-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-[var(--theme-text-primary)]">Export Your Data</h3>
-                <p className="text-sm text-[var(--theme-text-subtle)]">Choose what to include</p>
+                <h3 className="text-xl font-bold text-theme-primary">Export Your Data</h3>
+                <p className="text-sm text-theme-subtle">Choose what to include</p>
               </div>
             </div>
 
@@ -472,19 +472,19 @@ export default function PrivacySettings() {
               ].map((item) => (
                 <label
                   key={item.label}
-                  className="flex items-center gap-3 p-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg cursor-pointer hover:border-cyan-500/30 transition-colors"
+                  className="flex items-center gap-3 p-3 bg-theme-hover border border-theme rounded-lg cursor-pointer hover:border-cyan-500/30 transition-colors"
                 >
                   <input
                     type="checkbox"
                     defaultChecked={item.checked}
-                    className="w-4 h-4 rounded border-[var(--theme-border)] bg-[var(--theme-bg-tertiary)] text-cyan-500 focus:ring-cyan-500/50"
+                    className="w-4 h-4 rounded border-theme bg-theme-tertiary text-cyan-500 focus:ring-cyan-500/50"
                   />
-                  <span className="text-sm text-[var(--theme-text-muted)]">{item.label}</span>
+                  <span className="text-sm text-theme-muted">{item.label}</span>
                 </label>
               ))}
             </div>
 
-            <p className="text-xs text-[var(--theme-text-subtle)] mb-6 flex items-center gap-2">
+            <p className="text-xs text-theme-subtle mb-6 flex items-center gap-2">
               <FileText className="w-3.5 h-3.5 text-cyan-400" />
               Data will be exported as a JSON file
             </p>
@@ -492,14 +492,14 @@ export default function PrivacySettings() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDataModal(false)}
-                className="flex-1 px-5 py-2.5 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] hover:border-[var(--theme-border-hover)] rounded-xl font-medium text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-all"
+                className="flex-1 px-5 py-2.5 bg-theme-hover border border-theme hover:border-theme-hover rounded-xl font-medium text-theme-muted hover:text-theme-primary transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDownloadData}
                 disabled={downloading}
-                className="flex-1 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-xl font-semibold text-[var(--theme-bg-primary)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 px-5 py-2.5 bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-xl font-semibold text-bg-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {downloading ? (
                   <>

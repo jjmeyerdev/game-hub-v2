@@ -19,6 +19,8 @@ export const CONSOLE_OPTIONS: Record<string, readonly string[]> = {
     'PS3',
     'PS2',
     'PS1',
+    'PS Vita',
+    'PSP',
   ],
   Xbox: [
     'Xbox Series X|S',
@@ -71,6 +73,20 @@ export const PRIORITIES = [
 export type PlatformId = (typeof PLATFORMS)[number]['id'];
 export type StatusId = (typeof STATUSES)[number]['id'];
 export type PriorityId = (typeof PRIORITIES)[number]['id'];
+
+/**
+ * Extract the display name from a platform string.
+ * If format is "Platform (Console)", returns just "Console".
+ * Otherwise returns the original platform string.
+ * Examples:
+ *   "Xbox (Xbox 360)" -> "Xbox 360"
+ *   "PlayStation (PS5)" -> "PS5"
+ *   "Steam" -> "Steam"
+ */
+export function getDisplayPlatform(platform: string): string {
+  const match = platform.match(/\(([^)]+)\)/);
+  return match ? match[1] : platform;
+}
 
 // Platforms that can have active session tracking (PC platforms)
 export const PC_PLATFORMS = ['Steam', 'Windows', 'Epic Games', 'EA App', 'Battle.net', 'GOG', 'Xbox Game Pass'] as const;
@@ -171,9 +187,9 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   // Epic Games
   if (p.includes('epic')) {
     return {
-      bg: 'bg-[var(--theme-text-primary)]',
-      text: 'text-[var(--theme-bg-primary)]',
-      border: 'border-[var(--theme-text-primary)]/50',
+      bg: 'bg-text-primary',
+      text: 'text-bg-primary',
+      border: 'border-(--theme-text-primary)/50',
       glow: 'shadow-[0_0_20px_rgba(128,128,128,0.4),0_0_40px_rgba(128,128,128,0.15)]',
     };
   }
@@ -242,7 +258,7 @@ export function getPlatformBrandStyle(platform: string): PlatformBrandStyle {
   return {
     bg: 'bg-white/10',
     text: 'text-white',
-    border: 'border-white/[0.08]',
+    border: 'border-white/8',
   };
 }
 
@@ -289,9 +305,9 @@ export function getPlatformBrandStyleSubtle(platform: string): PlatformBrandStyl
   // Epic Games
   if (p.includes('epic')) {
     return {
-      bg: 'bg-[var(--theme-text-primary)]/10',
-      text: 'text-[var(--theme-text-secondary)]',
-      border: 'border-[var(--theme-text-primary)]/15',
+      bg: 'bg-text-primary/10',
+      text: 'text-theme-secondary',
+      border: 'border-(--theme-text-primary)/15',
     };
   }
 
@@ -352,9 +368,131 @@ export function getPlatformBrandStyleSubtle(platform: string): PlatformBrandStyl
   // Default fallback
   return {
     bg: 'bg-white/5',
-    text: 'text-[var(--theme-text-muted)]',
-    border: 'border-white/[0.05]',
+    text: 'text-theme-muted',
+    border: 'border-white/5',
   };
+}
+
+/**
+ * IGDB Platform ID mapping
+ * Maps IGDB platform IDs to our console names
+ * Reference: https://api-docs.igdb.com/#platform
+ */
+export const IGDB_PLATFORM_ID_TO_CONSOLE: Record<number, string> = {
+  // PC
+  6: 'PC',           // PC (Microsoft Windows)
+  14: 'PC',          // Mac
+  3: 'PC',           // Linux
+
+  // PlayStation
+  167: 'PS5',        // PlayStation 5
+  48: 'PS4',         // PlayStation 4
+  9: 'PS3',          // PlayStation 3
+  8: 'PS2',          // PlayStation 2
+  7: 'PS1',          // PlayStation
+  38: 'PSP',         // PlayStation Portable
+  46: 'PS Vita',     // PlayStation Vita
+
+  // Xbox
+  169: 'Xbox Series X|S',  // Xbox Series X|S
+  49: 'Xbox One',          // Xbox One
+  12: 'Xbox 360',          // Xbox 360
+  11: 'Xbox',              // Xbox (original)
+
+  // Nintendo
+  130: 'Switch',     // Nintendo Switch
+  41: 'Wii U',       // Wii U
+  5: 'Wii',          // Wii
+  37: '3DS',         // Nintendo 3DS
+  20: 'DS',          // Nintendo DS
+  21: 'GameCube',    // Nintendo GameCube
+  4: 'Nintendo 64',  // Nintendo 64
+  19: 'SNES',        // Super Nintendo
+  18: 'NES',         // Nintendo Entertainment System
+  33: 'Game Boy',    // Game Boy
+  24: 'GBA',         // Game Boy Advance
+
+  // Steam Deck (Linux-based, but specific)
+  386: 'Steam Deck',
+};
+
+/**
+ * Reverse mapping: Console name to IGDB platform IDs
+ * Some consoles map to multiple IGDB IDs (e.g., PC includes Windows, Mac, Linux)
+ */
+export const CONSOLE_TO_IGDB_PLATFORM_IDS: Record<string, number[]> = {
+  // PC platforms
+  'PC': [6, 14, 3],
+  'Steam': [6],
+  'Steam Deck': [386, 6],
+
+  // PlayStation
+  'PS5': [167],
+  'PS4': [48],
+  'PS3': [9],
+  'PS2': [8],
+  'PS1': [7],
+  'PSP': [38],
+  'PS Vita': [46],
+
+  // Xbox
+  'Xbox Series X|S': [169],
+  'Xbox One': [49],
+  'Xbox 360': [12],
+  'Xbox': [11],
+
+  // Nintendo
+  'Switch': [130],
+  'Switch 2': [130], // Fallback to Switch until IGDB adds Switch 2
+  'Wii U': [41],
+  'Wii': [5],
+  '3DS': [37],
+  'DS': [20],
+  'GameCube': [21],
+  'Nintendo 64': [4],
+  'SNES': [19],
+  'NES': [18],
+  'Game Boy': [33],
+  'GBA': [24],
+};
+
+/**
+ * Get IGDB platform IDs for a given platform/console combination
+ * @param platform - Base platform (e.g., "PlayStation", "Steam")
+ * @param console - Optional specific console (e.g., "PS5", "Xbox One")
+ * @returns Array of IGDB platform IDs to match against
+ */
+export function getIGDBPlatformIds(platform: string, console?: string): number[] {
+  // If we have a specific console, use it
+  if (console && CONSOLE_TO_IGDB_PLATFORM_IDS[console]) {
+    return CONSOLE_TO_IGDB_PLATFORM_IDS[console];
+  }
+
+  // Check if platform itself is in the mapping
+  if (CONSOLE_TO_IGDB_PLATFORM_IDS[platform]) {
+    return CONSOLE_TO_IGDB_PLATFORM_IDS[platform];
+  }
+
+  // For family platforms, return all consoles in that family
+  const lowerPlatform = platform.toLowerCase();
+
+  if (lowerPlatform.includes('playstation') || lowerPlatform === 'psn') {
+    return [167, 48, 9, 8, 7, 38, 46]; // All PlayStation platforms
+  }
+
+  if (lowerPlatform.includes('xbox')) {
+    return [169, 49, 12, 11]; // All Xbox platforms
+  }
+
+  if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch')) {
+    return [130, 41, 5, 37, 20, 21, 4, 19, 18, 33, 24]; // All Nintendo platforms
+  }
+
+  if (lowerPlatform.includes('steam') || lowerPlatform.includes('pc') || lowerPlatform.includes('epic') || lowerPlatform.includes('gog')) {
+    return [6]; // PC (Windows)
+  }
+
+  return [];
 }
 
 export const CONSOLE_GENERATIONS: ConsoleGeneration[] = [

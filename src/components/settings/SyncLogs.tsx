@@ -134,7 +134,7 @@ const serviceConfig: Record<
   },
   epic: {
     name: 'Epic Games',
-    color: 'text-[var(--theme-text-muted)]',
+    color: 'text-theme-muted',
     bgColor: 'bg-gray-500/10',
     borderColor: 'border-gray-500/30',
     icon: (
@@ -246,15 +246,15 @@ export default function SyncLogs() {
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="absolute inset-0 bg-orange-500/20 blur-md rounded-full" />
-            <div className="relative p-2 bg-gradient-to-br from-orange-500/20 to-amber-600/20 border border-orange-500/30 rounded-lg">
+            <div className="relative p-2 bg-linear-to-br from-orange-500/20 to-amber-600/20 border border-orange-500/30 rounded-lg">
               <Terminal className="w-4 h-4 text-orange-400" />
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[var(--theme-text-primary)] tracking-wide" style={{ fontFamily: 'var(--font-rajdhani)' }}>
+            <h3 className="text-sm font-bold text-theme-primary tracking-wide" style={{ fontFamily: 'var(--font-rajdhani)' }}>
               SYNC DIAGNOSTICS
             </h3>
-            <p className="text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider">
+            <p className="text-[10px] text-theme-subtle uppercase tracking-wider">
               {logs.length} {logs.length === 1 ? 'entry' : 'entries'}
               {totalErrors > 0 && (
                 <span className="text-amber-400 ml-2">
@@ -269,17 +269,17 @@ export default function SyncLogs() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleDownload()}
-              className="p-2 bg-[var(--theme-hover-bg)]/20 hover:bg-[var(--theme-hover-bg)]/30 border border-[var(--theme-border)]/30 rounded-lg transition-all group"
+              className="p-2 bg-theme-hover/20 hover:bg-theme-hover/30 border border-theme/30 rounded-lg transition-all group"
               title="Download all logs"
             >
-              <Download className="w-3.5 h-3.5 text-[var(--theme-text-muted)] group-hover:text-cyan-400 transition-colors" />
+              <Download className="w-3.5 h-3.5 text-theme-muted group-hover:text-cyan-400 transition-colors" />
             </button>
             <button
               onClick={() => handleClearLogs()}
-              className="p-2 bg-[var(--theme-hover-bg)]/20 hover:bg-red-500/10 border border-[var(--theme-border)]/30 hover:border-red-500/30 rounded-lg transition-all group"
+              className="p-2 bg-theme-hover/20 hover:bg-red-500/10 border border-theme/30 hover:border-red-500/30 rounded-lg transition-all group"
               title="Clear all logs"
             >
-              <Trash2 className="w-3.5 h-3.5 text-[var(--theme-text-muted)] group-hover:text-red-400 transition-colors" />
+              <Trash2 className="w-3.5 h-3.5 text-theme-muted group-hover:text-red-400 transition-colors" />
             </button>
           </div>
         )}
@@ -298,16 +298,16 @@ export default function SyncLogs() {
         </div>
 
         {/* Terminal window */}
-        <div className="relative bg-[#0a0e14] border border-[var(--theme-border)]/40 rounded-xl overflow-hidden">
+        <div className="relative bg-[#0a0e14] border border-theme/40 rounded-xl overflow-hidden">
           {/* Terminal header bar */}
-          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1218] to-[#0a0e14] border-b border-[var(--theme-border)]/30">
+          <div className="flex items-center justify-between px-4 py-2 bg-linear-to-r from-[#0d1218] to-[#0a0e14] border-b border-theme/30">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
               </div>
-              <span className="ml-3 text-[10px] font-mono text-[var(--theme-text-subtle)] tracking-wider">sync_diagnostic.log</span>
+              <span className="ml-3 text-[10px] font-mono text-theme-subtle tracking-wider">sync_diagnostic.log</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
@@ -321,13 +321,13 @@ export default function SyncLogs() {
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="relative mb-4">
                   <div className="absolute inset-0 bg-gray-500/10 blur-xl rounded-full" />
-                  <Gamepad2 className="relative w-10 h-10 text-[var(--theme-text-subtle)]" />
+                  <Gamepad2 className="relative w-10 h-10 text-theme-subtle" />
                 </div>
-                <p className="text-sm text-[var(--theme-text-subtle)] font-mono mb-1">No sync logs yet</p>
-                <p className="text-[10px] text-[var(--theme-text-subtle)]">Sync your gaming platforms to see diagnostics here</p>
+                <p className="text-sm text-theme-subtle font-mono mb-1">No sync logs yet</p>
+                <p className="text-[10px] text-theme-subtle">Sync your gaming platforms to see diagnostics here</p>
               </div>
             ) : (
-              <div className="divide-y divide-[var(--theme-border)]">
+              <div className="divide-y divide-border">
                 {services.map((service) => {
                   const serviceLogs = logsByService[service] || [];
                   const config = serviceConfig[service];
@@ -341,7 +341,7 @@ export default function SyncLogs() {
                         onClick={() => serviceLogs.length > 0 && toggleService(service)}
                         className={`
                           w-full flex items-center justify-between px-4 py-3
-                          hover:bg-white/[0.02] transition-colors cursor-pointer
+                          hover:bg-white/2 transition-colors cursor-pointer
                           ${serviceLogs.length === 0 ? 'opacity-50 cursor-default' : ''}
                         `}
                         role="button"
@@ -355,9 +355,9 @@ export default function SyncLogs() {
                       >
                         <div className="flex items-center gap-3">
                           {isExpanded ? (
-                            <ChevronDown className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                            <ChevronDown className="w-3.5 h-3.5 text-theme-subtle" />
                           ) : (
-                            <ChevronRight className="w-3.5 h-3.5 text-[var(--theme-text-subtle)]" />
+                            <ChevronRight className="w-3.5 h-3.5 text-theme-subtle" />
                           )}
                           <div className={`p-1.5 rounded ${config.bgColor} ${config.borderColor} border`}>
                             <span className={config.color}>{config.icon}</span>
@@ -369,7 +369,7 @@ export default function SyncLogs() {
                         <div className="flex items-center gap-3">
                           {serviceLogs.length > 0 && (
                             <>
-                              <span className="text-[10px] font-mono text-[var(--theme-text-subtle)]">
+                              <span className="text-[10px] font-mono text-theme-subtle">
                                 {serviceLogs.length} {serviceLogs.length === 1 ? 'log' : 'logs'}
                               </span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -378,10 +378,10 @@ export default function SyncLogs() {
                                     e.stopPropagation();
                                     handleDownload(service);
                                   }}
-                                  className="p-1 hover:bg-[var(--theme-hover-bg)]/30 rounded transition-colors"
+                                  className="p-1 hover:bg-theme-hover/30 rounded transition-colors"
                                   title={`Download ${config.name} logs`}
                                 >
-                                  <Download className="w-3 h-3 text-[var(--theme-text-subtle)] hover:text-cyan-400" />
+                                  <Download className="w-3 h-3 text-theme-subtle hover:text-cyan-400" />
                                 </button>
                                 <button
                                   onClick={(e) => {
@@ -391,7 +391,7 @@ export default function SyncLogs() {
                                   className="p-1 hover:bg-red-500/10 rounded transition-colors"
                                   title={`Clear ${config.name} logs`}
                                 >
-                                  <Trash2 className="w-3 h-3 text-[var(--theme-text-subtle)] hover:text-red-400" />
+                                  <Trash2 className="w-3 h-3 text-theme-subtle hover:text-red-400" />
                                 </button>
                               </div>
                             </>
@@ -401,17 +401,17 @@ export default function SyncLogs() {
 
                       {/* Expanded log entries */}
                       {isExpanded && serviceLogs.length > 0 && (
-                        <div className="bg-black/30 border-t border-[var(--theme-border)]/10">
+                        <div className="bg-black/30 border-t border-theme/10">
                           {serviceLogs.map((log) => {
                             const isLogExpanded = expandedLogs.has(log.id);
                             const date = new Date(log.timestamp);
 
                             return (
-                              <div key={log.id} className="border-b border-[var(--theme-border)]/10 last:border-b-0">
+                              <div key={log.id} className="border-b border-theme/10 last:border-b-0">
                                 {/* Log entry header */}
                                 <button
                                   onClick={() => toggleLog(log.id)}
-                                  className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/[0.01] transition-colors text-left"
+                                  className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/1 transition-colors text-left"
                                 >
                                   <div className="w-4 flex justify-center">
                                     {log.success ? (
@@ -427,14 +427,14 @@ export default function SyncLogs() {
 
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 text-[11px] font-mono">
-                                      <span className="text-[var(--theme-text-subtle)]">
+                                      <span className="text-theme-subtle">
                                         [{date.toLocaleDateString()} {date.toLocaleTimeString()}]
                                       </span>
                                       <span className={log.success ? 'text-emerald-400' : 'text-red-400'}>
                                         {log.success ? 'SUCCESS' : 'FAILED'}
                                       </span>
                                     </div>
-                                    <div className="text-[10px] text-[var(--theme-text-muted)] mt-0.5">
+                                    <div className="text-[10px] text-theme-muted mt-0.5">
                                       +{log.gamesAdded} added, {log.gamesUpdated} updated
                                       {log.errors.length > 0 && (
                                         <span className="text-amber-400 ml-2">({log.errors.length} warnings)</span>
@@ -443,7 +443,7 @@ export default function SyncLogs() {
                                   </div>
 
                                   <ChevronRight
-                                    className={`w-3 h-3 text-[var(--theme-text-subtle)] transition-transform ${isLogExpanded ? 'rotate-90' : ''}`}
+                                    className={`w-3 h-3 text-theme-subtle transition-transform ${isLogExpanded ? 'rotate-90' : ''}`}
                                   />
                                 </button>
 
@@ -452,23 +452,23 @@ export default function SyncLogs() {
                                   <div className="px-4 py-3 bg-black/40 font-mono text-[10px] space-y-2">
                                     {/* Stats */}
                                     <div className="grid grid-cols-4 gap-2">
-                                      <div className="p-2 bg-[var(--theme-hover-bg)]/10 rounded border border-[var(--theme-border)]/20">
+                                      <div className="p-2 bg-theme-hover/10 rounded border border-theme/20">
                                         <div className="text-cyan-400 font-bold">{log.totalGames}</div>
-                                        <div className="text-[var(--theme-text-subtle)] uppercase">Total</div>
+                                        <div className="text-theme-subtle uppercase">Total</div>
                                       </div>
                                       <div className="p-2 bg-emerald-500/5 rounded border border-emerald-500/20">
                                         <div className="text-emerald-400 font-bold">{log.gamesAdded}</div>
-                                        <div className="text-[var(--theme-text-subtle)] uppercase">Added</div>
+                                        <div className="text-theme-subtle uppercase">Added</div>
                                       </div>
                                       <div className="p-2 bg-purple-500/5 rounded border border-purple-500/20">
                                         <div className="text-purple-400 font-bold">{log.gamesUpdated}</div>
-                                        <div className="text-[var(--theme-text-subtle)] uppercase">Updated</div>
+                                        <div className="text-theme-subtle uppercase">Updated</div>
                                       </div>
                                       <div className="p-2 bg-amber-500/5 rounded border border-amber-500/20">
                                         <div className="text-amber-400 font-bold">
                                           {log.metadata?.achievementsUpdated || log.metadata?.trophiesUpdated || 0}
                                         </div>
-                                        <div className="text-[var(--theme-text-subtle)] uppercase">
+                                        <div className="text-theme-subtle uppercase">
                                           {service === 'psn' ? 'Trophies' : 'Achieve'}
                                         </div>
                                       </div>
@@ -476,7 +476,7 @@ export default function SyncLogs() {
 
                                     {/* Duration */}
                                     {log.duration && (
-                                      <div className="flex items-center gap-2 text-[var(--theme-text-subtle)]">
+                                      <div className="flex items-center gap-2 text-theme-subtle">
                                         <Clock className="w-3 h-3" />
                                         <span>Completed in {(log.duration / 1000).toFixed(2)}s</span>
                                       </div>
@@ -513,13 +513,13 @@ export default function SyncLogs() {
           </div>
 
           {/* Terminal footer */}
-          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-[#0d1218] to-[#0a0e14] border-t border-[var(--theme-border)]/30">
-            <div className="flex items-center gap-2 text-[9px] font-mono text-[var(--theme-text-subtle)]">
+          <div className="flex items-center justify-between px-4 py-2 bg-linear-to-r from-[#0d1218] to-[#0a0e14] border-t border-theme/30">
+            <div className="flex items-center gap-2 text-[9px] font-mono text-theme-subtle">
               <span>$</span>
-              <span className="text-[var(--theme-text-subtle)]">gamehub sync --status</span>
+              <span className="text-theme-subtle">gamehub sync --status</span>
               <span className="w-2 h-3.5 bg-gray-500 animate-pulse" />
             </div>
-            <span className="text-[9px] font-mono text-[var(--theme-text-subtle)]">
+            <span className="text-[9px] font-mono text-theme-subtle">
               Last updated: {logs[0] ? new Date(logs[0].timestamp).toLocaleString() : 'Never'}
             </span>
           </div>

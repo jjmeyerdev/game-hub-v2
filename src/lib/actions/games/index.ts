@@ -40,6 +40,7 @@ export {
   enrichAllGamesFromIGDB,
   updateGameCoverFromIGDB,
   fetchIGDBMetadata,
+  refreshReleaseDatesFromIGDB,
 } from './enrichment';
 
 // Duplicate detection and merging
@@ -49,9 +50,12 @@ export {
   mergeStatsAcrossCopies,
   mergeSelectedKeepRest,
   dismissDuplicateGroup,
+  getDismissedPairsCount,
+  clearDismissedPairsForGames,
+  clearAllDismissedDuplicates,
+  // Deprecated exports (kept for backward compatibility)
   getDismissedDuplicates,
   clearDismissedDuplicate,
-  clearAllDismissedDuplicates,
 } from './duplicates';
 
 // Platform scanning and sync
@@ -66,6 +70,20 @@ export {
 // Achievements
 export {
   getGameAchievements,
+  getStoredAchievements,
+  updateAchievementOwnership,
+  bulkUpdateAchievementOwnership,
+  getAchievementStats,
+  markAllUnlockedAsOwned,
+  resetAchievementOwnership,
   type NormalizedAchievement,
   type GameAchievementsResult,
 } from './achievements';
+
+// Achievement types
+export type {
+  UserAchievement,
+  GameAchievementStats,
+  AchievementPlatform,
+  TrophyType,
+} from './types';

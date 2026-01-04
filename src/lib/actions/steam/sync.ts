@@ -76,16 +76,19 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
     }
 
     // Reset any Steam 'playing' games that are NOT in the recently played list
+    // Skip games that are locked (is_locked = true)
     if (recentlyPlayedAppIds.size > 0) {
       const { data: currentlyPlayingGames } = await supabase
         .from('user_games')
-        .select('id, steam_appid')
+        .select('id, steam_appid, is_locked')
         .eq('user_id', user.id)
         .eq('platform', 'Steam')
         .eq('status', 'playing');
 
       if (currentlyPlayingGames) {
         for (const game of currentlyPlayingGames) {
+          // Skip locked games - don't change their status
+          if (game.is_locked) continue;
           if (game.steam_appid && !recentlyPlayedAppIds.has(game.steam_appid)) {
             await supabase
               .from('user_games')
@@ -95,12 +98,14 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
         }
       }
     } else {
+      // Only reset non-locked games
       await supabase
         .from('user_games')
         .update({ status: 'in_progress', updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
         .eq('platform', 'Steam')
-        .eq('status', 'playing');
+        .eq('status', 'playing')
+        .eq('is_locked', false);
     }
 
     // Fetch owned games from Steam
@@ -153,7 +158,7 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
         // Check if user_games entry exists by steam_appid first
         let { data: existingUserGame } = await supabase
           .from('user_games')
-          .select('id, locked_fields')
+          .select('id, locked_fields, is_locked')
           .eq('user_id', user.id)
           .eq('steam_appid', steamGame.appid)
           .single();
@@ -162,7 +167,7 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
         if (!existingUserGame) {
           const { data: fallbackGame } = await supabase
             .from('user_games')
-            .select('id, locked_fields')
+            .select('id, locked_fields, is_locked')
             .eq('user_id', user.id)
             .eq('game_id', game.id)
             .eq('platform', 'Steam')
@@ -176,6 +181,7 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
 
         if (existingUserGame) {
           const lockedFields = (existingUserGame.locked_fields as Record<string, boolean>) || {};
+          const isGameLocked = existingUserGame.is_locked ?? false;
 
           const updateData: Record<string, unknown> = {
             updated_at: new Date().toISOString(),
@@ -188,7 +194,8 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
             updateData.steam_last_played = lastPlayed;
           }
 
-          if (isRecentlyPlayed && !lockedFields['status']) {
+          // Don't update status if game is locked
+          if (isRecentlyPlayed && !lockedFields['status'] && !isGameLocked) {
             updateData.status = 'playing';
           }
 
@@ -249,12 +256,19 @@ export async function syncSteamLibrary(): Promise<SteamSyncResult> {
               const lockedFields = (userGame.locked_fields as Record<string, boolean>) || {};
 
               if (!lockedFields['completion_percentage'] && !lockedFields['achievements']) {
+                const updateData: Record<string, unknown> = {
+                  achievements_earned: achievementsEarned,
+                  achievements_total: achievementsTotal,
+                };
+
+                // Set completed_at when reaching 100% completion
+                if (achievementsEarned === achievementsTotal && achievementsTotal > 0) {
+                  updateData.completed_at = new Date().toISOString();
+                }
+
                 const { error: achievementUpdateError } = await supabase
                   .from('user_games')
-                  .update({
-                    achievements_earned: achievementsEarned,
-                    achievements_total: achievementsTotal,
-                  })
+                  .update(updateData)
                   .eq('id', userGame.id);
 
                 if (!achievementUpdateError) {
@@ -396,7 +410,7 @@ export async function syncSteamGame(appId: number): Promise<SteamGameSyncResult>
 
     const { data: existingUserGame } = await supabase
       .from('user_games')
-      .select('id, locked_fields')
+      .select('id, locked_fields, is_locked')
       .eq('user_id', user.id)
       .eq('game_id', game.id)
       .eq('platform', 'Steam')
@@ -404,6 +418,7 @@ export async function syncSteamGame(appId: number): Promise<SteamGameSyncResult>
 
     if (existingUserGame) {
       const lockedFields = (existingUserGame.locked_fields as Record<string, boolean>) || {};
+      const isGameLocked = existingUserGame.is_locked ?? false;
 
       const updateData: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
@@ -416,7 +431,8 @@ export async function syncSteamGame(appId: number): Promise<SteamGameSyncResult>
         updateData.steam_last_played = lastPlayed;
       }
 
-      if (isRecentlyPlayed && !lockedFields['status']) {
+      // Don't update status if game is locked
+      if (isRecentlyPlayed && !lockedFields['status'] && !isGameLocked) {
         updateData.status = 'playing';
       }
 
@@ -467,13 +483,20 @@ export async function syncSteamGame(appId: number): Promise<SteamGameSyncResult>
           const lockedFields = (userGame.locked_fields as Record<string, boolean>) || {};
 
           if (!lockedFields['completion_percentage'] && !lockedFields['achievements']) {
+            const updateData: Record<string, unknown> = {
+              achievements_earned: achievementsEarned,
+              achievements_total: achievementsTotal,
+              completion_percentage: Math.round((achievementsEarned / achievementsTotal) * 100),
+            };
+
+            // Set completed_at when reaching 100% completion
+            if (achievementsEarned === achievementsTotal && achievementsTotal > 0) {
+              updateData.completed_at = new Date().toISOString();
+            }
+
             await supabase
               .from('user_games')
-              .update({
-                achievements_earned: achievementsEarned,
-                achievements_total: achievementsTotal,
-                completion_percentage: Math.round((achievementsEarned / achievementsTotal) * 100),
-              })
+              .update(updateData)
               .eq('id', userGame.id);
           }
         }

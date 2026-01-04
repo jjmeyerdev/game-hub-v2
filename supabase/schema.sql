@@ -13,16 +13,23 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
 BEGIN
   NEW.updated_at = timezone('utc'::text, now());
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Function to automatically create a profile when a user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, full_name)
   VALUES (
@@ -32,7 +39,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- ============================================================================
 -- PROFILES TABLE
@@ -117,6 +124,7 @@ CREATE TABLE IF NOT EXISTS public.games (
   xbox_title_id TEXT UNIQUE,
   epic_catalog_item_id TEXT UNIQUE,
   epic_namespace TEXT,
+  psn_played_id TEXT UNIQUE,
 
   -- Game metadata
   title TEXT NOT NULL,
@@ -127,7 +135,6 @@ CREATE TABLE IF NOT EXISTS public.games (
   publisher TEXT,
   genres TEXT[],
   platforms TEXT[],
-  metacritic_score INTEGER,
 
   -- Timestamps
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -161,6 +168,7 @@ CREATE INDEX IF NOT EXISTS idx_games_psn_communication_id ON public.games(psn_co
 CREATE INDEX IF NOT EXISTS idx_games_xbox_title_id ON public.games(xbox_title_id) WHERE xbox_title_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_games_epic_catalog_item_id ON public.games(epic_catalog_item_id) WHERE epic_catalog_item_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_games_epic_namespace ON public.games(epic_namespace) WHERE epic_namespace IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_games_psn_played_id ON public.games(psn_played_id) WHERE psn_played_id IS NOT NULL;
 
 -- Games: Trigger
 CREATE TRIGGER set_updated_at_games
@@ -178,9 +186,10 @@ CREATE TABLE IF NOT EXISTS public.user_games (
 
   -- Ownership & Platform
   platform TEXT NOT NULL,
-  owned BOOLEAN DEFAULT true,
   ownership_status TEXT NOT NULL DEFAULT 'owned',
   is_physical BOOLEAN NOT NULL DEFAULT false,
+  is_locked BOOLEAN NOT NULL DEFAULT false,
+  is_not_compatible BOOLEAN NOT NULL DEFAULT false,
   hidden BOOLEAN DEFAULT false,
 
   -- Progress Tracking
@@ -208,6 +217,9 @@ CREATE TABLE IF NOT EXISTS public.user_games (
   -- Xbox-specific
   xbox_title_id TEXT,
   xbox_last_played TIMESTAMP WITH TIME ZONE,
+
+  -- PSN-specific
+  psn_title_id TEXT,
 
   -- Timestamps
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -255,6 +267,8 @@ CREATE INDEX IF NOT EXISTS idx_user_games_steam_appid ON public.user_games(steam
 CREATE INDEX IF NOT EXISTS idx_user_games_user_steam ON public.user_games(user_id, steam_appid);
 CREATE INDEX IF NOT EXISTS idx_user_games_steam_playtime ON public.user_games(steam_playtime_minutes) WHERE steam_playtime_minutes > 0;
 CREATE INDEX IF NOT EXISTS idx_user_games_xbox_title_id ON public.user_games(xbox_title_id) WHERE xbox_title_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_user_games_psn_title_id ON public.user_games(psn_title_id) WHERE psn_title_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_user_games_user_psn ON public.user_games(user_id, psn_title_id);
 
 -- User Games: Trigger
 CREATE TRIGGER set_updated_at_user_games
@@ -262,11 +276,14 @@ CREATE TRIGGER set_updated_at_user_games
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 -- User Games: Comments
-COMMENT ON COLUMN public.user_games.owned IS 'DEPRECATED: Use ownership_status instead';
 COMMENT ON COLUMN public.user_games.ownership_status IS 'Ownership status: owned, wishlist, or unowned';
 COMMENT ON COLUMN public.user_games.is_physical IS 'Whether the user owns a physical copy';
 COMMENT ON COLUMN public.user_games.steam_appid IS 'Steam App ID - cached for fast session tracking';
+COMMENT ON COLUMN public.user_games.psn_title_id IS 'PSN Communication ID - set during PSN sync to identify synced games';
 COMMENT ON COLUMN public.user_games.locked_fields IS 'Fields locked from being overwritten during syncs/IGDB refreshes. Keys: cover, description, developer, publisher, releaseDate, genres';
+COMMENT ON COLUMN public.user_games.is_locked IS 'When true, sync operations will not modify this game status or priority';
+COMMENT ON COLUMN public.user_games.is_not_compatible IS 'When true, indicates game is not compatible with current hardware';
+COMMENT ON COLUMN public.games.psn_played_id IS 'PSN Played Title ID for games without trophy support (from played games API)';
 
 -- ============================================================================
 -- GAME_SESSIONS TABLE
@@ -549,32 +566,22 @@ CREATE TRIGGER set_updated_at_epic_tokens
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 -- ============================================================================
--- DISMISSED_DUPLICATES TABLE
--- Stores user's dismissed duplicate pairs to exclude from future scans
+-- DISMISSED_DUPLICATES TABLE (DEPRECATED)
+-- This table used normalized titles which was fragile. Replaced by
+-- dismissed_game_pairs which uses direct game ID references.
+-- Kept for backward compatibility - can be dropped in future migration.
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS public.dismissed_duplicates (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-
-  -- Store the normalized title that was used for grouping
-  -- This allows us to match against future scans using the same normalization
   normalized_title TEXT NOT NULL,
-
-  -- Store the game IDs that were in the dismissed group
-  -- Using JSONB array to store multiple game IDs
   game_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
-
-  -- Timestamps
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-
-  -- Unique constraint: one dismissal per normalized title per user
   UNIQUE(user_id, normalized_title)
 );
 
--- Dismissed Duplicates: Enable RLS
 ALTER TABLE public.dismissed_duplicates ENABLE ROW LEVEL SECURITY;
 
--- Dismissed Duplicates: Policies
 CREATE POLICY "Users can view their own dismissed duplicates"
   ON public.dismissed_duplicates FOR SELECT
   USING (auth.uid() = user_id);
@@ -587,12 +594,129 @@ CREATE POLICY "Users can delete their own dismissed duplicates"
   ON public.dismissed_duplicates FOR DELETE
   USING (auth.uid() = user_id);
 
--- Dismissed Duplicates: Indexes
 CREATE INDEX IF NOT EXISTS idx_dismissed_duplicates_user_id
   ON public.dismissed_duplicates(user_id);
 
 CREATE INDEX IF NOT EXISTS idx_dismissed_duplicates_normalized_title
   ON public.dismissed_duplicates(user_id, normalized_title);
+
+-- ============================================================================
+-- DISMISSED_GAME_PAIRS TABLE
+-- Pair-based duplicate dismissal system. Stores specific pairs of games that
+-- the user has confirmed are NOT duplicates. Self-cleans via CASCADE when
+-- either game is deleted. Immune to normalization algorithm changes.
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.dismissed_game_pairs (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+
+  -- The two games that form a dismissed pair
+  -- Always store smaller UUID in game_id_a for consistent ordering
+  game_id_a UUID REFERENCES public.user_games(id) ON DELETE CASCADE NOT NULL,
+  game_id_b UUID REFERENCES public.user_games(id) ON DELETE CASCADE NOT NULL,
+
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+
+  -- Unique constraint for the pair
+  UNIQUE(user_id, game_id_a, game_id_b),
+
+  -- Ensure game_id_a < game_id_b (normalized ordering)
+  CONSTRAINT game_pair_ordering CHECK (game_id_a < game_id_b)
+);
+
+COMMENT ON TABLE public.dismissed_game_pairs IS
+  'Stores pairs of games confirmed as NOT duplicates. Self-cleans via CASCADE.';
+
+-- Dismissed Game Pairs: Enable RLS
+ALTER TABLE public.dismissed_game_pairs ENABLE ROW LEVEL SECURITY;
+
+-- Dismissed Game Pairs: Policies
+CREATE POLICY "Users can view their own dismissed pairs"
+  ON public.dismissed_game_pairs FOR SELECT
+  USING (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "Users can insert their own dismissed pairs"
+  ON public.dismissed_game_pairs FOR INSERT
+  WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY "Users can delete their own dismissed pairs"
+  ON public.dismissed_game_pairs FOR DELETE
+  USING (user_id = (SELECT auth.uid()));
+
+-- Dismissed Game Pairs: Indexes
+CREATE INDEX IF NOT EXISTS idx_dismissed_game_pairs_user_id
+  ON public.dismissed_game_pairs(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_dismissed_game_pairs_game_a
+  ON public.dismissed_game_pairs(user_id, game_id_a);
+
+CREATE INDEX IF NOT EXISTS idx_dismissed_game_pairs_game_b
+  ON public.dismissed_game_pairs(user_id, game_id_b);
+
+CREATE INDEX IF NOT EXISTS idx_dismissed_game_pairs_lookup
+  ON public.dismissed_game_pairs(user_id, game_id_a, game_id_b);
+
+-- Helper function: Insert a dismissed pair with normalized ordering
+CREATE OR REPLACE FUNCTION public.dismiss_game_pair(
+  p_user_id UUID,
+  p_game_id_1 UUID,
+  p_game_id_2 UUID
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+DECLARE
+  v_game_a UUID;
+  v_game_b UUID;
+BEGIN
+  -- Normalize order: smaller UUID first
+  IF p_game_id_1 < p_game_id_2 THEN
+    v_game_a := p_game_id_1;
+    v_game_b := p_game_id_2;
+  ELSE
+    v_game_a := p_game_id_2;
+    v_game_b := p_game_id_1;
+  END IF;
+
+  INSERT INTO public.dismissed_game_pairs (user_id, game_id_a, game_id_b)
+  VALUES (p_user_id, v_game_a, v_game_b)
+  ON CONFLICT (user_id, game_id_a, game_id_b) DO NOTHING;
+
+  RETURN TRUE;
+END;
+$$;
+
+-- Helper function: Check if all pairs in a group are dismissed
+CREATE OR REPLACE FUNCTION public.are_all_pairs_dismissed(
+  p_user_id UUID,
+  p_game_ids UUID[]
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+DECLARE
+  v_total_pairs INTEGER;
+  v_dismissed_pairs INTEGER;
+BEGIN
+  v_total_pairs := (array_length(p_game_ids, 1) * (array_length(p_game_ids, 1) - 1)) / 2;
+
+  IF v_total_pairs = 0 THEN
+    RETURN TRUE;
+  END IF;
+
+  SELECT COUNT(*) INTO v_dismissed_pairs
+  FROM public.dismissed_game_pairs dgp
+  WHERE dgp.user_id = p_user_id
+    AND dgp.game_id_a = ANY(p_game_ids)
+    AND dgp.game_id_b = ANY(p_game_ids);
+
+  RETURN v_dismissed_pairs >= v_total_pairs;
+END;
+$$;
 
 -- ============================================================================
 -- VIEWS

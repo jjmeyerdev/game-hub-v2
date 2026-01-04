@@ -16,6 +16,10 @@ export interface AchievementStats {
   completionPercentage: number;
   gamesWithAchievements: number;
   perfectGames: number;
+  perfectGamesList: Array<{
+    userGame: UserGame;
+    totalAchievements: number;
+  }>;
   platformStats: {
     steam: PlatformStats;
     psn: PlatformStats;
@@ -75,6 +79,7 @@ export async function getAchievementStats(): Promise<AchievementStats | null> {
 
   // Process each game
   const gamesWithPercentage: Array<{ userGame: UserGame; percentage: number }> = [];
+  const perfectGamesList: Array<{ userGame: UserGame; totalAchievements: number }> = [];
 
   for (const ug of userGames) {
     const earned = ug.achievements_earned || 0;
@@ -89,6 +94,10 @@ export async function getAchievementStats(): Promise<AchievementStats | null> {
 
     if (earned === total) {
       perfectGames++;
+      perfectGamesList.push({
+        userGame: ug as UserGame,
+        totalAchievements: total,
+      });
     }
 
     // Determine platform
@@ -156,12 +165,31 @@ export async function getAchievementStats(): Promise<AchievementStats | null> {
     ? Math.round((totalEarned / totalAvailable) * 100)
     : 0;
 
+  // Sort perfect games by completion date (newest first), then by total achievements
+  perfectGamesList.sort((a, b) => {
+    const aDate = a.userGame.completed_at ? new Date(a.userGame.completed_at).getTime() : 0;
+    const bDate = b.userGame.completed_at ? new Date(b.userGame.completed_at).getTime() : 0;
+
+    // If both have completion dates, sort by date (newest first)
+    if (aDate && bDate) {
+      return bDate - aDate;
+    }
+
+    // Games with completion dates come before those without
+    if (aDate && !bDate) return -1;
+    if (!aDate && bDate) return 1;
+
+    // Fallback: sort by total achievements (most impressive first)
+    return b.totalAchievements - a.totalAchievements;
+  });
+
   return {
     totalEarned,
     totalAvailable,
     completionPercentage: overallPercentage,
     gamesWithAchievements: userGames.length,
     perfectGames,
+    perfectGamesList,
     platformStats,
     topCompletedGames,
     almostComplete,

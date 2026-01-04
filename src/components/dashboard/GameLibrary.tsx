@@ -93,7 +93,7 @@ export function GameLibrary({
       </div>
 
       {/* Unified Filter Bar */}
-      <div className="bg-[var(--theme-bg-secondary)]/50 backdrop-blur-sm border border-[var(--theme-border)] rounded-2xl p-4 mb-6">
+      <div className="bg-theme-secondary/50 backdrop-blur-sm border border-theme rounded-2xl p-4 mb-6">
         {/* Top Row: Search + Sort + Hidden Toggle */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
           {/* Search */}
@@ -104,18 +104,18 @@ export function GameLibrary({
               placeholder="Search your library..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--theme-bg-primary)] border border-[var(--theme-border)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[var(--theme-text-primary)] placeholder:text-[var(--theme-text-muted)] focus:outline-none focus:border-cyan-500/50 transition-all"
+              className="w-full bg-theme-primary border border-theme rounded-xl pl-10 pr-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-muted focus:outline-hidden focus:border-cyan-500/50 transition-all"
             />
           </div>
 
           {/* Controls Group */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Sort Dropdown */}
             <div className="relative">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="appearance-none bg-[var(--theme-bg-primary)] border border-[var(--theme-border)] rounded-xl pl-3 pr-8 py-2.5 text-sm text-[var(--theme-text-secondary)] focus:outline-none focus:border-cyan-500/50 transition-all cursor-pointer hover:border-[var(--theme-border-hover)] hover:text-[var(--theme-text-primary)]"
+                className="appearance-none bg-theme-primary border border-theme rounded-xl pl-3 pr-8 py-2.5 text-sm text-theme-secondary focus:outline-hidden focus:border-cyan-500/50 transition-all cursor-pointer hover:border-theme-hover hover:text-theme-primary"
               >
                 <option value="title-asc">A → Z</option>
                 <option value="title-desc">Z → A</option>
@@ -137,7 +137,7 @@ export function GameLibrary({
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-all ${
                   showHiddenGames
                     ? 'bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/50'
-                    : 'bg-[var(--theme-bg-primary)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
+                    : 'bg-theme-primary border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
                 }`}
                 title={showHiddenGames ? 'Hide private games' : 'Show private games'}
               >
@@ -152,7 +152,7 @@ export function GameLibrary({
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-all ${
                   censorHidden
                     ? 'bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/50'
-                    : 'bg-[var(--theme-bg-primary)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:border-[var(--theme-border-hover)]'
+                    : 'bg-theme-primary border border-theme text-theme-muted hover:text-theme-primary hover:border-theme-hover'
                 }`}
                 title={censorHidden ? 'Show hidden game covers' : 'Blur hidden game covers'}
               >
@@ -163,7 +163,7 @@ export function GameLibrary({
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-[var(--theme-border)] to-transparent my-4" />
+        <div className="h-px bg-linear-to-r from-transparent via-border to-transparent my-4" />
 
         {/* Bottom Row: Platform + Priority Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
@@ -186,7 +186,7 @@ export function GameLibrary({
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       isSelected
                         ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
-                        : 'bg-[var(--theme-bg-primary)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-bg-tertiary)]'
+                        : 'bg-theme-primary text-theme-muted hover:text-theme-primary hover:bg-theme-tertiary'
                     }`}
                   >
                     {platform}
@@ -216,7 +216,7 @@ export function GameLibrary({
                     className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       isSelected
                         ? priority.activeClass
-                        : 'bg-[var(--theme-bg-primary)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-bg-tertiary)]'
+                        : 'bg-theme-primary text-theme-muted hover:text-theme-primary hover:bg-theme-tertiary'
                     }`}
                     title={priority.label}
                   >
@@ -231,8 +231,8 @@ export function GameLibrary({
 
         {/* Active Filters Summary */}
         {hasActiveFilters && (
-          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--theme-border)]">
-            <span className="text-xs text-[var(--theme-text-muted)]">Active:</span>
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-theme">
+            <span className="text-xs text-theme-muted">Active:</span>
             <div className="flex flex-wrap gap-1.5">
               {selectedPlatforms.map(platform => (
                 <span key={platform} className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 text-cyan-400 text-xs rounded-md">
@@ -271,7 +271,7 @@ export function GameLibrary({
                 setSelectedPlatforms([]);
                 setSelectedPriorities([]);
               }}
-              className="ml-auto text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] transition-colors"
+              className="ml-auto text-xs text-theme-muted hover:text-theme-primary transition-colors"
             >
               Clear all
             </button>
@@ -281,11 +281,11 @@ export function GameLibrary({
 
       {/* Game Grid */}
       {loading ? (
-        <div className="text-center py-12 text-[var(--theme-text-muted)]">Loading games...</div>
+        <div className="text-center py-12 text-theme-muted">Loading games...</div>
       ) : sortedGames.length === 0 ? (
-        <div className="text-center py-12 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl">
-          <Library className="w-12 h-12 text-[var(--theme-text-muted)] mx-auto mb-3" />
-          <p className="text-[var(--theme-text-muted)]">
+        <div className="text-center py-12 bg-theme-secondary border border-theme rounded-xl">
+          <Library className="w-12 h-12 text-theme-muted mx-auto mb-3" />
+          <p className="text-theme-muted">
             {userGames.length === 0 ? 'Your library is empty' : 'No games found'}
           </p>
           {userGames.length === 0 && (

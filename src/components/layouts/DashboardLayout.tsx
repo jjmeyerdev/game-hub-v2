@@ -13,7 +13,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user } = useDashboardData();
 
   return (
-    <div className="min-h-screen bg-[var(--theme-bg-primary)] flex overflow-hidden">
+    <div className="min-h-screen bg-theme-primary flex overflow-hidden">
       {/* Sidebar */}
       <DashboardSidebar
         userName={user.name}

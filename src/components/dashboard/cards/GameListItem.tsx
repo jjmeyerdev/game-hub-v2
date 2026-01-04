@@ -1,5 +1,22 @@
-import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar } from 'lucide-react';
+import { Library, Edit3, Trash2, Trophy, Clock, BarChart3, Gamepad2, Calendar, UserX } from 'lucide-react';
 import type { UserGame } from '@/lib/actions/games';
+import { getDisplayPlatform } from '@/lib/constants/platforms';
+import { SteamLogo, PlayStationLogo, XboxLogo, EpicLogo, EALogo, WindowsLogo, NintendoLogo, GOGLogo, BattleNetLogo, UbisoftLogo } from '@/components/icons/PlatformLogos';
+
+const getPlatformIcon = (platform: string) => {
+  const lowerPlatform = platform.toLowerCase();
+  if (lowerPlatform.includes('steam')) return <SteamLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('playstation') || lowerPlatform.includes('ps')) return <PlayStationLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('xbox')) return <XboxLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('epic')) return <EpicLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('ea app') || lowerPlatform.includes('origin')) return <EALogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('nintendo') || lowerPlatform.includes('switch') || lowerPlatform.includes('wii')) return <NintendoLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('gog')) return <GOGLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('battle.net') || lowerPlatform.includes('blizzard')) return <BattleNetLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('ubisoft') || lowerPlatform.includes('uplay')) return <UbisoftLogo className="w-3 h-3" />;
+  if (lowerPlatform.includes('pc') || lowerPlatform.includes('windows')) return <WindowsLogo className="w-3 h-3" />;
+  return <Gamepad2 className="w-3 h-3" />;
+};
 
 interface GameListItemProps {
   game: UserGame;
@@ -36,6 +53,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProps) {
   const isCompleted = game.status === 'completed' || game.status === 'finished';
+  const isUnowned = game.ownership_status === 'unowned';
 
   return (
     <div
@@ -44,21 +62,41 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
         animation: `fadeInUp 0.4s ease-out ${index * 0.03}s both`,
       }}
     >
+      {/* Unowned glow effect */}
+      {isUnowned && (
+        <div
+          className="absolute -inset-1 rounded-xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 blur-lg"
+          style={{ background: 'rgba(244, 63, 94, 0.2)' }}
+        />
+      )}
+
       {/* Main container with cyber border effect */}
-      <div className="relative bg-gradient-to-r from-[var(--theme-bg-secondary)] via-[var(--theme-bg-secondary)] to-[var(--theme-bg-secondary)] border-2 border-[var(--theme-border)] rounded-xl overflow-hidden transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(0,217,255,0.15)]">
+      <div className={`relative bg-linear-to-r from-theme-secondary via-theme-secondary to-theme-secondary border-2 rounded-xl overflow-hidden transition-all duration-300 ${
+        isUnowned
+          ? 'border-rose-500/40 hover:border-rose-500/60 hover:shadow-[0_0_30px_rgba(244,63,94,0.15)]'
+          : 'border-theme hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(0,217,255,0.15)]'
+      }`}>
         {/* Animated scan line effect on hover */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent animate-scan" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-cyan-500/5 to-transparent animate-scan" />
         </div>
 
-        {/* Corner accents */}
-        <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-cyan-500/20 group-hover:border-cyan-500/60 transition-colors duration-300" />
-        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-purple-500/20 group-hover:border-purple-500/60 transition-colors duration-300" />
+        {/* Corner accents - rose for unowned */}
+        <div className={`absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 transition-colors duration-300 ${
+          isUnowned
+            ? 'border-rose-500/40 group-hover:border-rose-500/70'
+            : 'border-cyan-500/20 group-hover:border-cyan-500/60'
+        }`} />
+        <div className={`absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 transition-colors duration-300 ${
+          isUnowned
+            ? 'border-rose-500/40 group-hover:border-rose-500/70'
+            : 'border-purple-500/20 group-hover:border-purple-500/60'
+        }`} />
 
         <div className="relative flex items-center gap-6 p-5">
           {/* Cover art */}
-          <div className="relative flex-shrink-0">
-            <div className="w-24 h-32 rounded-lg overflow-hidden border-2 border-[var(--theme-border)] group-hover:border-cyan-500/50 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(0,217,255,0.2)]">
+          <div className="relative shrink-0">
+            <div className="w-24 h-32 rounded-lg overflow-hidden border-2 border-theme group-hover:border-cyan-500/50 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(0,217,255,0.2)]">
               {game.game?.cover_url ? (
                 <>
                   <img
@@ -72,21 +110,21 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                       if (placeholder) placeholder.style.display = 'flex';
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-bg-secondary)] via-[var(--theme-bg-secondary)] to-[var(--theme-bg-secondary)] hidden items-center justify-center">
-                    <Library className="w-8 h-8 text-[var(--theme-text-subtle)]" />
+                  <div className="absolute inset-0 bg-linear-to-br from-theme-secondary via-theme-secondary to-theme-secondary hidden items-center justify-center">
+                    <Library className="w-8 h-8 text-theme-subtle" />
                   </div>
                 </>
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-bg-secondary)] via-[var(--theme-bg-secondary)] to-[var(--theme-bg-secondary)] flex items-center justify-center">
-                  <Library className="w-8 h-8 text-[var(--theme-text-subtle)]" />
+                <div className="absolute inset-0 bg-linear-to-br from-theme-secondary via-theme-secondary to-theme-secondary flex items-center justify-center">
+                  <Library className="w-8 h-8 text-theme-subtle" />
                 </div>
               )}
             </div>
 
             {/* Completion trophy badge */}
             {isCompleted && (
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/50 animate-pulse">
-                <Trophy className="w-4 h-4 text-[var(--theme-bg-primary)]" />
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-linear-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/50 animate-pulse">
+                <Trophy className="w-4 h-4 text-bg-primary" />
               </div>
             )}
           </div>
@@ -96,17 +134,23 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
             {/* Title and platform row */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-2xl font-bold text-[var(--theme-text-primary)] group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1 mb-1">
+                <h3 className="text-2xl font-bold text-theme-primary group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1 mb-1">
                   {game.game?.title || 'Untitled'}
                 </h3>
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-md text-xs font-bold text-cyan-400 uppercase tracking-wider">
-                    <Gamepad2 className="w-3 h-3" />
-                    {game.platform}
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-theme-secondary border border-theme rounded-md text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                    {getPlatformIcon(game.platform)}
+                    {getDisplayPlatform(game.platform)}
                   </span>
                   <span className={`text-sm font-bold uppercase tracking-wider ${STATUS_COLORS[game.status] || 'text-gray-400'}`}>
                     {STATUS_LABELS[game.status] || game.status}
                   </span>
+                  {isUnowned && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-500/15 border border-rose-500/30 rounded-md text-[10px] font-bold text-rose-400 uppercase tracking-wider">
+                      <UserX className="w-3 h-3" />
+                      Unowned
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -117,7 +161,7 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                     e.stopPropagation();
                     onEdit();
                   }}
-                  className="p-2 bg-gradient-to-br from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-lg text-[var(--theme-bg-primary)] transition-all transform hover:scale-110 shadow-lg hover:shadow-cyan-500/50"
+                  className="p-2 bg-linear-to-br from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-lg text-bg-primary transition-all hover:scale-110 shadow-lg hover:shadow-cyan-500/50"
                   title="Edit game"
                 >
                   <Edit3 className="w-4 h-4" />
@@ -127,7 +171,7 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                     e.stopPropagation();
                     onDelete();
                   }}
-                  className="p-2 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 rounded-lg text-[var(--theme-text-primary)] transition-all transform hover:scale-110 shadow-lg hover:shadow-red-500/50"
+                  className="p-2 bg-linear-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 rounded-lg text-theme-primary transition-all hover:scale-110 shadow-lg hover:shadow-red-500/50"
                   title="Delete game"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -139,7 +183,7 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
             <div className="grid grid-cols-3 gap-4">
               {/* Completion percentage */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-xs text-theme-muted uppercase tracking-wider">
                   <BarChart3 className="w-3.5 h-3.5" />
                   <span>Progress</span>
                 </div>
@@ -148,11 +192,11 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                     <span className="text-2xl font-bold text-cyan-400">
                       {game.completion_percentage}
                     </span>
-                    <span className="text-sm text-[var(--theme-text-muted)]">%</span>
+                    <span className="text-sm text-theme-muted">%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-[var(--theme-border)] rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-border rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-400 rounded-full transition-all duration-500"
+                      className="h-full bg-linear-to-r from-cyan-500 via-purple-500 to-cyan-400 rounded-full transition-all duration-500"
                       style={{ width: `${game.completion_percentage}%` }}
                     />
                   </div>
@@ -161,7 +205,7 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
 
               {/* Playtime */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-xs text-theme-muted uppercase tracking-wider">
                   <Clock className="w-3.5 h-3.5" />
                   <span>Playtime</span>
                 </div>
@@ -169,17 +213,17 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
                   <span className="text-2xl font-bold text-purple-400">
                     {Math.round(game.playtime_hours)}
                   </span>
-                  <span className="text-sm text-[var(--theme-text-muted)]">hours</span>
+                  <span className="text-sm text-theme-muted">hours</span>
                 </div>
               </div>
 
               {/* Date added */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-xs text-theme-muted uppercase tracking-wider">
                   <Calendar className="w-3.5 h-3.5" />
                   <span>Added</span>
                 </div>
-                <div className="text-sm text-[var(--theme-text-muted)]">
+                <div className="text-sm text-theme-muted">
                   {new Date(game.created_at).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -191,8 +235,8 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
 
             {/* Notes preview (if exists) */}
             {game.notes && (
-              <div className="pt-2 border-t border-[var(--theme-border)]">
-                <p className="text-sm text-[var(--theme-text-muted)] line-clamp-1 italic">
+              <div className="pt-2 border-t border-theme">
+                <p className="text-sm text-theme-muted line-clamp-1 italic">
                   &ldquo;{game.notes}&rdquo;
                 </p>
               </div>
@@ -201,7 +245,7 @@ export function GameListItem({ game, index, onEdit, onDelete }: GameListItemProp
         </div>
 
         {/* Bottom border accent */}
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
     </div>
   );

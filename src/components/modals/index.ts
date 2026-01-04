@@ -1,5 +1,5 @@
 export * from './BaseModal';
-export { default as GameFormModal } from './GameFormModal';
-export { default as DeleteConfirmModal } from './DeleteConfirmModal';
-export { default as SteamImportModal } from './SteamImportModal';
-export { default as DuplicateFinderModal } from './DuplicateFinderModal';
+export { GameFormModal } from './GameFormModal';
+export { DeleteConfirmModal } from './DeleteConfirmModal';
+export { SteamImportModal } from './SteamImportModal';
+export { DuplicateFinderModal } from './DuplicateFinderModal';

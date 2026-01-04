@@ -53,7 +53,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-[100] w-[380px] transition-all duration-400 ${
+      className={`fixed bottom-6 right-6 z-100 w-[380px] transition-all duration-400 ${
         isAnimatingOut
           ? 'opacity-0 translate-x-8 scale-95'
           : 'opacity-100 translate-x-0 scale-100'
@@ -63,7 +63,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
       }}
     >
       {/* Main container with warning glow */}
-      <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-[var(--theme-bg-secondary)] backdrop-blur-xl shadow-2xl shadow-amber-500/10">
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-theme-secondary backdrop-blur-xl shadow-2xl shadow-amber-500/10">
 
         {/* Animated warning stripe pattern at top */}
         <div className="absolute top-0 left-0 right-0 h-1.5 overflow-hidden">
@@ -83,7 +83,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 p-1 rounded-lg bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] text-[var(--theme-text-subtle)] hover:text-[var(--theme-text-primary)] hover:border-amber-500/50 hover:bg-amber-500/10 transition-all z-10"
+          className="absolute top-3 right-3 p-1 rounded-lg bg-theme-hover border border-theme text-theme-subtle hover:text-theme-primary hover:border-amber-500/50 hover:bg-amber-500/10 transition-all z-10"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -92,8 +92,8 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
           {/* Header with icon */}
           <div className="flex items-start gap-4 mb-4">
             {/* Animated warning icon */}
-            <div className="relative flex-shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center">
+            <div className="relative shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center">
                 <AlertTriangle
                   className="w-6 h-6 text-amber-400"
                   style={{ animation: 'warningPulse 2s ease-in-out infinite' }}
@@ -107,20 +107,20 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
             </div>
 
             <div className="flex-1 min-w-0 pr-6">
-              <h3 className="text-base font-bold text-[var(--theme-text-primary)] mb-1 flex items-center gap-2">
+              <h3 className="text-base font-bold text-theme-primary mb-1 flex items-center gap-2">
                 Steam API Rate Limited
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
               </h3>
-              <p className="text-xs text-[var(--theme-text-muted)] leading-relaxed">
+              <p className="text-xs text-theme-muted leading-relaxed">
                 Too many requests sent to Steam. Session tracking is paused to protect your account.
               </p>
             </div>
           </div>
 
           {/* Countdown display */}
-          <div className="relative mb-4 p-3 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-xl">
+          <div className="relative mb-4 p-3 bg-theme-hover border border-theme rounded-xl">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)]">
+              <div className="flex items-center gap-2 text-xs text-theme-muted">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
                 <span>Resuming in</span>
               </div>
@@ -133,7 +133,7 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
             </div>
 
             {/* Progress bar */}
-            <div className="h-1.5 bg-[var(--theme-bg-primary)] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-theme-primary rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-1000 ease-linear"
                 style={{
@@ -146,14 +146,14 @@ export function RateLimitToast({ isVisible, onClose, waitTimeMs = 300000 }: Rate
           </div>
 
           {/* Info footer */}
-          <div className="flex items-center gap-2 text-[10px] text-[var(--theme-text-subtle)] uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-[10px] text-theme-subtle uppercase tracking-wider">
             <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
             <span>Steam allows 200 requests per 5 minutes</span>
           </div>
         </div>
 
         {/* Bottom accent line */}
-        <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+        <div className="h-0.5 bg-linear-to-r from-transparent via-amber-500/50 to-transparent" />
       </div>
 
       <style jsx global>{`

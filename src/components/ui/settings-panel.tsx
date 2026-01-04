@@ -28,11 +28,11 @@ const accentBarStyles: Record<AccentColor, string> = {
 };
 
 const borderStyles: Record<AccentColor, string> = {
-  cyan: 'border-[var(--theme-border)]',
-  purple: 'border-[var(--theme-border)]',
-  emerald: 'border-[var(--theme-border)]',
+  cyan: 'border-theme',
+  purple: 'border-theme',
+  emerald: 'border-theme',
   red: 'border-red-500/20',
-  yellow: 'border-[var(--theme-border)]',
+  yellow: 'border-theme',
 };
 
 /**
@@ -45,13 +45,13 @@ export function SettingsPanel({ children, accent = 'cyan', className }: Settings
       {/* Hover glow */}
       <div
         className={cn(
-          'absolute -inset-0.5 bg-gradient-to-r rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+          'absolute -inset-0.5 bg-linear-to-r rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500',
           glowStyles[accent]
         )}
       />
       <div
         className={cn(
-          'relative bg-[var(--theme-bg-secondary)] backdrop-blur-sm border rounded-2xl overflow-hidden',
+          'relative bg-theme-secondary backdrop-blur-sm border rounded-2xl overflow-hidden',
           borderStyles[accent],
           className
         )}
@@ -59,7 +59,7 @@ export function SettingsPanel({ children, accent = 'cyan', className }: Settings
         {/* Accent bar */}
         <div
           className={cn(
-            'h-1 bg-gradient-to-r from-transparent to-transparent',
+            'h-1 bg-linear-to-r from-transparent to-transparent',
             accentBarStyles[accent]
           )}
         />
@@ -116,14 +116,14 @@ export function SettingsPanelHeader({
   action,
 }: SettingsPanelHeaderProps) {
   const styles = headerIconStyles[accent];
-  const titleColor = accent === 'red' ? 'text-red-400' : 'text-[var(--theme-text-primary)]';
+  const titleColor = accent === 'red' ? 'text-red-400' : 'text-theme-primary';
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
         <div
           className={cn(
-            'w-12 h-12 rounded-xl bg-gradient-to-br border flex items-center justify-center',
+            'w-12 h-12 rounded-xl bg-linear-to-br border flex items-center justify-center',
             styles.bg,
             styles.border
           )}
@@ -132,7 +132,7 @@ export function SettingsPanelHeader({
         </div>
         <div>
           <h3 className={cn('text-lg font-bold', titleColor)}>{title}</h3>
-          {description && <p className="text-sm text-[var(--theme-text-subtle)]">{description}</p>}
+          {description && <p className="text-sm text-theme-subtle">{description}</p>}
         </div>
       </div>
       {action}

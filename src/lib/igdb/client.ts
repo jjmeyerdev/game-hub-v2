@@ -1,5 +1,6 @@
 import {
   type IGDBGameResult,
+  type PlatformReleaseDate,
   transformIGDBResults,
   selectBestMatch,
   extractUpdateData,
@@ -7,6 +8,7 @@ import {
   type TransformedGame,
   type IGDBGameUpdateData,
 } from '@/lib/types/igdb';
+import { getIGDBPlatformIds, IGDB_PLATFORM_ID_TO_CONSOLE } from '@/lib/constants/platforms';
 
 /**
  * IGDB API client with token caching
@@ -92,20 +94,81 @@ async function igdbFetch<T>(endpoint: string, body: string): Promise<T> {
   return response.json();
 }
 
+// Common fields for all IGDB game queries
+const IGDB_GAME_FIELDS = `name, cover.url, summary, first_release_date, release_dates.platform, release_dates.date, genres.name, platforms.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher, total_rating, total_rating_count, follows`;
+
 /**
  * Search for games on IGDB
+ * Filters out DLCs, expansions, and bundles to return only main games
+ * IGDB category: 0 = main game, 1 = DLC, 2 = expansion, 3 = bundle, etc.
  */
 export async function searchGames(query: string, limit = 10): Promise<TransformedGame[]> {
-  const results = await igdbFetch<IGDBGameResult[]>(
+  // Escape double quotes in query to prevent IGDB query injection
+  const escapedQuery = query.replace(/"/g, '\\"');
+
+  // Fetch more results to account for filtering
+  const results = await igdbFetch<(IGDBGameResult & { category?: number })[]>(
     'games',
     `
-      search "${query}";
-      fields name, cover.url, summary, first_release_date, genres.name, platforms.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher;
-      limit ${limit};
+      search "${escapedQuery}";
+      fields ${IGDB_GAME_FIELDS}, category;
+      limit ${limit * 3};
     `
   );
 
-  return transformIGDBResults(results);
+  // Filter out DLCs by category if available, or by name patterns
+  // DLC/expansion indicators in the name
+  const dlcPatterns = /\b(DLC|Pack|Expansion|Bundle|Season Pass|Starter Pack|Upgrade|Add-On|Addon)\b/i;
+  // Edition variants - both with colon and without (e.g., "Game: Deluxe Edition" or "Game Definitive Edition")
+  const editionPattern = /:?\s*(Deluxe|Ultimate|Gold|Collector|Standard|Premium|Complete|Definitive|Special|Limited|Exclusive|Digital|Earth's Mightiest|Endgame)\s*Edition/i;
+  const dlcContentPattern = /:\s*[A-Z][a-zA-Z\s]+(-|–)\s*[A-Z]/; // Pattern like "Game: Character - Subtitle" which indicates DLC
+  // Multi-game bundles (e.g., "Game + Other Game")
+  const bundlePattern = /\s\+\s/;
+  // Pinball games (typically spin-offs, not main games)
+  const pinballPattern = /\bPinball\b/i;
+
+  const mainGames = results.filter(game => {
+    // Keep category 0 (main game) if available
+    if (game.category === 0) return true;
+    // Exclude category 1 (DLC), 2 (expansion), 3 (bundle), etc.
+    if (game.category !== undefined && game.category !== 0) return false;
+
+    // If category not available, filter by name patterns
+    const name = game.name;
+
+    // Exclude if name contains DLC/Pack/Expansion indicators
+    if (dlcPatterns.test(name)) return false;
+
+    // Exclude edition variants (Deluxe Edition, Ultimate Edition, etc.)
+    if (editionPattern.test(name)) return false;
+
+    // Exclude DLC content patterns (e.g., "Marvel's Avengers: Kate Bishop - Taking AIM")
+    if (dlcContentPattern.test(name)) return false;
+
+    // Exclude bundles
+    if (bundlePattern.test(name)) return false;
+
+    // Exclude pinball games
+    if (pinballPattern.test(name)) return false;
+
+    // Exclude games with colon followed by subtitle (likely DLC/spin-off)
+    // but allow things like "Game: The Sequel" or simple subtitles
+    if (name.includes(':') && name.split(':')[1]?.trim().length > 30) return false;
+
+    return true;
+  });
+
+  // Transform and deduplicate - only keep ONE entry per unique game (by igdbId)
+  // This prevents games with many platforms from dominating results
+  const transformed = transformIGDBResults(mainGames);
+  const seenIds = new Set<number>();
+  const deduplicated = transformed.filter(game => {
+    if (seenIds.has(game.igdbId)) return false;
+    seenIds.add(game.igdbId);
+    return true;
+  });
+
+  return deduplicated.slice(0, limit);
 }
 
 /**
@@ -115,7 +178,7 @@ export async function getGameById(id: number): Promise<TransformedGame | null> {
   const results = await igdbFetch<IGDBGameResult[]>(
     'games',
     `
-      fields name, cover.url, summary, first_release_date, genres.name, platforms.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher;
+      fields ${IGDB_GAME_FIELDS};
       where id = ${id};
       limit 1;
     `
@@ -142,7 +205,7 @@ export async function findBestMatch(
     return null;
   }
 
-  return selectBestMatch(results, platform);
+  return selectBestMatch(results, platform, title);
 }
 
 /**
@@ -153,7 +216,7 @@ export async function findPCGame(title: string): Promise<IGDBGameResult | null> 
     'games',
     `
       search "${title}";
-      fields name, cover.url, summary, first_release_date, genres.name, platforms.name, involved_companies.company.name, involved_companies.developer, involved_companies.publisher;
+      fields ${IGDB_GAME_FIELDS};
       limit 10;
     `
   );
@@ -185,5 +248,58 @@ export async function getGameUpdateData(
   return extractUpdateData(igdbGame, currentData);
 }
 
+/**
+ * Get the platform-specific release date from an array of release dates
+ * @param releaseDates - Array of platform release dates from IGDB
+ * @param platform - Base platform (e.g., "PlayStation", "Steam")
+ * @param console - Optional specific console (e.g., "PS5", "Xbox One")
+ * @param fallbackDate - Fallback date if no platform-specific date is found
+ * @returns ISO date string (YYYY-MM-DD) or null
+ */
+export function getPlatformReleaseDate(
+  releaseDates: PlatformReleaseDate[],
+  platform: string,
+  consoleName?: string,
+  fallbackDate?: string | null
+): string | null {
+  if (!releaseDates || releaseDates.length === 0) {
+    return fallbackDate ?? null;
+  }
+
+  // Get the IGDB platform IDs that match our platform/console
+  const targetPlatformIds = getIGDBPlatformIds(platform, consoleName);
+
+  if (targetPlatformIds.length === 0) {
+    return fallbackDate ?? null;
+  }
+
+  // Find matching release dates
+  const matchingDates = releaseDates.filter(
+    (rd) => rd.date && targetPlatformIds.includes(rd.platformId)
+  );
+
+  if (matchingDates.length === 0) {
+    return fallbackDate ?? null;
+  }
+
+  // If multiple matches (e.g., different regions), return the earliest
+  const sortedDates = matchingDates
+    .filter((rd) => rd.date !== null)
+    .sort((a, b) => {
+      const dateA = new Date(a.date!).getTime();
+      const dateB = new Date(b.date!).getTime();
+      return dateA - dateB;
+    });
+
+  return sortedDates[0]?.date ?? fallbackDate ?? null;
+}
+
+/**
+ * Get the console name from a platform ID
+ */
+export function getConsoleFromPlatformId(platformId: number): string | null {
+  return IGDB_PLATFORM_ID_TO_CONSOLE[platformId] ?? null;
+}
+
 // Re-export types for convenience
-export type { TransformedGame, IGDBGameResult, IGDBGameUpdateData };
+export type { TransformedGame, IGDBGameResult, IGDBGameUpdateData, PlatformReleaseDate };

@@ -403,12 +403,18 @@ export function calculateDefinedTrophies(definedTrophies: {
 export function normalizePsnPlatform(platform: string): string {
   const normalized = platform.toUpperCase();
 
-  if (normalized.includes('PS5')) return 'PS5';
-  if (normalized.includes('PS4')) return 'PS4';
-  if (normalized.includes('PS3')) return 'PS3';
-  if (normalized.includes('VITA')) return 'PS Vita';
+  // Return format: "PlayStation (Console)" for proper filtering
+  if (normalized.includes('PS5')) return 'PlayStation (PS5)';
+  if (normalized.includes('PS4')) return 'PlayStation (PS4)';
+  if (normalized.includes('PS3')) return 'PlayStation (PS3)';
+  if (normalized.includes('VITA')) return 'PlayStation (PS Vita)';
+  if (normalized.includes('PSP')) return 'PlayStation (PSP)';
+  // PS2 and PS1 games might appear via PS Plus classics
+  if (normalized.includes('PS2') || normalized === 'PLAYSTATION2') return 'PlayStation (PS2)';
+  if (normalized.includes('PS1') || normalized === 'PLAYSTATION') return 'PlayStation (PS1)';
 
-  return 'PlayStation';
+  // Fallback - default to PS4 as most common platform
+  return 'PlayStation (PS4)';
 }
 
 /**

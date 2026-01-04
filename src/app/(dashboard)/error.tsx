@@ -21,14 +21,14 @@ export default function DashboardError({
           <AlertTriangle className="w-8 h-8 text-red-400" />
         </div>
 
-        <h2 className="text-2xl font-bold text-[var(--theme-text-primary)] mb-2">Something went wrong</h2>
-        <p className="text-[var(--theme-text-muted)] mb-6">
+        <h2 className="text-2xl font-bold text-theme-primary mb-2">Something went wrong</h2>
+        <p className="text-theme-muted mb-6">
           {error.message || 'An unexpected error occurred while loading this page.'}
         </p>
 
         <button
           onClick={reset}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-[var(--theme-bg-primary)] font-bold rounded-xl transition-all hover:scale-105"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-bg-primary font-bold rounded-xl transition-all hover:scale-105"
         >
           <RefreshCw className="w-4 h-4" />
           Try again

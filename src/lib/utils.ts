@@ -25,7 +25,7 @@ export interface GameFilterOptions {
  */
 export function getGameSyncSource(game: UserGame): SyncSourceId {
   // Check user_games level platform IDs - these are set when syncing
-  const userGame = game as UserGame & { steam_appid?: number; xbox_title_id?: string };
+  const userGame = game as UserGame & { steam_appid?: number; xbox_title_id?: string; psn_title_id?: string };
 
   // Steam: user_games.steam_appid is set during Steam sync
   if (userGame.steam_appid) return 'steam';
@@ -33,13 +33,12 @@ export function getGameSyncSource(game: UserGame): SyncSourceId {
   // Xbox: user_games.xbox_title_id is set during Xbox sync
   if (userGame.xbox_title_id) return 'xbox';
 
+  // PSN: user_games.psn_title_id is set during PSN sync
+  if (userGame.psn_title_id) return 'psn';
+
   // Epic: check platform AND shared game has epic_catalog_item_id
   // (Epic sync sets platform to "Epic Games" and stores ID on games table)
   if (game.platform === 'Epic Games' && game.game?.epic_catalog_item_id) return 'epic';
-
-  // PSN: check platform contains PlayStation AND shared game has psn_communication_id
-  const platformLower = game.platform.toLowerCase();
-  if ((platformLower.includes('playstation') || platformLower.startsWith('ps')) && game.game?.psn_communication_id) return 'psn';
 
   return 'manual';
 }
@@ -86,13 +85,47 @@ export function filterGames(games: UserGame[], options: GameFilterOptions): User
         // For other platforms, check if game platform contains the filter
         return gamePlatform.includes(lowerFilter);
       });
-      if (!matchesPlatform) return false;
+      if (!matchesPlatform) {
+        return false;
+      }
     }
 
     // Console filter - specific console matching (empty array = all consoles)
     if (selectedConsoles && selectedConsoles.length > 0) {
       const consoleName = extractConsoleName(userGame.platform);
-      if (!selectedConsoles.includes(consoleName)) return false;
+      const platformLower = userGame.platform.toLowerCase();
+      const gameSource = getGameSyncSource(userGame);
+
+      // Direct match with selected consoles
+      if (selectedConsoles.includes(consoleName)) {
+        // Pass - exact match
+      }
+      // Handle generic platform names (e.g., "PlayStation" without specific console)
+      // If any console from that family is selected, include the game
+      else if (
+        (platformLower === 'playstation' && selectedConsoles.some(c => ['PS5', 'PS4', 'PS3', 'PS2', 'PS1', 'PSP', 'PS Vita'].includes(c))) ||
+        (platformLower === 'xbox' && selectedConsoles.some(c => ['Xbox Series X|S', 'Xbox One', 'Xbox 360', 'Xbox'].includes(c))) ||
+        (platformLower === 'nintendo' && selectedConsoles.some(c => ['Switch', 'Switch 2', 'Wii U', 'Wii', '3DS', 'DS', 'GameCube', 'Nintendo 64', 'SNES', 'NES', 'Game Boy', 'GBA'].includes(c)))
+      ) {
+        // Pass - generic platform matches family with selected consoles
+      }
+      // For manual games, also check if platform starts with a console family prefix
+      // This handles cases like "PlayStation 5" or "PS4 Pro" that aren't in the exact format
+      else if (gameSource === 'manual') {
+        const matchesPlayStation = selectedConsoles.some(c => ['PS5', 'PS4', 'PS3', 'PS2', 'PS1', 'PSP', 'PS Vita'].includes(c)) &&
+          (platformLower.startsWith('ps') || platformLower.includes('playstation'));
+        const matchesXbox = selectedConsoles.some(c => ['Xbox Series X|S', 'Xbox One', 'Xbox 360', 'Xbox'].includes(c)) &&
+          platformLower.includes('xbox');
+        const matchesNintendo = selectedConsoles.some(c => ['Switch', 'Switch 2', 'Wii U', 'Wii', '3DS', 'DS', 'GameCube', 'Nintendo 64', 'SNES', 'NES', 'Game Boy', 'GBA'].includes(c)) &&
+          (platformLower.includes('nintendo') || platformLower.includes('switch') || platformLower.includes('wii'));
+
+        if (!matchesPlayStation && !matchesXbox && !matchesNintendo) {
+          return false;
+        }
+      }
+      else {
+        return false;
+      }
     }
 
     // Priority filter (empty array = all priorities)
@@ -103,7 +136,9 @@ export function filterGames(games: UserGame[], options: GameFilterOptions): User
     // Sync source filter (empty array = all sources)
     if (selectedSources.length > 0) {
       const gameSource = getGameSyncSource(userGame);
-      if (!selectedSources.includes(gameSource)) return false;
+      if (!selectedSources.includes(gameSource)) {
+        return false;
+      }
     }
 
     // Search filter

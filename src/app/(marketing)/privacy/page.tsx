@@ -58,22 +58,22 @@ export default function PrivacyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)]">
+    <div className="min-h-screen bg-theme-primary text-theme-primary">
       {/* Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 h-0.5 bg-[var(--theme-border)] z-50">
+      <div className="fixed top-0 left-0 right-0 h-0.5 bg-border z-50">
         <div
-          className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 transition-all duration-150"
+          className="h-full bg-linear-to-r from-violet-500 to-cyan-500 transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
       {/* Header */}
-      <header className="fixed top-0.5 left-0 right-0 z-40 bg-[var(--theme-bg-primary)]/90 backdrop-blur-xl border-b border-[var(--theme-border)]">
+      <header className="fixed top-0.5 left-0 right-0 z-40 bg-theme-primary/90 backdrop-blur-xl border-b border-theme">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-linear-to-br from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center">
                   <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2.5} />
                 </div>
                 <div className="absolute -top-0.5 -left-0.5 w-2 h-2 border-l border-t border-violet-400/50" />
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
                 <div className="absolute -bottom-0.5 -left-0.5 w-2 h-2 border-l border-b border-violet-400/50" />
                 <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 border-r border-b border-violet-400/50" />
               </div>
-              <span className="text-lg font-semibold tracking-wide font-[family-name:var(--font-family-display)]">
+              <span className="text-lg font-semibold tracking-wide font-family-display">
                 GAMEHUB
               </span>
             </Link>
@@ -90,14 +90,14 @@ export default function PrivacyPage() {
               {/* Mobile TOC Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-hover-bg)]"
+                className="lg:hidden p-2 rounded-lg border border-theme bg-theme-hover"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
 
               <Link
                 href="/"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-violet)] border border-[var(--theme-border)] hover:border-[var(--theme-accent-violet)]/50 rounded-lg bg-[var(--theme-hover-bg)] transition-all"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-theme-muted hover:text-accent-violet border border-theme hover:border-accent-violet/50 rounded-lg bg-theme-hover transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden sm:inline">Return</span>
@@ -111,10 +111,10 @@ export default function PrivacyPage() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-30 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute top-20 left-4 right-4 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-4 max-h-[70vh] overflow-y-auto">
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[var(--theme-border)]">
-              <Shield className="w-4 h-4 text-[var(--theme-accent-violet)]" />
-              <span className="text-xs font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">Table of Contents</span>
+          <div className="absolute top-20 left-4 right-4 bg-theme-secondary border border-theme rounded-xl p-4 max-h-[70vh] overflow-y-auto">
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-theme">
+              <Shield className="w-4 h-4 text-accent-violet" />
+              <span className="text-xs font-mono text-theme-muted uppercase tracking-wider">Table of Contents</span>
             </div>
             <nav className="space-y-1">
               {sections.map((section) => (
@@ -123,8 +123,8 @@ export default function PrivacyPage() {
                   onClick={() => scrollToSection(section.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${
                     activeSection === section.id
-                      ? 'bg-[var(--theme-accent-violet)]/10 text-[var(--theme-accent-violet)]'
-                      : 'text-[var(--theme-text-muted)] hover:bg-[var(--theme-hover-bg)]'
+                      ? 'bg-accent-violet/10 text-accent-violet'
+                      : 'text-theme-muted hover:bg-theme-hover'
                   }`}
                 >
                   <span className="text-xs font-mono opacity-50">{section.number}</span>
@@ -152,10 +152,10 @@ export default function PrivacyPage() {
                     <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-violet-400/30" />
                   </div>
 
-                  <div className="bg-[var(--theme-bg-secondary)]/50 backdrop-blur-sm border border-[var(--theme-border)] rounded-xl p-5">
-                    <div className="flex items-center gap-2 mb-5 pb-4 border-b border-[var(--theme-border)]">
-                      <Shield className="w-4 h-4 text-[var(--theme-accent-violet)]" />
-                      <span className="text-[10px] font-mono text-[var(--theme-accent-violet)] uppercase tracking-wider">
+                  <div className="bg-theme-secondary/50 backdrop-blur-sm border border-theme rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-5 pb-4 border-b border-theme">
+                      <Shield className="w-4 h-4 text-accent-violet" />
+                      <span className="text-[10px] font-mono text-accent-violet uppercase tracking-wider">
                         // CONTENTS
                       </span>
                     </div>
@@ -166,26 +166,26 @@ export default function PrivacyPage() {
                           onClick={() => scrollToSection(section.id)}
                           className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-300 ${
                             activeSection === section.id
-                              ? 'bg-[var(--theme-accent-violet)]/10 border border-[var(--theme-accent-violet)]/30'
-                              : 'hover:bg-[var(--theme-hover-bg)] border border-transparent'
+                              ? 'bg-accent-violet/10 border border-accent-violet/30'
+                              : 'hover:bg-theme-hover border border-transparent'
                           }`}
                         >
                           <span className={`text-xs font-mono transition-colors ${
                             activeSection === section.id
-                              ? 'text-[var(--theme-accent-violet)]'
-                              : 'text-[var(--theme-text-subtle)] group-hover:text-[var(--theme-text-muted)]'
+                              ? 'text-accent-violet'
+                              : 'text-theme-subtle group-hover:text-theme-muted'
                           }`}>
                             {section.number}
                           </span>
                           <span className={`text-sm transition-colors ${
                             activeSection === section.id
-                              ? 'text-[var(--theme-accent-violet)]'
-                              : 'text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text-primary)]'
+                              ? 'text-accent-violet'
+                              : 'text-theme-muted group-hover:text-theme-primary'
                           }`}>
                             {section.title}
                           </span>
                           {activeSection === section.id && (
-                            <ChevronRight className="w-4 h-4 ml-auto text-[var(--theme-accent-violet)]" />
+                            <ChevronRight className="w-4 h-4 ml-auto text-accent-violet" />
                           )}
                         </button>
                       ))}
@@ -200,20 +200,20 @@ export default function PrivacyPage() {
               {/* Hero */}
               <div className={`mb-12 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 max-w-12 bg-gradient-to-r from-transparent to-[var(--theme-accent-violet)]" />
-                  <span className="text-[10px] font-mono text-[var(--theme-accent-violet)] uppercase tracking-wider">
+                  <div className="h-px flex-1 max-w-12 bg-linear-to-r from-transparent to-accent-violet" />
+                  <span className="text-[10px] font-mono text-accent-violet uppercase tracking-wider">
                     // DATA_PROTECTION
                   </span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold font-[family-name:var(--font-family-display)] tracking-tight mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold font-family-display tracking-tight mb-4">
                   Privacy Policy
                 </h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--theme-text-muted)]">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-theme-muted">
                   <span className="font-mono">Last Updated: December 2024</span>
-                  <span className="w-1 h-1 rounded-full bg-[var(--theme-text-subtle)]" />
+                  <span className="w-1 h-1 rounded-full bg-text-subtle" />
                   <span className="font-mono">Version 1.0</span>
                 </div>
-                <p className="mt-6 text-[var(--theme-text-secondary)] leading-relaxed max-w-2xl">
+                <p className="mt-6 text-theme-secondary leading-relaxed max-w-2xl">
                   At GameHub, we are committed to protecting your privacy and ensuring the security of your personal
                   information. This Privacy Policy explains how we collect, use, and safeguard your data.
                 </p>
@@ -268,9 +268,9 @@ export default function PrivacyPage() {
                         { title: 'Security', desc: 'To detect and prevent fraud, abuse, or security incidents' },
                         { title: 'Legal Compliance', desc: 'To comply with applicable laws and regulations' },
                       ].map((item) => (
-                        <div key={item.title} className="p-4 bg-[var(--theme-hover-bg)] border border-[var(--theme-border)] rounded-lg">
-                          <h4 className="font-semibold text-[var(--theme-text-primary)] mb-1">{item.title}</h4>
-                          <p className="text-sm text-[var(--theme-text-muted)] m-0">{item.desc}</p>
+                        <div key={item.title} className="p-4 bg-theme-hover border border-theme rounded-lg">
+                          <h4 className="font-semibold text-theme-primary mb-1">{item.title}</h4>
+                          <p className="text-sm text-theme-muted m-0">{item.desc}</p>
                         </div>
                       ))}
                     </div>
@@ -294,10 +294,10 @@ export default function PrivacyPage() {
                     <div className="overflow-x-auto my-6">
                       <table className="w-full border-collapse">
                         <thead>
-                          <tr className="border-b border-[var(--theme-border)]">
-                            <th className="text-left py-3 px-4 text-sm font-mono text-[var(--theme-text-muted)]">Platform</th>
-                            <th className="text-left py-3 px-4 text-sm font-mono text-[var(--theme-text-muted)]">Data Accessed</th>
-                            <th className="text-left py-3 px-4 text-sm font-mono text-[var(--theme-text-muted)]">Auth Method</th>
+                          <tr className="border-b border-theme">
+                            <th className="text-left py-3 px-4 text-sm font-mono text-theme-muted">Platform</th>
+                            <th className="text-left py-3 px-4 text-sm font-mono text-theme-muted">Data Accessed</th>
+                            <th className="text-left py-3 px-4 text-sm font-mono text-theme-muted">Auth Method</th>
                           </tr>
                         </thead>
                         <tbody className="text-sm">
@@ -309,11 +309,11 @@ export default function PrivacyPage() {
                             { platform: 'Nintendo', data: 'Games (limited)', auth: 'API Key' },
                             { platform: 'GOG', data: 'Games, Achievements', auth: 'OAuth 2.0' },
                           ].map((row) => (
-                            <tr key={row.platform} className="border-b border-[var(--theme-border)]">
-                              <td className="py-3 px-4 font-medium text-[var(--theme-text-primary)]">{row.platform}</td>
-                              <td className="py-3 px-4 text-[var(--theme-text-secondary)]">{row.data}</td>
+                            <tr key={row.platform} className="border-b border-theme">
+                              <td className="py-3 px-4 font-medium text-theme-primary">{row.platform}</td>
+                              <td className="py-3 px-4 text-theme-secondary">{row.data}</td>
                               <td className="py-3 px-4">
-                                <span className="px-2 py-1 bg-[var(--theme-accent-cyan)]/10 text-[var(--theme-accent-cyan)] rounded text-xs font-mono">
+                                <span className="px-2 py-1 bg-accent-cyan/10 text-accent-cyan rounded text-xs font-mono">
                                   {row.auth}
                                 </span>
                               </td>
@@ -371,11 +371,11 @@ export default function PrivacyPage() {
                       ].map((item) => (
                         <div key={item.right} className="flex gap-4 items-start">
                           <div className="w-24 shrink-0">
-                            <span className="inline-block px-3 py-1 bg-[var(--theme-accent-violet)]/10 text-[var(--theme-accent-violet)] rounded-full text-xs font-mono">
+                            <span className="inline-block px-3 py-1 bg-accent-violet/10 text-accent-violet rounded-full text-xs font-mono">
                               {item.right}
                             </span>
                           </div>
-                          <p className="text-[var(--theme-text-secondary)] m-0">{item.desc}</p>
+                          <p className="text-theme-secondary m-0">{item.desc}</p>
                         </div>
                       ))}
                     </div>
@@ -465,44 +465,44 @@ export default function PrivacyPage() {
                       If you have questions, concerns, or requests regarding this Privacy Policy or our data
                       practices, please reach out to us:
                     </p>
-                    <div className="bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-6 my-6">
+                    <div className="bg-theme-secondary border border-theme rounded-xl p-6 my-6">
                       <div className="space-y-4">
                         <div className="flex items-start gap-4">
-                          <span className="text-xs font-mono text-[var(--theme-text-subtle)] w-24 shrink-0 pt-0.5">PRIVACY</span>
+                          <span className="text-xs font-mono text-theme-subtle w-24 shrink-0 pt-0.5">PRIVACY</span>
                           <div>
-                            <a href="mailto:privacy@gamehub.com" className="text-[var(--theme-accent-violet)] hover:underline">
+                            <a href="mailto:privacy@gamehub.com" className="text-accent-violet hover:underline">
                               privacy@gamehub.com
                             </a>
-                            <p className="text-sm text-[var(--theme-text-muted)] mt-1 mb-0">
+                            <p className="text-sm text-theme-muted mt-1 mb-0">
                               For privacy-specific inquiries and data requests
                             </p>
                           </div>
                         </div>
                         <div className="flex items-start gap-4">
-                          <span className="text-xs font-mono text-[var(--theme-text-subtle)] w-24 shrink-0 pt-0.5">DPO</span>
+                          <span className="text-xs font-mono text-theme-subtle w-24 shrink-0 pt-0.5">DPO</span>
                           <div>
-                            <a href="mailto:dpo@gamehub.com" className="text-[var(--theme-accent-violet)] hover:underline">
+                            <a href="mailto:dpo@gamehub.com" className="text-accent-violet hover:underline">
                               dpo@gamehub.com
                             </a>
-                            <p className="text-sm text-[var(--theme-text-muted)] mt-1 mb-0">
+                            <p className="text-sm text-theme-muted mt-1 mb-0">
                               Data Protection Officer for GDPR-related matters
                             </p>
                           </div>
                         </div>
                         <div className="flex items-start gap-4">
-                          <span className="text-xs font-mono text-[var(--theme-text-subtle)] w-24 shrink-0 pt-0.5">SUPPORT</span>
+                          <span className="text-xs font-mono text-theme-subtle w-24 shrink-0 pt-0.5">SUPPORT</span>
                           <div>
-                            <a href="mailto:support@gamehub.com" className="text-[var(--theme-accent-violet)] hover:underline">
+                            <a href="mailto:support@gamehub.com" className="text-accent-violet hover:underline">
                               support@gamehub.com
                             </a>
-                            <p className="text-sm text-[var(--theme-text-muted)] mt-1 mb-0">
+                            <p className="text-sm text-theme-muted mt-1 mb-0">
                               General support and account assistance
                             </p>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-[var(--theme-text-muted)]">
+                    <p className="text-sm text-theme-muted">
                       We aim to respond to all privacy-related inquiries within 30 days. For urgent security
                       matters, please include &quot;URGENT&quot; in your subject line.
                     </p>
@@ -511,16 +511,16 @@ export default function PrivacyPage() {
               </div>
 
               {/* Footer Navigation */}
-              <div className="mt-16 pt-8 border-t border-[var(--theme-border)]">
+              <div className="mt-16 pt-8 border-t border-theme">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <Link
                     href="/terms"
-                    className="flex items-center gap-2 text-[var(--theme-text-muted)] hover:text-[var(--theme-accent-violet)] transition-colors"
+                    className="flex items-center gap-2 text-theme-muted hover:text-accent-violet transition-colors"
                   >
                     <span>Read our Terms of Service</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
-                  <span className="text-xs font-mono text-[var(--theme-text-subtle)]">
+                  <span className="text-xs font-mono text-theme-subtle">
                     © {new Date().getFullYear()} GameHub. All rights reserved.
                   </span>
                 </div>
@@ -589,15 +589,15 @@ function SectionHeader({ number, title }: { number: string; title: string }) {
   return (
     <div className="flex items-center gap-4 mb-6">
       <div className="relative">
-        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-[var(--theme-accent-violet)]/30 flex items-center justify-center">
-          <span className="text-sm font-mono font-bold text-[var(--theme-accent-violet)]">{number}</span>
+        <div className="w-12 h-12 rounded-lg bg-linear-to-br from-violet-500/20 to-cyan-500/20 border border-accent-violet/30 flex items-center justify-center">
+          <span className="text-sm font-mono font-bold text-accent-violet">{number}</span>
         </div>
-        <div className="absolute -top-1 -left-1 w-2 h-2 border-l border-t border-[var(--theme-accent-violet)]/50" />
-        <div className="absolute -top-1 -right-1 w-2 h-2 border-r border-t border-[var(--theme-accent-violet)]/50" />
-        <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l border-b border-[var(--theme-accent-violet)]/50" />
-        <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r border-b border-[var(--theme-accent-violet)]/50" />
+        <div className="absolute -top-1 -left-1 w-2 h-2 border-l border-t border-accent-violet/50" />
+        <div className="absolute -top-1 -right-1 w-2 h-2 border-r border-t border-accent-violet/50" />
+        <div className="absolute -bottom-1 -left-1 w-2 h-2 border-l border-b border-accent-violet/50" />
+        <div className="absolute -bottom-1 -right-1 w-2 h-2 border-r border-b border-accent-violet/50" />
       </div>
-      <h2 className="text-2xl font-bold font-[family-name:var(--font-family-display)] text-[var(--theme-text-primary)]">
+      <h2 className="text-2xl font-bold font-family-display text-theme-primary">
         {title}
       </h2>
     </div>

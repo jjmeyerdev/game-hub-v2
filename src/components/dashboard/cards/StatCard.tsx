@@ -70,7 +70,7 @@ export function StatCard({ label, value, icon: Icon, change, color, delay = 0 }:
   const c = colorConfig[color];
 
   return (
-    <div className="group relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl p-6 transition-all duration-500 hover:bg-[var(--theme-bg-tertiary)] hover:border-[var(--theme-border-hover)] overflow-hidden">
+    <div className="group relative bg-theme-secondary border border-theme rounded-2xl p-6 transition-all duration-500 hover:bg-theme-tertiary hover:border-theme-hover overflow-hidden">
       {/* HUD corners on hover */}
       <div className={`absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 ${c.iconBorder.replace('/20', '/50')} opacity-0 group-hover:opacity-100 transition-opacity`} />
       <div className={`absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 ${c.iconBorder.replace('/20', '/50')} opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -104,7 +104,7 @@ export function StatCard({ label, value, icon: Icon, change, color, delay = 0 }:
       {/* Label */}
       <div className="relative flex items-center gap-2">
         <div className={`w-1 h-1 rounded-full ${c.accent}`} />
-        <span className="text-[10px] font-mono text-[var(--theme-text-muted)] uppercase tracking-wider">
+        <span className="text-[10px] font-mono text-theme-muted uppercase tracking-wider">
           {label}
         </span>
       </div>
